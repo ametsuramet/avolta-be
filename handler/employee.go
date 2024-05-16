@@ -4,13 +4,40 @@ import (
 	"avolta/database"
 	"avolta/model"
 	"avolta/util"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 func EmployeeImportHandler(c *gin.Context) {
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer file.Close()
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	rows, err := f.GetRows(f.WorkBook.Sheets.Sheet[0].Name)
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	for i, row := range rows {
+		if i < 2 {
+			continue
+		}
+		for _, colCell := range row {
+			fmt.Print(colCell, "\t")
+		}
+		fmt.Println()
+	}
 }
 func EmployeeGetAllHandler(c *gin.Context) {
 	var data []model.Employee
