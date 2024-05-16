@@ -1,0 +1,9 @@
+sample := admin.Group("/sample")
+		sample.Use()
+		{
+			sample.GET("", handler.SampleGetAllHandler)
+			sample.GET("/:id", handler.SampleGetOneHandler)
+			sample.POST("", handler.SampleCreateHandler)
+			sample.PUT("/:id", handler.SampleUpdateHandler)
+			sample.DELETE("/:id", handler.SampleDeleteHandler)
+		}

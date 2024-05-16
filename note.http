@@ -1,0 +1,40 @@
+# LOGIN
+POST http://localhost:12000/api/v1/login  
+Content-Type: application/json
+
+{
+    "email": "ametsuramet@gmail.com",
+    "password": "balakutak"
+}
+
+# GET BLOG POST
+GET http://localhost:12000/api/v1/admin/blogPost?page=1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtZXRzdXJhbWV0QGdtYWlsLmNvbSIsImV4cCI6MTcwODkxODA2NCwianRpIjoiZmJhMmI0NzUtNWU0Zi00ZTFjLWE5MjQtYjEyOGFjODBkMjZkIn0.K8CymI2KTtsCAk-p7zzy3oYQOQ29vCfBp_rw33RPWlE
+
+# CREATE BLOG POST
+POST http://localhost:12000/api/v1/admin/blogPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtZXRzdXJhbWV0QGdtYWlsLmNvbSIsImV4cCI6MTcwODkxODA2NCwianRpIjoiZmJhMmI0NzUtNWU0Zi00ZTFjLWE5MjQtYjEyOGFjODBkMjZkIn0.K8CymI2KTtsCAk-p7zzy3oYQOQ29vCfBp_rw33RPWlE
+
+{
+      "title": "test 2",
+      "content": "Ipsum aut quis nesciunt itaque commodi. Voluptatem sapiente nihil velit non accusantium. Nesciunt libero commodi placeat est atque. Sit aut aperiam tempora tenetur omnis. Adipisci ut velit et exercitationem cumque. In magni blanditiis libero fugit sit. Nobis adipisci quo similique at et. Dolores voluptas quis odio eveniet quos. Voluptas atque molestiae nemo nihil voluptatem.",
+      "category_id": "9265e9e5-289c-4d13-8f33-7521e1693ed7",
+      "published": false,
+      "is_page": false
+}
+
+
+# CREATE BLOG POST
+POST http://localhost:12000/api/v1/admin/tag
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtZXRzdXJhbWV0QGdtYWlsLmNvbSIsImV4cCI6MTcwODkxODA2NCwianRpIjoiZmJhMmI0NzUtNWU0Zi00ZTFjLWE5MjQtYjEyOGFjODBkMjZkIn0.K8CymI2KTtsCAk-p7zzy3oYQOQ29vCfBp_rw33RPWlE
+
+{
+      "name": "TEST",
+      "content": "Ipsum aut quis nesciunt itaque commodi. Voluptatem sapiente nihil velit non accusantium. Nesciunt libero commodi placeat est atque. Sit aut aperiam tempora tenetur omnis. Adipisci ut velit et exercitationem cumque. In magni blanditiis libero fugit sit. Nobis adipisci quo similique at et. Dolores voluptas quis odio eveniet quos. Voluptas atque molestiae nemo nihil voluptatem.",
+      "category_id": "9265e9e5-289c-4d13-8f33-7521e1693ed7",
+      "published": false,
+      "is_page": false
+}
