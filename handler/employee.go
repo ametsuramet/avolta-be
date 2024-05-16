@@ -9,19 +9,57 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func EmployeeImportHandler(c *gin.Context) {
+
+}
 func EmployeeGetAllHandler(c *gin.Context) {
 	var data []model.Employee
-	preloads := []string{}
+	preloads := []string{"JobTitle"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
 	paginator.Paginate(&data)
-	// search, ok := c.GetQuery("search")
-	// if ok {
-	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
-	// 		"full_name": search,
-	// 	})
-	// }
+	search, ok := c.GetQuery("search")
+	if ok {
+		paginator.Search = append(paginator.Search, map[string]interface{}{
+			"full_name": search,
+		})
+	}
+	jobTitleId, ok := c.GetQuery("job_title_id")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"job_title_id": jobTitleId,
+		})
+
+	}
+	gender, ok := c.GetQuery("gender")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"gender": gender,
+		})
+
+	}
+	ageStartDate, ok := c.GetQuery("age_start_date")
+	if ok {
+		paginator.WhereLessEqual = append(paginator.WhereLessEqual, map[string]interface{}{
+			"date_of_birth": ageStartDate,
+		})
+
+	}
+	ageEndDate, ok := c.GetQuery("age_end_date")
+	if ok {
+		paginator.WhereMoreEqual = append(paginator.WhereMoreEqual, map[string]interface{}{
+			"date_of_birth": ageEndDate,
+		})
+
+	}
+	startedWork, ok := c.GetQuery("started_work")
+	if ok {
+		paginator.WhereMoreEqual = append(paginator.WhereMoreEqual, map[string]interface{}{
+			"started_work": startedWork,
+		})
+
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

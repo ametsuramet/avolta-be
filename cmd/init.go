@@ -13,6 +13,8 @@ func Init(args []string) {
 		GenPermissions()
 	case "assign-superadmin":
 		AssignSuperadmin(args)
+	case "sample-job-title":
+		SampleJobTitle()
 	case "sample-employee":
 		SampleEmployee(args)
 	case "sample-attendance":

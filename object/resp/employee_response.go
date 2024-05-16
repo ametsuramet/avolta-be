@@ -10,7 +10,7 @@ type EmployeeReponse struct {
 	LastName                  string     `json:"last_name"`
 	Username                  string     `json:"username"`
 	Phone                     string     `json:"phone"`
-	Position                  string     `json:"position"`
+	JobTitle                  string     `json:"job_title"`
 	Grade                     string     `json:"grade"`
 	Address                   string     `json:"address"`
 	Picture                   *string    `json:"picture"`

@@ -31,6 +31,7 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Transaction{})
 	database.DB.AutoMigrate(&model.Account{})
 	database.DB.AutoMigrate(&model.Organization{})
+	database.DB.AutoMigrate(&model.JobTitle{})
 }
 
 func TestCreateUser(args []string) {
@@ -70,6 +71,14 @@ func SampleAttendance(args []string) {
 		})
 	}
 }
+func SampleJobTitle() {
+	positions := []string{"Staff", "Manager", "Leader", "Supervisor", "HRD"}
+	for _, v := range positions {
+		database.DB.Create(&model.JobTitle{
+			Name: v,
+		})
+	}
+}
 func SampleEmployee(args []string) {
 	if len(args) == 0 {
 		fmt.Println("please set number of employee")
@@ -82,17 +91,20 @@ func SampleEmployee(args []string) {
 		os.Exit(0)
 	}
 
+	jobTitles := []model.JobTitle{}
+	database.DB.Find(&jobTitles)
 	for i := 0; i < max; i++ {
 
 		rand.New(rand.NewSource(time.Now().Unix()))
 		genders := []string{"f", "m"}
 		randomIndex := rand.Intn(len(genders))
-		positions := []string{"staff", "manager", "leader", "supervisor", "hrd"}
+
 		gender := genders[randomIndex]
-		randomIndex2 := rand.Intn(len(positions))
-		position := positions[randomIndex2]
+		randomIndex2 := rand.Intn(len(jobTitles))
+		JobTitleID := jobTitles[randomIndex2].ID
 
 		startedWork, _ := time.Parse("2006-01-02", faker.Date())
+		birthDate, _ := time.Parse("2006-01-02", faker.Date())
 
 		database.DB.Create(&model.Employee{
 			Email:       faker.Email(),
@@ -101,7 +113,8 @@ func SampleEmployee(args []string) {
 			MiddleName:  faker.Word(),
 			LastName:    faker.LastName(),
 			Phone:       faker.Phonenumber(),
-			Position:    position,
+			JobTitleID:  &JobTitleID,
+			DateOfBirth: &birthDate,
 			StartedWork: &startedWork,
 		})
 	}

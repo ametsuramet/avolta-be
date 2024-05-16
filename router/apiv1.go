@@ -70,6 +70,7 @@ func SetupRouter() *gin.Engine {
 		employee.Use(middleware.AdminMiddleware())
 		{
 			employee.GET("", handler.EmployeeGetAllHandler)
+			employee.POST("/import", handler.EmployeeImportHandler)
 			employee.GET("/:id", handler.EmployeeGetOneHandler)
 			employee.POST("", handler.EmployeeCreateHandler)
 			employee.PUT("/:id", handler.EmployeeUpdateHandler)
@@ -164,6 +165,16 @@ func SetupRouter() *gin.Engine {
 			organization.POST("", handler.OrganizationCreateHandler)
 			organization.PUT("/:id", handler.OrganizationUpdateHandler)
 			organization.DELETE("/:id", handler.OrganizationDeleteHandler)
+		}
+
+		jobTitle := admin.Group("/jobTitle")
+		jobTitle.Use()
+		{
+			jobTitle.GET("", handler.JobTitleGetAllHandler)
+			jobTitle.GET("/:id", handler.JobTitleGetOneHandler)
+			jobTitle.POST("", handler.JobTitleCreateHandler)
+			jobTitle.PUT("/:id", handler.JobTitleUpdateHandler)
+			jobTitle.DELETE("/:id", handler.JobTitleDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

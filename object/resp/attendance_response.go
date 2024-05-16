@@ -15,6 +15,6 @@ type AttendanceReponse struct {
 	ClockOutLng      float64    `json:"clock_out_lng"`
 	EmployeeID       *string    `json:"employee_id"`
 	EmployeeName     string     `json:"employee_name"`
-	EmployeePosition string     `json:"employee_position"`
+	EmployeeJobTitle string     `json:"employee_job_title"`
 	EmployeePicture  *string    `json:"employee_picture"`
 }

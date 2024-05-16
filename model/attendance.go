@@ -44,7 +44,7 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 		ClockOutLng:      m.ClockOutLng,
 		EmployeeName:     m.Employee.FullName,
 		EmployeeID:       m.EmployeeID,
-		EmployeePosition: m.Employee.Position,
+		EmployeeJobTitle: m.Employee.JobTitle.Name,
 		EmployeePicture:  m.Employee.Picture,
 	})
 }
