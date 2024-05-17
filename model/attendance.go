@@ -31,6 +31,10 @@ func (u *Attendance) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Attendance) MarshalJSON() ([]byte, error) {
+	var employeePicture *string
+	if employeePicture = &m.Employee.Picture.String; !m.Employee.Picture.Valid {
+		employeePicture = nil
+	}
 	return json.Marshal(resp.AttendanceReponse{
 		ClockIn:          m.ClockIn,
 		ClockOut:         m.ClockOut,
@@ -45,6 +49,6 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 		EmployeeName:     m.Employee.FullName,
 		EmployeeID:       m.EmployeeID,
 		EmployeeJobTitle: m.Employee.JobTitle.Name,
-		EmployeePicture:  m.Employee.Picture,
+		EmployeePicture:  employeePicture,
 	})
 }

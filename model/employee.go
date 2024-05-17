@@ -19,14 +19,14 @@ type Employee struct {
 	LastName                  string
 	Username                  string
 	Phone                     string
-	JobTitleID                *string
+	JobTitleID                sql.NullString
 	JobTitle                  JobTitle `gorm:"foreignKey:JobTitleID"`
 	Grade                     string
 	Address                   string
-	Picture                   *string
+	Picture                   sql.NullString
 	Cover                     string
-	StartedWork               *time.Time
-	DateOfBirth               *time.Time
+	StartedWork               sql.NullTime
+	DateOfBirth               sql.NullTime
 	EmployeeIdentityNumber    string
 	FullName                  string
 	ConnectedTo               sql.NullString
@@ -41,18 +41,39 @@ type Employee struct {
 	Gender                    string
 	Attendance                []Attendance `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Organization              Organization `gorm:"foreignKey:OrganizationID"`
-	OrganizationID            *string
+	OrganizationID            sql.NullString
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
 	tx.Statement.SetColumn("id", uuid.New().String())
-	names := []string{u.FirstName, u.MiddleName, u.LastName}
-	tx.Statement.SetColumn("full_name", strings.Join(names, " "))
-
+	if u.FullName == "" {
+		names := []string{u.FirstName, u.MiddleName, u.LastName}
+		tx.Statement.SetColumn("full_name", strings.Join(names, " "))
+	} else {
+		splitName := strings.Split(u.FullName, " ")
+		tx.Statement.SetColumn("first_name", splitName[0])
+		if len(splitName) > 1 {
+			tx.Statement.SetColumn("middle_name", splitName[1])
+		}
+		if len(splitName) > 2 {
+			tx.Statement.SetColumn("last_name", splitName[2])
+		}
+	}
 	return
 }
 
 func (m Employee) MarshalJSON() ([]byte, error) {
+	var picture *string
+	var dateOfBirth, startedWork *time.Time
+	if picture = &m.Picture.String; !m.Picture.Valid {
+		picture = nil
+	}
+	if dateOfBirth = &m.DateOfBirth.Time; !m.DateOfBirth.Valid {
+		dateOfBirth = nil
+	}
+	if startedWork = &m.StartedWork.Time; !m.StartedWork.Valid {
+		startedWork = nil
+	}
 
 	return json.Marshal(resp.EmployeeReponse{
 		ID:                        m.ID,
@@ -65,9 +86,9 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		JobTitle:                  m.JobTitle.Name,
 		Grade:                     m.Grade,
 		Address:                   m.Address,
-		Picture:                   m.Picture,
+		Picture:                   picture,
 		Cover:                     m.Cover,
-		DateOfBirth:               m.DateOfBirth,
+		DateOfBirth:               dateOfBirth,
 		EmployeeIdentityNumber:    m.EmployeeIdentityNumber,
 		FullName:                  m.FullName,
 		BasicSalary:               m.BasicSalary,
@@ -78,6 +99,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		TaxPayerNumber:            m.TaxPayerNumber,
 		Gender:                    m.Gender,
 		OrganizationName:          m.Organization.Name,
-		StartedWork:               m.StartedWork,
+		StartedWork:               startedWork,
 	})
 }

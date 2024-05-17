@@ -102,9 +102,14 @@ func SampleEmployee(args []string) {
 		gender := genders[randomIndex]
 		randomIndex2 := rand.Intn(len(jobTitles))
 		JobTitleID := jobTitles[randomIndex2].ID
+		var startedWork, birthDate time.Time
+		if startedWork, err = time.Parse("2006-01-02", faker.Date()); err != nil {
+			startedWork = time.Time{}
+		}
 
-		startedWork, _ := time.Parse("2006-01-02", faker.Date())
-		birthDate, _ := time.Parse("2006-01-02", faker.Date())
+		if birthDate, err = time.Parse("2006-01-02", faker.Date()); err != nil {
+			birthDate = time.Time{}
+		}
 
 		database.DB.Create(&model.Employee{
 			Email:       faker.Email(),
@@ -113,9 +118,9 @@ func SampleEmployee(args []string) {
 			MiddleName:  faker.Word(),
 			LastName:    faker.LastName(),
 			Phone:       faker.Phonenumber(),
-			JobTitleID:  &JobTitleID,
-			DateOfBirth: &birthDate,
-			StartedWork: &startedWork,
+			JobTitleID:  model.NullStringConv(JobTitleID),
+			DateOfBirth: model.NullTimeConv(birthDate),
+			StartedWork: model.NullTimeConv(startedWork),
 		})
 	}
 }
