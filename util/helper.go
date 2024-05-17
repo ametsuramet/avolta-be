@@ -2,7 +2,9 @@ package util
 
 import (
 	"avolta/config"
+	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -24,4 +26,14 @@ func IntToLetters(number int32) (letters string) {
 	}
 
 	return
+}
+
+func LogJson(data interface{}) {
+	jsonString, _ := json.MarshalIndent(data, "", "  ")
+	fmt.Println(string(jsonString))
+}
+
+func SaveLogJson(data interface{}) {
+	jsonString, _ := json.MarshalIndent(data, "", "  ")
+	log.Println(string(jsonString))
 }

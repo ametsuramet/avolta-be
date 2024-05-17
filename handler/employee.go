@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -152,7 +153,7 @@ func EmployeeGetAllHandler(c *gin.Context) {
 		xls := excelize.NewFile()
 		xlsStyle := constants.NewExcelStyle(xls)
 		xls.SetSheetName(xls.GetSheetName(0), sheet1Name)
-		headers := []string{"No", "Nama Karyawan", "NIP", "Jabatan", "Telp", "Email", "Alamat", "Jenis Kelamin", "Mulai Bekerja"}
+		headers := []string{"No", "Nama Karyawan", "NIK", "Jabatan", "Telp", "Email", "Alamat", "Jenis Kelamin", "Mulai Bekerja"}
 		headerStyle := []int{xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter}
 		headerWidth := []float64{7, 25, 15, 15, 15, 20, 30, 15, 15}
 		for j, v := range headers {
@@ -212,7 +213,7 @@ func EmployeeGetOneHandler(c *gin.Context) {
 func EmployeeCreateHandler(c *gin.Context) {
 	var data model.Employee
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindWith(&data, binding.JSON); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -221,6 +222,8 @@ func EmployeeCreateHandler(c *gin.Context) {
 	// user := getUser.(model.User)
 
 	// data.AuthorID = user.ID
+
+	util.LogJson(data)
 
 	if err := database.DB.Create(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

@@ -11,9 +11,11 @@ type EmployeeReponse struct {
 	Username                  string     `json:"username"`
 	Phone                     string     `json:"phone"`
 	JobTitle                  string     `json:"job_title"`
+	JobTitleID                string     `json:"job_title_id"`
 	Grade                     string     `json:"grade"`
 	Address                   string     `json:"address"`
 	Picture                   *string    `json:"picture"`
+	PictureUrl                string     `json:"picture_url"`
 	Cover                     string     `json:"cover"`
 	DateOfBirth               *time.Time `json:"date_of_birth"`
 	EmployeeIdentityNumber    string     `json:"employee_identity_number"`

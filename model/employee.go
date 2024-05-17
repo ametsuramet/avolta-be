@@ -1,9 +1,11 @@
 package model
 
 import (
+	"avolta/config"
 	"avolta/object/resp"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,35 +15,35 @@ import (
 
 type Employee struct {
 	Base
-	Email                     string
-	FirstName                 string
-	MiddleName                string
-	LastName                  string
-	Username                  string
-	Phone                     string
-	JobTitleID                sql.NullString
-	JobTitle                  JobTitle `gorm:"foreignKey:JobTitleID"`
-	Grade                     string
-	Address                   string
-	Picture                   sql.NullString
-	Cover                     string
-	StartedWork               sql.NullTime
-	DateOfBirth               sql.NullTime
-	EmployeeIdentityNumber    string
-	FullName                  string
-	ConnectedTo               sql.NullString
-	Flag                      bool
-	BasicSalary               float64
-	PositionalAllowance       float64
-	TransportAllowance        float64
-	MealAllowance             float64
-	NonTaxableIncomeLevelCode string
-	PayRolls                  []PayRoll
-	TaxPayerNumber            string
-	Gender                    string
-	Attendance                []Attendance `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Organization              Organization `gorm:"foreignKey:OrganizationID"`
-	OrganizationID            sql.NullString
+	Email                     string         `json:"email"`
+	FirstName                 string         `json:"first_name"`
+	MiddleName                string         `json:"middle_name"`
+	LastName                  string         `json:"last_name"`
+	Username                  string         `json:"username"`
+	Phone                     string         `json:"phone"`
+	JobTitleID                sql.NullString `json:"job_title_id"`
+	JobTitle                  JobTitle       `gorm:"foreignKey:JobTitleID"`
+	Grade                     string         `json:"grade"`
+	Address                   string         `json:"address"`
+	Picture                   sql.NullString `json:"picture"`
+	Cover                     string         `json:"cover"`
+	StartedWork               sql.NullTime   `json:"started_work"`
+	DateOfBirth               sql.NullTime   `json:"date_of_birth"`
+	EmployeeIdentityNumber    string         `json:"employee_identity_number"`
+	FullName                  string         `json:"full_name"`
+	ConnectedTo               sql.NullString `json:"connected_to"`
+	Flag                      bool           `json:"flag"`
+	BasicSalary               float64        `json:"basic_salary"`
+	PositionalAllowance       float64        `json:"positional_allowance"`
+	TransportAllowance        float64        `json:"transport_allowance"`
+	MealAllowance             float64        `json:"meal_allowance"`
+	NonTaxableIncomeLevelCode string         `json:"non_taxable_income_level_code"`
+	PayRolls                  []PayRoll      `json:"pay_rolls"`
+	TaxPayerNumber            string         `json:"tax_payer_number"`
+	Gender                    string         `json:"gender"`
+	Attendance                []Attendance   `json:"attendance" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Organization              Organization   `gorm:"foreignKey:OrganizationID"`
+	OrganizationID            sql.NullString `json:"organization_id"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -74,6 +76,10 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 	if startedWork = &m.StartedWork.Time; !m.StartedWork.Valid {
 		startedWork = nil
 	}
+	var pictureUrl string
+	if m.Picture.Valid {
+		pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Picture.String)
+	}
 
 	return json.Marshal(resp.EmployeeReponse{
 		ID:                        m.ID,
@@ -84,6 +90,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		Username:                  m.Username,
 		Phone:                     m.Phone,
 		JobTitle:                  m.JobTitle.Name,
+		JobTitleID:                m.JobTitleID.String,
 		Grade:                     m.Grade,
 		Address:                   m.Address,
 		Picture:                   picture,
@@ -100,5 +107,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		Gender:                    m.Gender,
 		OrganizationName:          m.Organization.Name,
 		StartedWork:               startedWork,
+		PictureUrl:                pictureUrl,
 	})
 }
