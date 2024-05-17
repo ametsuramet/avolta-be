@@ -4,6 +4,7 @@ import (
 	"avolta/config"
 	"avolta/model"
 	"avolta/object/auth"
+	"avolta/util"
 	"fmt"
 	"net/http"
 	"strings"
@@ -63,5 +64,25 @@ func AdminMiddleware() gin.HandlerFunc {
 		user.GetPermissions()
 		c.Set("permissions", user.Permissions)
 		c.Next()
+	}
+}
+func PermissionMiddleware(userPermission string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		getPermissions, _ := c.Get("permissions")
+		permissions := getPermissions.([]string)
+		getUser, _ := c.Get("user")
+		user := getUser.(model.User)
+		user.GetPermissions()
+		if user.Role.IsSuperAdmin {
+			c.Next()
+			return
+		}
+
+		if util.Contains(permissions, userPermission) {
+			c.Next()
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "no " + userPermission + " permission exists"})
+		c.Abort()
 	}
 }

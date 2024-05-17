@@ -37,3 +37,12 @@ func SaveLogJson(data interface{}) {
 	jsonString, _ := json.MarshalIndent(data, "", "  ")
 	log.Println(string(jsonString))
 }
+
+func Contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}

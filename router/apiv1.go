@@ -13,7 +13,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"http://localhost:3033"},
+		AllowOrigins:  []string{"http://localhost:3033", "https://avolta.web.app"},
 		AllowMethods:  []string{"PUT", "PATCH", "GET", "POST", "DELETE", "HEAD"},
 		AllowHeaders:  []string{"Origin", "Authorization", "Content-Length", "Content-Type", "Access-Control-Allow-Origin", "API-KEY", "Currency-Code", "Cache-Control", "X-Requested-With", "Content-Disposition", "Content-Description"},
 		ExposeHeaders: []string{"Content-Length", "Content-Disposition", "Content-Description"},
@@ -69,12 +69,12 @@ func SetupRouter() *gin.Engine {
 		employee := admin.Group("/employee")
 		employee.Use(middleware.AdminMiddleware())
 		{
-			employee.GET("", handler.EmployeeGetAllHandler)
-			employee.POST("/import", handler.EmployeeImportHandler)
-			employee.GET("/:id", handler.EmployeeGetOneHandler)
-			employee.POST("", handler.EmployeeCreateHandler)
-			employee.PUT("/:id", handler.EmployeeUpdateHandler)
-			employee.DELETE("/:id", handler.EmployeeDeleteHandler)
+			employee.GET("", middleware.PermissionMiddleware("read_employee"), handler.EmployeeGetAllHandler)
+			employee.POST("/import", middleware.PermissionMiddleware("create_employee"), handler.EmployeeImportHandler)
+			employee.GET("/:id", middleware.PermissionMiddleware("read_employee"), handler.EmployeeGetOneHandler)
+			employee.POST("", middleware.PermissionMiddleware("create_employee"), handler.EmployeeCreateHandler)
+			employee.PUT("/:id", middleware.PermissionMiddleware("update_employee"), handler.EmployeeUpdateHandler)
+			employee.DELETE("/:id", middleware.PermissionMiddleware("delete_employee"), handler.EmployeeDeleteHandler)
 		}
 
 		payRoll := admin.Group("/payRoll")

@@ -1,8 +1,10 @@
 package model
 
 import (
+	"avolta/config"
 	"avolta/object/resp"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,10 +33,11 @@ func (u *Attendance) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Attendance) MarshalJSON() ([]byte, error) {
-	var employeePicture *string
-	if employeePicture = &m.Employee.Picture.String; !m.Employee.Picture.Valid {
-		employeePicture = nil
+	var employeePicture string
+	if m.Employee.Picture.Valid {
+		employeePicture = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Employee.Picture.String)
 	}
+
 	return json.Marshal(resp.AttendanceReponse{
 		ClockIn:          m.ClockIn,
 		ClockOut:         m.ClockOut,
@@ -49,6 +52,6 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 		EmployeeName:     m.Employee.FullName,
 		EmployeeID:       m.EmployeeID,
 		EmployeeJobTitle: m.Employee.JobTitle.Name,
-		EmployeePicture:  employeePicture,
+		EmployeePicture:  &employeePicture,
 	})
 }

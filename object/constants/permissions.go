@@ -11,6 +11,7 @@ func DefaultPermission(search string) []model.Permission {
 
 	var features = []map[string]interface{}{
 		{"name": "account", "is_default": true, "is_active": true},
+		{"name": "attendance", "is_default": true, "is_active": true},
 		{"name": "employee", "is_default": true, "is_active": true},
 		{"name": "transaction", "is_default": true, "is_active": true},
 		{"name": "incentive", "is_default": true, "is_active": true},
