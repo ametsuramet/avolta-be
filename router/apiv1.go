@@ -182,6 +182,8 @@ func SetupRouter() *gin.Engine {
 		{
 			schedule.GET("", handler.ScheduleGetAllHandler)
 			schedule.GET("/:id", handler.ScheduleGetOneHandler)
+			schedule.PUT("/:id/AddEmployee", handler.ScheduleAddEmployeeHandler)
+			schedule.DELETE("/:id/DeleteEmployee/:employeeId", handler.ScheduleDeleteEmployeeHandler)
 			schedule.POST("", handler.ScheduleCreateHandler)
 			schedule.PUT("/:id", handler.ScheduleUpdateHandler)
 			schedule.DELETE("/:id", handler.ScheduleDeleteHandler)

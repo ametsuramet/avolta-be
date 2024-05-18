@@ -45,13 +45,54 @@ func ScheduleGetOneHandler(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Employees").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	util.ResponseSuccess(c, "Data Schedule Retrived", data, nil)
 }
 
+func ScheduleAddEmployeeHandler(c *gin.Context) {
+	input := struct {
+		EmployeeID string `json:"employee_id"`
+	}{}
+	var data model.Schedule
+	id := c.Params.ByName("id")
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	employee := model.Employee{}
+	database.DB.Find(&employee, "id = ?", input.EmployeeID)
+	database.DB.Model(&data).Association("Employees").Append(&employee)
+
+	util.ResponseSuccess(c, "Data Schedule Updated", nil, nil)
+
+}
+func ScheduleDeleteEmployeeHandler(c *gin.Context) {
+
+	var data model.Schedule
+	id := c.Params.ByName("id")
+	employeeId := c.Params.ByName("employeeId")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	employee := model.Employee{}
+	database.DB.Find(&employee, "id = ?", employeeId)
+	database.DB.Model(&data).Association("Employees").Delete(&employee)
+
+	util.ResponseSuccess(c, "Data Schedule Updated", nil, nil)
+
+}
 func ScheduleCreateHandler(c *gin.Context) {
 	var data model.Schedule
 
@@ -59,11 +100,6 @@ func ScheduleCreateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	// getUser, _ := c.Get("user")
-	// user := getUser.(model.User)
-
-	// data.AuthorID = user.ID
 
 	if err := database.DB.Create(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
