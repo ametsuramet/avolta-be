@@ -11,6 +11,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/TigorLazuardi/tanggal v1.0.0 // indirect
 	github.com/bxcodec/faker v2.0.1+incompatible // indirect
 	github.com/bxcodec/faker/v3 v3.8.1 // indirect
 	github.com/bxcodec/faker/v4 v4.0.0-beta.3 // indirect

@@ -44,10 +44,14 @@ type Employee struct {
 	Attendance                []Attendance   `json:"attendance" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Organization              Organization   `gorm:"foreignKey:OrganizationID"`
 	OrganizationID            sql.NullString `json:"organization_id"`
+	WorkingType               string         `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
+	Schedule                  []*Schedule    `json:"-" gorm:"many2many:schedule_employees;"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	if u.FullName == "" {
 		names := []string{u.FirstName, u.MiddleName, u.LastName}
 		tx.Statement.SetColumn("full_name", strings.Join(names, " "))

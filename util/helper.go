@@ -46,3 +46,14 @@ func Contains(s []string, e string) bool {
 	}
 	return false
 }
+
+func GetDates(startDate, endDate time.Time) []time.Time {
+	dates := []time.Time{}
+	currentDate := startDate
+
+	for currentDate.Before(endDate.AddDate(0, 0, 1)) {
+		dates = append(dates, currentDate)
+		currentDate = currentDate.AddDate(0, 0, 1)
+	}
+	return dates
+}

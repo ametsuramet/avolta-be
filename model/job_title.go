@@ -10,7 +10,8 @@ import (
 
 type JobTitle struct {
 	Base
-	Name string
+	Name        string
+	Description string
 }
 
 func (u *JobTitle) BeforeCreate(tx *gorm.DB) (err error) {
@@ -20,7 +21,8 @@ func (u *JobTitle) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (m JobTitle) MarshalJSON() ([]byte, error) {
 	return json.Marshal(resp.JobTitleReponse{
-		ID:   m.ID,
-		Name: m.Name,
+		ID:          m.ID,
+		Name:        m.Name,
+		Description: m.Description,
 	})
 }

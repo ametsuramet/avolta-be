@@ -11,6 +11,8 @@ func DefaultPermission(search string) []model.Permission {
 
 	var features = []map[string]interface{}{
 		{"name": "account", "is_default": true, "is_active": true},
+		{"name": "schedule", "is_default": true, "is_active": true},
+		{"name": "job_title", "is_default": true, "is_active": true},
 		{"name": "attendance", "is_default": true, "is_active": true},
 		{"name": "employee", "is_default": true, "is_active": true},
 		{"name": "transaction", "is_default": true, "is_active": true},
@@ -28,6 +30,16 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "cash_flow", "is_default": true, "is_active": true},
 	}
 	var menus = []map[string]interface{}{
+		{"name": "dashboard", "is_default": true, "is_active": true},
+		{"name": "employee", "is_default": true, "is_active": true},
+		{"name": "attendance", "is_default": true, "is_active": true},
+		{"name": "leave", "is_default": true, "is_active": true},
+		{"name": "role", "is_default": true, "is_active": true},
+		{"name": "pay_roll", "is_default": true, "is_active": true},
+		{"name": "company", "is_default": true, "is_active": true},
+		{"name": "report", "is_default": true, "is_active": true},
+	}
+	var imports = []map[string]interface{}{
 		{"name": "dashboard", "is_default": true, "is_active": true},
 		{"name": "employee", "is_default": true, "is_active": true},
 		{"name": "attendance", "is_default": true, "is_active": true},
@@ -86,6 +98,20 @@ func DefaultPermission(search string) []model.Permission {
 			IsDefault: menu["is_default"].(bool),
 			IsActive:  menu["is_active"].(bool),
 			Group:     "menu",
+		})
+	}
+	for _, importDoc := range imports {
+		var split = strings.Split(importDoc["name"].(string), "_")
+		for i, _ := range split {
+			split[i] = strings.Title(split[i])
+		}
+		var title = strings.Join(split, " ")
+		permissions = append(permissions, model.Permission{
+			Name:      "Import " + title,
+			Key:       "import_" + importDoc["name"].(string),
+			IsDefault: importDoc["is_default"].(bool),
+			IsActive:  importDoc["is_active"].(bool),
+			Group:     "import",
 		})
 	}
 

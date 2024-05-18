@@ -255,10 +255,6 @@ func EmployeeDeleteHandler(c *gin.Context) {
 	var input, data model.Employee
 	id := c.Params.ByName("id")
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
-	}
 	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return

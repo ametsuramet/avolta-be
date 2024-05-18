@@ -12,12 +12,15 @@ import (
 )
 
 type Paginator struct {
+	DB             *gorm.DB
 	Ctx            *gin.Context
 	OrderBy        []string
 	Page           string
 	PerPage        string
 	Search         []map[string]interface{}
 	Where          []map[string]interface{}
+	WhereOr        []map[string]interface{}
+	WhereQuery     []map[string][]interface{}
 	Joins          []map[string]interface{}
 	WhereNotNull   []string
 	WhereNull      []string
@@ -42,6 +45,15 @@ type DataPaginator struct {
 	Prev         int64       `json:"prev"`
 }
 
+// func (p *Paginator) WhereQuery(query interface{}, args ...interface{}) *gorm.DB {
+// 	fmt.Println("Execute WhereQuery")
+// 	db := p.DB
+// 	db = db.Where(query, args...)
+// 	p.DB = db
+
+// 	return db
+// }
+
 func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 	done := make(chan bool, 1)
 	if p.Ctx == nil {
@@ -64,6 +76,7 @@ func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 	offset := (page - 1) * limit
 
 	db := database.DB
+	p.DB = db
 
 	for _, o := range p.OrderBy {
 		db = db.Order(o)
@@ -126,6 +139,12 @@ func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 	}
 	for _, preload := range p.Preloads {
 		db = db.Preload(preload)
+	}
+	for _, query := range p.WhereQuery {
+		for key, value := range query {
+			db = db.Where(key, value...)
+		}
+		// db = db.Preload(preload)
 	}
 
 	var searchQuery []string

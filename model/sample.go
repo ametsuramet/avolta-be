@@ -14,7 +14,9 @@ type Sample struct {
 }
 
 func (u *Sample) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	return
 }
 

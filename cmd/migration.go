@@ -15,6 +15,7 @@ import (
 )
 
 func Migrate() {
+	fmt.Println("START TO MIGRATE")
 	database.DB.AutoMigrate(&model.User{})
 	database.DB.AutoMigrate(&model.Employee{})
 	database.DB.AutoMigrate(&model.PayRoll{})
@@ -32,6 +33,9 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Account{})
 	database.DB.AutoMigrate(&model.Organization{})
 	database.DB.AutoMigrate(&model.JobTitle{})
+	database.DB.AutoMigrate(&model.Schedule{})
+
+	fmt.Println("FINISHED  MIGRATE")
 }
 
 func TestCreateUser(args []string) {
@@ -60,8 +64,16 @@ func SampleAttendance(args []string) {
 	for i := 0; i < max; i++ {
 		rand.New(rand.NewSource(time.Now().Unix()))
 		index := rand.Intn(len(employees))
-		clockin, _ := time.Parse("2006-01-02 15:04:05", "2024-05-15 "+faker.TimeString())
-		clockout, _ := time.Parse("2006-01-02 15:04:05", "2024-05-15 "+faker.TimeString())
+		min := 00
+		max := 60
+		hourMin := 1
+		hourMax := 9
+		dateMin := 1
+		dateMax := 15
+		g := fmt.Sprintf("%02d", rand.Intn(dateMax-dateMin)+dateMin)
+
+		clockin, _ := time.Parse("2006-01-02 15:04:05", "2024-05-"+g+" "+faker.TimeString())
+		clockout := clockin.Add(time.Hour*time.Duration(rand.Intn(hourMax-hourMin)+hourMin) + time.Minute*time.Duration(rand.Intn(max-min)+min))
 		database.DB.Create(&model.Attendance{
 			EmployeeID:    &employees[index].ID,
 			ClockIn:       clockin,

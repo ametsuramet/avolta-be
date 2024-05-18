@@ -24,7 +24,10 @@ type Attendance struct {
 	ClockOutLat     float64 `gorm:"type:DECIMAL(10,8)"`
 	ClockOutLng     float64 `gorm:"type:DECIMAL(11,8)"`
 	EmployeeID      *string
-	Employee        Employee `gorm:"foreignKey:EmployeeID"`
+	Employee        Employee  `gorm:"foreignKey:EmployeeID"`
+	BreakStart      *TimeOnly `gorm:"type:TIME"`
+	BreakEnd        *TimeOnly `gorm:"type:TIME"`
+	Overtime        *TimeOnly `gorm:"type:TIME"`
 }
 
 func (u *Attendance) BeforeCreate(tx *gorm.DB) (err error) {
@@ -39,19 +42,20 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(resp.AttendanceReponse{
-		ClockIn:          m.ClockIn,
-		ClockOut:         m.ClockOut,
-		ClockInNotes:     m.ClockInNotes,
-		ClockOutNotes:    m.ClockOutNotes,
-		ClockInPicture:   m.ClockInPicture,
-		ClockOutPicture:  m.ClockOutPicture,
-		ClockInLat:       m.ClockInLat,
-		ClockInLng:       m.ClockInLng,
-		ClockOutLat:      m.ClockOutLat,
-		ClockOutLng:      m.ClockOutLng,
-		EmployeeName:     m.Employee.FullName,
-		EmployeeID:       m.EmployeeID,
-		EmployeeJobTitle: m.Employee.JobTitle.Name,
-		EmployeePicture:  &employeePicture,
+		ClockIn:                m.ClockIn,
+		ClockOut:               m.ClockOut,
+		ClockInNotes:           m.ClockInNotes,
+		ClockOutNotes:          m.ClockOutNotes,
+		ClockInPicture:         m.ClockInPicture,
+		ClockOutPicture:        m.ClockOutPicture,
+		ClockInLat:             m.ClockInLat,
+		ClockInLng:             m.ClockInLng,
+		ClockOutLat:            m.ClockOutLat,
+		ClockOutLng:            m.ClockOutLng,
+		EmployeeName:           m.Employee.FullName,
+		EmployeeID:             m.EmployeeID,
+		EmployeeJobTitle:       m.Employee.JobTitle.Name,
+		EmployeePicture:        &employeePicture,
+		EmployeeIdentityNumber: m.Employee.EmployeeIdentityNumber,
 	})
 }

@@ -177,6 +177,16 @@ func SetupRouter() *gin.Engine {
 			jobTitle.DELETE("/:id", handler.JobTitleDeleteHandler)
 		}
 
+		schedule := admin.Group("/schedule")
+		schedule.Use()
+		{
+			schedule.GET("", handler.ScheduleGetAllHandler)
+			schedule.GET("/:id", handler.ScheduleGetOneHandler)
+			schedule.POST("", handler.ScheduleCreateHandler)
+			schedule.PUT("/:id", handler.ScheduleUpdateHandler)
+			schedule.DELETE("/:id", handler.ScheduleDeleteHandler)
+		}
+
 		// DONT REMOVE THIS LINE
 
 	}

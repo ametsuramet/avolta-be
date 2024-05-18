@@ -5,13 +5,14 @@ import (
 	"avolta/model"
 	"avolta/util"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func JobTitleGetAllHandler(c *gin.Context) {
-	var data []model.JobTitle
-	preloads := []string{}
+func ScheduleGetAllHandler(c *gin.Context) {
+	var data []model.Schedule
+	preloads := []string{"Employees"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
@@ -22,17 +23,25 @@ func JobTitleGetAllHandler(c *gin.Context) {
 	// 		"full_name": search,
 	// 	})
 	// }
+	dateRange, ok := c.GetQuery("date_range")
+	if ok {
+		split := strings.Split(dateRange, ",")
+
+		paginator.WhereQuery = append(paginator.WhereQuery, map[string][]interface{}{
+			"(start_date >= ? and start_date <= ?) OR (schedule_type = 'WEEKLY')": {split[0], split[1]},
+		})
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	util.ResponsePaginatorSuccess(c, "Data List JobTitle Retrived", dataRecords.Records, dataRecords)
+	util.ResponsePaginatorSuccess(c, "Data List Schedule Retrived", dataRecords.Records, dataRecords)
 }
 
-func JobTitleGetOneHandler(c *gin.Context) {
-	var data model.JobTitle
+func ScheduleGetOneHandler(c *gin.Context) {
+	var data model.Schedule
 
 	id := c.Params.ByName("id")
 
@@ -40,11 +49,11 @@ func JobTitleGetOneHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data JobTitle Retrived", data, nil)
+	util.ResponseSuccess(c, "Data Schedule Retrived", data, nil)
 }
 
-func JobTitleCreateHandler(c *gin.Context) {
-	var data model.JobTitle
+func ScheduleCreateHandler(c *gin.Context) {
+	var data model.Schedule
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -60,11 +69,18 @@ func JobTitleCreateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data JobTitle Created", gin.H{"last_id": data.ID}, nil)
+	employees := []model.Employee{}
+	for _, v := range data.EmployeeIDs {
+		employee := model.Employee{}
+		database.DB.Find(&employee, "id = ?", v)
+		employees = append(employees, employee)
+	}
+	database.DB.Model(&data).Association("Employees").Append(employees)
+	util.ResponseSuccess(c, "Data Schedule Created", gin.H{"last_id": data.ID}, nil)
 }
 
-func JobTitleUpdateHandler(c *gin.Context) {
-	var input, data model.JobTitle
+func ScheduleUpdateHandler(c *gin.Context) {
+	var input, data model.Schedule
 	id := c.Params.ByName("id")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -79,11 +95,11 @@ func JobTitleUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data JobTitle Updated", nil, nil)
+	util.ResponseSuccess(c, "Data Schedule Updated", nil, nil)
 }
 
-func JobTitleDeleteHandler(c *gin.Context) {
-	var input, data model.JobTitle
+func ScheduleDeleteHandler(c *gin.Context) {
+	var input, data model.Schedule
 	id := c.Params.ByName("id")
 
 	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
@@ -94,5 +110,5 @@ func JobTitleDeleteHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data JobTitle Deleted", nil, nil)
+	util.ResponseSuccess(c, "Data Schedule Deleted", nil, nil)
 }
