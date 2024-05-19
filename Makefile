@@ -4,6 +4,5 @@ build:
 
 deploy-staging:build
 	rsync -a avolta ametory@103.172.205.9:/home/ametory/araya -v --stats --progress
-	ssh ametory@103.172.205.9 "source ~/.profile && cd araya && ./avolta &"
 
 

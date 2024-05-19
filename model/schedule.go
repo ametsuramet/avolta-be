@@ -21,6 +21,13 @@ type Schedule struct {
 	StartTime    *TimeOnly  `json:"start_time" gorm:"type:TIME"`
 	EndTime      *TimeOnly  `json:"end_time" gorm:"type:TIME"`
 	Employees    []Employee `json:"-" gorm:"many2many:schedule_employees;"`
+	Sunday       bool       `json:"sunday"`
+	Monday       bool       `json:"monday"`
+	Tuesday      bool       `json:"tuesday"`
+	Wednesday    bool       `json:"wednesday"`
+	Thursday     bool       `json:"thursday"`
+	Friday       bool       `json:"friday"`
+	Saturday     bool       `json:"saturday"`
 	EmployeeIDs  []string   `json:"employee_ids" gorm:"-"`
 }
 
@@ -108,5 +115,12 @@ func (m Schedule) MarshalJSON() ([]byte, error) {
 		StartTime:    startTime,
 		EndTime:      endTime,
 		Employees:    employees,
+		Sunday:       m.Sunday,
+		Monday:       m.Monday,
+		Tuesday:      m.Tuesday,
+		Wednesday:    m.Wednesday,
+		Thursday:     m.Thursday,
+		Friday:       m.Friday,
+		Saturday:     m.Saturday,
 	})
 }

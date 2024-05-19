@@ -70,7 +70,7 @@ func SetupRouter() *gin.Engine {
 		employee.Use(middleware.AdminMiddleware())
 		{
 			employee.GET("", middleware.PermissionMiddleware("read_employee"), handler.EmployeeGetAllHandler)
-			employee.POST("/import", middleware.PermissionMiddleware("create_employee"), handler.EmployeeImportHandler)
+			employee.POST("/import", middleware.PermissionMiddleware("import_employee"), handler.EmployeeImportHandler)
 			employee.GET("/:id", middleware.PermissionMiddleware("read_employee"), handler.EmployeeGetOneHandler)
 			employee.POST("", middleware.PermissionMiddleware("create_employee"), handler.EmployeeCreateHandler)
 			employee.PUT("/:id", middleware.PermissionMiddleware("update_employee"), handler.EmployeeUpdateHandler)
@@ -80,31 +80,33 @@ func SetupRouter() *gin.Engine {
 		payRoll := admin.Group("/payRoll")
 		payRoll.Use(middleware.AdminMiddleware())
 		{
-			payRoll.GET("", handler.PayRollGetAllHandler)
-			payRoll.GET("/:id", handler.PayRollGetOneHandler)
-			payRoll.POST("", handler.PayRollCreateHandler)
-			payRoll.PUT("/:id", handler.PayRollUpdateHandler)
-			payRoll.DELETE("/:id", handler.PayRollDeleteHandler)
+			payRoll.GET("", middleware.PermissionMiddleware("read_pay_roll"), handler.PayRollGetAllHandler)
+			payRoll.GET("/:id", middleware.PermissionMiddleware("read_pay_roll"), handler.PayRollGetOneHandler)
+			payRoll.POST("", middleware.PermissionMiddleware("create_pay_roll"), handler.PayRollCreateHandler)
+			payRoll.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollUpdateHandler)
+			payRoll.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollDeleteHandler)
 		}
 
 		leave := admin.Group("/leave")
 		leave.Use(middleware.AdminMiddleware())
 		{
-			leave.GET("", handler.LeaveGetAllHandler)
-			leave.GET("/:id", handler.LeaveGetOneHandler)
-			leave.POST("", handler.LeaveCreateHandler)
-			leave.PUT("/:id", handler.LeaveUpdateHandler)
-			leave.DELETE("/:id", handler.LeaveDeleteHandler)
+
+			leave.GET("", middleware.PermissionMiddleware("read_leave"), handler.LeaveGetAllHandler)
+			leave.GET("/:id", middleware.PermissionMiddleware("read_leave"), handler.LeaveGetOneHandler)
+			leave.POST("", middleware.PermissionMiddleware("create_leave"), handler.LeaveCreateHandler)
+			leave.PUT("/:id", middleware.PermissionMiddleware("update_leave"), handler.LeaveUpdateHandler)
+			leave.DELETE("/:id", middleware.PermissionMiddleware("delete_leave"), handler.LeaveDeleteHandler)
 		}
 
 		attendance := admin.Group("/attendance")
 		attendance.Use(middleware.AdminMiddleware())
 		{
-			attendance.GET("", handler.AttendanceGetAllHandler)
-			attendance.GET("/:id", handler.AttendanceGetOneHandler)
-			attendance.POST("", handler.AttendanceCreateHandler)
-			attendance.PUT("/:id", handler.AttendanceUpdateHandler)
-			attendance.DELETE("/:id", handler.AttendanceDeleteHandler)
+			attendance.GET("", middleware.PermissionMiddleware("read_attendance"), handler.AttendanceGetAllHandler)
+			attendance.POST("/import", middleware.PermissionMiddleware("import_attendance"), handler.AttendanceImportHandler)
+			attendance.GET("/:id", middleware.PermissionMiddleware("read_attendance"), handler.AttendanceGetOneHandler)
+			attendance.POST("", middleware.PermissionMiddleware("create_attendance"), handler.AttendanceCreateHandler)
+			attendance.PUT("/:id", middleware.PermissionMiddleware("update_attendance"), handler.AttendanceUpdateHandler)
+			attendance.DELETE("/:id", middleware.PermissionMiddleware("delete_attendance"), handler.AttendanceDeleteHandler)
 		}
 
 		incentive := admin.Group("/incentive")

@@ -29,12 +29,18 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		token1, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return []byte(config.App.Server.SecretKey), nil
+		})
+
+		fmt.Println(token1.Claims)
+
 		token, err := jwt.ParseWithClaims(reqToken, &auth.Claims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(config.App.Server.SecretKey), nil
 		})
 
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": "token unparsed"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": err.Error()})
 			c.Abort()
 			return
 		}

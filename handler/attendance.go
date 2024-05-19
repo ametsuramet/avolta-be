@@ -17,6 +17,51 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+func AttendanceImportHandler(c *gin.Context) {
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer file.Close()
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	errorRows := []string{}
+	rows, err := f.GetRows(f.WorkBook.Sheets.Sheet[0].Name)
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	fmt.Println(errorRows)
+	dataMappings := []AttendanceImport{}
+	dataMapping := AttendanceImport{}
+	for _, row := range rows {
+		if len(row) == 0 {
+			continue
+
+		}
+		// for _, cell := range row {
+		// 	fmt.Print(cell, "\t")
+		// 	fmt.Println()
+		// }
+
+		if row[0] == "Fingerprint ID" {
+			if dataMapping.FingerprintID != "" {
+				dataMappings = append(dataMappings, dataMapping)
+
+			}
+			dataMapping.FingerprintID = row[2]
+
+		}
+	}
+
+	util.ResponseSuccess(c, "Import Succeed", dataMappings, nil)
+}
+
 func AttendanceGetAllHandler(c *gin.Context) {
 	_, ok := c.GetQuery("download")
 	if ok {
@@ -338,4 +383,24 @@ func AttendanceDeleteHandler(c *gin.Context) {
 		return
 	}
 	util.ResponseSuccess(c, "Data Attendance Deleted", nil, nil)
+}
+
+type AttendanceImport struct {
+	FingerprintID string
+	EmployeeCode  string
+	Items         []AttendanceImportItem
+}
+
+type AttendanceImportItem struct {
+	Day            string
+	Date           string
+	WorkingHour    string
+	Activity       string
+	DutyOn         string
+	DutyOff        string
+	LateIn         string
+	EarlyDeparture string
+	EffectiveHour  string
+	Overtime       string
+	Notes          string
 }

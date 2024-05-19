@@ -45,7 +45,7 @@ type Employee struct {
 	Organization              Organization   `gorm:"foreignKey:OrganizationID"`
 	OrganizationID            sql.NullString `json:"organization_id"`
 	WorkingType               string         `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
-	Schedule                  []*Schedule    `json:"-" gorm:"many2many:schedule_employees;"`
+	Schedules                 []*Schedule    `json:"-" gorm:"many2many:schedule_employees;"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -84,6 +84,48 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 	if m.Picture.Valid {
 		pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Picture.String)
 	}
+	schedules := []resp.ScheduleReponse{}
+	for _, v := range m.Schedules {
+		fmt.Println("Schedules", *v)
+		if v != nil {
+			weekDay := ""
+			startDate := ""
+			endDate := ""
+			startTime := ""
+			endTime := ""
+			if v.WeekDay != nil {
+				weekDay = *v.WeekDay
+			}
+			if v.StartDate != nil {
+				startDate = v.StartDate.Format("2006-01-02")
+			}
+			if v.EndDate != nil {
+				endDate = v.EndDate.Format("2006-01-02")
+			}
+			if v.StartTime != nil {
+				startTime = v.StartTime.Format("15:04")
+			}
+			if v.EndTime != nil {
+				endTime = v.EndTime.Format("15:04")
+			}
+			schedules = append(schedules, resp.ScheduleReponse{
+				Name:         v.Name,
+				ScheduleType: v.ScheduleType,
+				WeekDay:      weekDay,
+				StartDate:    startDate,
+				EndDate:      endDate,
+				StartTime:    startTime,
+				EndTime:      endTime,
+				Sunday:       v.Sunday,
+				Monday:       v.Monday,
+				Tuesday:      v.Tuesday,
+				Wednesday:    v.Wednesday,
+				Thursday:     v.Thursday,
+				Friday:       v.Friday,
+				Saturday:     v.Saturday,
+			})
+		}
+	}
 
 	return json.Marshal(resp.EmployeeReponse{
 		ID:                        m.ID,
@@ -112,5 +154,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		OrganizationName:          m.Organization.Name,
 		StartedWork:               startedWork,
 		PictureUrl:                pictureUrl,
+		Schedules:                 schedules,
 	})
 }
