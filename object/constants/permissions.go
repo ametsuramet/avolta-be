@@ -116,6 +116,14 @@ func DefaultPermission(search string) []model.Permission {
 	}
 
 	permissions = append(permissions, model.Permission{
+		Name:      "Import Attendance Approval",
+		Key:       "import_attendance_approval",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "import",
+	})
+
+	permissions = append(permissions, model.Permission{
 		Name:      "Payment Invoice",
 		Key:       "payment_invoice",
 		IsDefault: true,

@@ -93,3 +93,5 @@ var AccountName map[string]string = map[string]string{
 	TYPE_LIABILITY:  "Hutang",
 	TYPE_COST:       "Biaya",
 }
+
+var DaysOfWeekAbbr = []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}

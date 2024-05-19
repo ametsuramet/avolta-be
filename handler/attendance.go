@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"avolta/config"
 	"avolta/database"
 	"avolta/model"
 	"avolta/object/constants"
@@ -15,10 +16,144 @@ import (
 	"github.com/TigorLazuardi/tanggal"
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
+	"gorm.io/gorm"
 )
 
+func AttendanceImportRejectHandler(c *gin.Context) {
+	var data model.AttendanceBulkImport
+	var input = struct {
+		Notes string `json:"notes"`
+	}{}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	data.Notes = input.Notes
+	data.Status = "REJECTED"
+	if err := database.DB.Updates(&data).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.ResponseSuccess(c, "Data Attendance Bulk Import Rejected", data, nil)
+}
+
+func AttendanceImportApproveHandler(c *gin.Context) {
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	var data model.AttendanceBulkImport
+	var input = struct {
+		Notes string `json:"notes"`
+	}{}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Preload("Data", func(db *gorm.DB) *gorm.DB {
+		db = db.Order("sequence_number asc")
+		return db
+	}).Preload("Data.Items", func(db *gorm.DB) *gorm.DB {
+		db = db.Order("sequence_number asc")
+		return db
+	}).Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, dataAttendances := range data.Data {
+			var employee model.Employee
+			if err := database.DB.Find(&employee, "id = ?", dataAttendances.SystemEmployeeID).Error; err != nil {
+				return err
+			}
+			for _, item := range dataAttendances.Items {
+				if item.DutyOn == "" {
+					continue
+				}
+				if item.DutyOn == "" && item.DutyOff == "" {
+					continue
+				}
+				clockIn, err := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", item.Date, item.DutyOn), loc)
+				if err != nil {
+					return err
+				}
+				var clockOut *time.Time
+				if item.DutyOff != "" {
+					cOut, err := time.ParseInLocation("02-01-2006 15:04", fmt.Sprintf("%s %s", item.Date, item.DutyOff), loc)
+					if err != nil {
+						return err
+					}
+					clockOut = &cOut
+				}
+
+				var overTime *model.TimeOnly
+				if item.Overtime != "" {
+					scannedTime, err := time.Parse("15:04", item.Overtime)
+					if err == nil {
+						overTime = &model.TimeOnly{scannedTime}
+					}
+				}
+
+				if err := database.DB.Create(&model.Attendance{
+					ClockIn:                clockIn,
+					ClockOut:               clockOut,
+					Overtime:               overTime,
+					ClockInNotes:           item.Notes,
+					EmployeeID:             &employee.ID,
+					AttendanceBulkImportID: id,
+					AttendanceImportItemID: item.ID,
+				}).Error; err != nil {
+					return err
+				}
+
+			}
+
+		}
+
+		data.Status = "APPROVED"
+		data.Notes = input.Notes
+		database.DB.Updates(&data)
+
+		return nil
+	})
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Attendance Bulk Import Approved", nil, nil)
+}
+
+func AttendanceImportDetailHandler(c *gin.Context) {
+	var data model.AttendanceBulkImport
+
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Preload("User").Preload("Data", func(db *gorm.DB) *gorm.DB {
+		db = db.Order("sequence_number asc")
+		return db
+	}).Preload("Data.Items", func(db *gorm.DB) *gorm.DB {
+		db = db.Order("sequence_number asc")
+		return db
+	}).Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Attendance Bulk Import Retrived", data, nil)
+
+}
 func AttendanceImportHandler(c *gin.Context) {
-	file, _, err := c.Request.FormFile("file")
+	file, headers, err := c.Request.FormFile("file")
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
@@ -37,8 +172,10 @@ func AttendanceImportHandler(c *gin.Context) {
 	}
 
 	fmt.Println(errorRows)
-	dataMappings := []AttendanceImport{}
-	dataMapping := AttendanceImport{}
+	seqNo := 1
+	dataMappings := []model.AttendanceImport{}
+	dataMapping := model.AttendanceImport{}
+	seqItemNo := 1
 	for _, row := range rows {
 		if len(row) == 0 {
 			continue
@@ -50,16 +187,70 @@ func AttendanceImportHandler(c *gin.Context) {
 		// }
 
 		if row[0] == "Fingerprint ID" {
-			if dataMapping.FingerprintID != "" {
-				dataMappings = append(dataMappings, dataMapping)
-
-			}
+			dataMapping.SequenceNumber = seqNo
 			dataMapping.FingerprintID = row[2]
+			dataMapping.Items = []model.AttendanceImportItem{}
 
 		}
+		if row[0] == "Employee Code" {
+			dataMapping.EmployeeCode = row[2]
+			employee := model.Employee{}
+			database.DB.Find(&employee, "employee_code = ?", row[2])
+			dataMapping.SystemEmployeeName = employee.FullName
+			dataMapping.SystemEmployeeID = employee.ID
+		}
+		if row[0] == "Employee Name" {
+			dataMapping.EmployeeName = row[2]
+		}
+		if util.Contains(config.DaysOfWeekAbbr, row[0]) {
+			dataMapping.Items = append(dataMapping.Items, model.AttendanceImportItem{
+				SequenceNumber: seqItemNo,
+				Day:            row[0],
+				Date:           row[1],
+				WorkingHour:    row[2],
+				Activity:       row[3],
+				DutyOn:         row[4],
+				DutyOff:        row[5],
+				LateIn:         row[6],
+				EarlyDeparture: row[7],
+				EffectiveHour:  row[8],
+				Overtime:       row[9],
+				Notes:          row[10],
+			})
+			seqItemNo++
+		}
+
+		if len(row) > 3 {
+			if row[3] == "Total" {
+				dataMappings = append(dataMappings, dataMapping)
+				seqNo++
+				seqItemNo = 1
+			}
+		}
+
+	}
+	getUser, _ := c.Get("user")
+	user := getUser.(model.User)
+
+	data := model.AttendanceBulkImport{
+		FileName:       headers.Filename,
+		ImportedBy:     user.ID,
+		DateImportedAt: time.Now(),
+		Data:           dataMappings,
+		Status:         "DRAFT",
 	}
 
-	util.ResponseSuccess(c, "Import Succeed", dataMappings, nil)
+	err = database.DB.Transaction(func(tx *gorm.DB) error {
+		database.DB.Create(&data)
+		database.DB.Save(&data)
+		return nil
+	})
+	if err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.ResponseSuccess(c, "Import Succeed", data.ID, nil)
 }
 
 func AttendanceGetAllHandler(c *gin.Context) {
@@ -146,7 +337,7 @@ func AttendanceGetAllHandler(c *gin.Context) {
 
 	}
 
-	paginator.OrderBy = append(paginator.OrderBy, "clock_in asc")
+	paginator.OrderBy = []string{"clock_in asc"}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
@@ -383,24 +574,4 @@ func AttendanceDeleteHandler(c *gin.Context) {
 		return
 	}
 	util.ResponseSuccess(c, "Data Attendance Deleted", nil, nil)
-}
-
-type AttendanceImport struct {
-	FingerprintID string
-	EmployeeCode  string
-	Items         []AttendanceImportItem
-}
-
-type AttendanceImportItem struct {
-	Day            string
-	Date           string
-	WorkingHour    string
-	Activity       string
-	DutyOn         string
-	DutyOff        string
-	LateIn         string
-	EarlyDeparture string
-	EffectiveHour  string
-	Overtime       string
-	Notes          string
 }

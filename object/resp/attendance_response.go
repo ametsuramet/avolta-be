@@ -18,4 +18,5 @@ type AttendanceReponse struct {
 	EmployeeJobTitle       string     `json:"employee_job_title"`
 	EmployeeIdentityNumber string     `json:"employee_identity_number"`
 	EmployeePicture        *string    `json:"employee_picture"`
+	Overtime               string     `json:"overtime"`
 }

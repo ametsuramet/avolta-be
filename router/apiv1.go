@@ -103,6 +103,9 @@ func SetupRouter() *gin.Engine {
 		{
 			attendance.GET("", middleware.PermissionMiddleware("read_attendance"), handler.AttendanceGetAllHandler)
 			attendance.POST("/import", middleware.PermissionMiddleware("import_attendance"), handler.AttendanceImportHandler)
+			attendance.GET("/import/:id", middleware.PermissionMiddleware("import_attendance"), handler.AttendanceImportDetailHandler)
+			attendance.PUT("/import/:id/Reject", middleware.PermissionMiddleware("import_attendance_approval"), handler.AttendanceImportRejectHandler)
+			attendance.PUT("/import/:id/Approve", middleware.PermissionMiddleware("import_attendance_approval"), handler.AttendanceImportApproveHandler)
 			attendance.GET("/:id", middleware.PermissionMiddleware("read_attendance"), handler.AttendanceGetOneHandler)
 			attendance.POST("", middleware.PermissionMiddleware("create_attendance"), handler.AttendanceCreateHandler)
 			attendance.PUT("/:id", middleware.PermissionMiddleware("update_attendance"), handler.AttendanceUpdateHandler)

@@ -13,10 +13,13 @@ import (
 )
 
 type Base struct {
-	ID        string `gorm:"type:char(36);primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `sql:"index"`
+	ID        string         `gorm:"type:char(36);primary_key" json:"id"`
+	CreatedAt time.Time      `json:"-" `
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `sql:"index" json:"-"`
+}
+type BaseNoTimeStamp struct {
+	ID string `gorm:"type:char(36);primary_key" json:"id"`
 }
 
 // func (u *Base) BeforeCreate(tx *gorm.DB) (err error) {

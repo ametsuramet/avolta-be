@@ -19,6 +19,7 @@ type EmployeeReponse struct {
 	Cover                     string            `json:"cover"`
 	DateOfBirth               *time.Time        `json:"date_of_birth"`
 	EmployeeIdentityNumber    string            `json:"employee_identity_number"`
+	EmployeeCode              string            `json:"employee_code"`
 	FullName                  string            `json:"full_name"`
 	BasicSalary               float64           `json:"basic_salary"`
 	PositionalAllowance       float64           `json:"positional_allowance"`

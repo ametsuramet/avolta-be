@@ -13,13 +13,13 @@ import (
 
 type User struct {
 	Base
-	Email       string
-	Password    string
-	FullName    string
-	Avatar      string
-	IsAdmin     bool
-	RoleID      *string
-	Role        Role     `gorm:"foreignKey:RoleID"`
+	Email       string   `json:"email"`
+	Password    string   `json:"-"`
+	FullName    string   `json:"full_name"`
+	Avatar      string   `json:"avatar"`
+	IsAdmin     bool     `json:"is_admin"`
+	RoleID      *string  `json:"-"`
+	Role        Role     `json:"role" gorm:"foreignKey:RoleID"`
 	Permissions []string `gorm:"-"`
 }
 

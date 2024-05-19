@@ -30,6 +30,7 @@ type Employee struct {
 	StartedWork               sql.NullTime   `json:"started_work"`
 	DateOfBirth               sql.NullTime   `json:"date_of_birth"`
 	EmployeeIdentityNumber    string         `json:"employee_identity_number"`
+	EmployeeCode              string         `json:"employee_code"`
 	FullName                  string         `json:"full_name"`
 	ConnectedTo               sql.NullString `json:"connected_to"`
 	Flag                      bool           `json:"flag"`
@@ -86,7 +87,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 	}
 	schedules := []resp.ScheduleReponse{}
 	for _, v := range m.Schedules {
-		fmt.Println("Schedules", *v)
 		if v != nil {
 			weekDay := ""
 			startDate := ""
@@ -155,5 +155,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		StartedWork:               startedWork,
 		PictureUrl:                pictureUrl,
 		Schedules:                 schedules,
+		EmployeeCode:              m.EmployeeCode,
 	})
 }

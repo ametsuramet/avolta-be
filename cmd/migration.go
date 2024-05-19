@@ -34,6 +34,9 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Organization{})
 	database.DB.AutoMigrate(&model.JobTitle{})
 	database.DB.AutoMigrate(&model.Schedule{})
+	database.DB.AutoMigrate(&model.AttendanceBulkImport{})
+	database.DB.AutoMigrate(&model.AttendanceImport{})
+	database.DB.AutoMigrate(&model.AttendanceImportItem{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
