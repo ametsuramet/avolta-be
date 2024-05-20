@@ -68,6 +68,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			c.Abort()
 		}
 		user.GetPermissions()
+		// fmt.Println("PERMISSIONS", user.Permissions)
 		c.Set("permissions", user.Permissions)
 		c.Next()
 	}

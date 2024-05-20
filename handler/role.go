@@ -11,7 +11,7 @@ import (
 
 func RoleGetAllHandler(c *gin.Context) {
 	var data []model.Role
-	preloads := []string{}
+	preloads := []string{"Permissions"}
 	total, err := model.Paginate(c, &data, preloads)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -53,20 +53,40 @@ func RoleCreateHandler(c *gin.Context) {
 }
 
 func RoleUpdateHandler(c *gin.Context) {
-	var input, data model.Role
+	var input model.RoleReq
+
 	id := c.Params.ByName("id")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	var data = model.Role{
+		Name:        input.Name,
+		Description: input.Description,
+	}
+
 	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
+	if err := database.DB.Model(&data).Updates(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	if !input.IsSuperAdmin {
+		permissions := []model.Permission{}
+		for _, v := range input.Permissions {
+			permission := model.Permission{}
+			database.DB.Find(&permission, "`key` = ?", v)
+			permissions = append(permissions, permission)
+		}
+
+		if len(permissions) > 0 {
+			database.DB.Model(&data).Association("Permissions").Append(&permissions)
+		}
 	}
 	util.ResponseSuccess(c, "Data Role Updated", nil, nil)
 }

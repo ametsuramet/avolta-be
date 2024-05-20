@@ -32,7 +32,9 @@ type Schedule struct {
 }
 
 func (u *Schedule) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	return
 }
 

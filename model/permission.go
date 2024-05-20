@@ -1,9 +1,6 @@
 package model
 
 import (
-	"avolta/object/resp"
-	"encoding/json"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -21,10 +18,8 @@ type Permission struct {
 }
 
 func (u *Permission) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	return
-}
-
-func (m Permission) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.PermissionReponse{})
 }

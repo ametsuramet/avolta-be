@@ -37,6 +37,7 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.AttendanceBulkImport{})
 	database.DB.AutoMigrate(&model.AttendanceImport{})
 	database.DB.AutoMigrate(&model.AttendanceImportItem{})
+	database.DB.AutoMigrate(&model.LeaveCategory{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -354,6 +355,28 @@ func GenPermissions() {
 		}
 	}
 	GenSuperAdmin()
+}
+func GenLeaveCategories() {
+	cats := []string{
+		"Izin Sakit",
+		"Sakit dengan Surat Dokter",
+		"Dinas Luar Kota",
+		"Cuti Menikah",
+		"Cuti Menikahkan Anak",
+		"Cuti Khitanan Anak",
+		"Cuti Baptis Anak",
+		"Cuti Istri Melahirkan atau Keguguran",
+		"Cuti Keluarga Meninggal",
+		"Cuti Anggota Keluarga Dalam Satu Rumah Meninggal",
+		"Cuti Ibadah Haji",
+		"Izin Lainnya",
+	}
+
+	for _, v := range cats {
+		database.DB.Create(&model.LeaveCategory{
+			Name: v,
+		})
+	}
 }
 func GenSuperAdmin() {
 	database.DB.Create(&model.Role{

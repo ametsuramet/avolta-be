@@ -18,10 +18,12 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "transaction", "is_default": true, "is_active": true},
 		{"name": "incentive", "is_default": true, "is_active": true},
 		{"name": "leave", "is_default": true, "is_active": true},
+		{"name": "leave_category", "is_default": true, "is_active": true},
 		{"name": "overtime", "is_default": true, "is_active": true},
 		{"name": "pay_roll", "is_default": true, "is_active": true},
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "user", "is_default": true, "is_active": true},
+		{"name": "organization", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},

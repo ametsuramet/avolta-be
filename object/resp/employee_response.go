@@ -2,6 +2,12 @@ package resp
 
 import "time"
 
+type SimpleEmployeeReponse struct {
+	ID         string `json:"id"`
+	FullName   string `json:"full_name"`
+	JobTitle   string `json:"job_title"`
+	PictureUrl string `json:"picture_url"`
+}
 type EmployeeReponse struct {
 	ID                        string            `json:"id"`
 	Email                     string            `json:"email"`

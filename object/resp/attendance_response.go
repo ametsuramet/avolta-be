@@ -3,6 +3,7 @@ package resp
 import "time"
 
 type AttendanceReponse struct {
+	ID                     string     `json:"id"`
 	ClockIn                time.Time  `json:"clock_in"`
 	ClockOut               *time.Time `json:"clock_out"`
 	ClockInNotes           string     `json:"clock_in_notes"`

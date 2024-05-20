@@ -137,9 +137,9 @@ func SetupRouter() *gin.Engine {
 		{
 			permission.GET("", handler.PermissionGetAllHandler)
 			permission.GET("/:id", handler.PermissionGetOneHandler)
-			permission.POST("", handler.PermissionCreateHandler)
-			permission.PUT("/:id", handler.PermissionUpdateHandler)
-			permission.DELETE("/:id", handler.PermissionDeleteHandler)
+			// permission.POST("", handler.PermissionCreateHandler)
+			// permission.PUT("/:id", handler.PermissionUpdateHandler)
+			// permission.DELETE("/:id", handler.PermissionDeleteHandler)
 		}
 
 		transaction := admin.Group("/transaction")
@@ -173,7 +173,7 @@ func SetupRouter() *gin.Engine {
 		}
 
 		jobTitle := admin.Group("/jobTitle")
-		jobTitle.Use()
+		jobTitle.Use(middleware.AdminMiddleware())
 		{
 			jobTitle.GET("", handler.JobTitleGetAllHandler)
 			jobTitle.GET("/:id", handler.JobTitleGetOneHandler)
@@ -183,7 +183,7 @@ func SetupRouter() *gin.Engine {
 		}
 
 		schedule := admin.Group("/schedule")
-		schedule.Use()
+		schedule.Use(middleware.AdminMiddleware())
 		{
 			schedule.GET("", handler.ScheduleGetAllHandler)
 			schedule.GET("/:id", handler.ScheduleGetOneHandler)
@@ -192,6 +192,26 @@ func SetupRouter() *gin.Engine {
 			schedule.POST("", handler.ScheduleCreateHandler)
 			schedule.PUT("/:id", handler.ScheduleUpdateHandler)
 			schedule.DELETE("/:id", handler.ScheduleDeleteHandler)
+		}
+
+		leaveCategory := admin.Group("/leaveCategory")
+		leaveCategory.Use(middleware.AdminMiddleware())
+		{
+			leaveCategory.GET("", middleware.PermissionMiddleware("read_leaved"), handler.LeaveCategoryGetAllHandler)
+			leaveCategory.GET("/:id", middleware.PermissionMiddleware("read_leaved"), handler.LeaveCategoryGetOneHandler)
+			leaveCategory.POST("", middleware.PermissionMiddleware("create_leaved"), handler.LeaveCategoryCreateHandler)
+			leaveCategory.PUT("/:id", middleware.PermissionMiddleware("update_leaved"), handler.LeaveCategoryUpdateHandler)
+			leaveCategory.DELETE("/:id", middleware.PermissionMiddleware("delete_leaved"), handler.LeaveCategoryDeleteHandler)
+		}
+
+		user := admin.Group("/user")
+		user.Use(middleware.AdminMiddleware())
+		{
+			user.GET("", middleware.PermissionMiddleware("read_user"), handler.UserGetAllHandler)
+			user.GET("/:id", middleware.PermissionMiddleware("read_user"), handler.UserGetOneHandler)
+			user.POST("", middleware.PermissionMiddleware("create_user"), handler.UserCreateHandler)
+			user.PUT("/:id", middleware.PermissionMiddleware("update_user"), handler.UserUpdateHandler)
+			user.DELETE("/:id", middleware.PermissionMiddleware("delete_user"), handler.UserDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

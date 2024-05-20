@@ -11,6 +11,8 @@ func Init(args []string) {
 		GenAccounts()
 	case "gen-permission":
 		GenPermissions()
+	case "gen-leave-category":
+		GenLeaveCategories()
 	case "assign-superadmin":
 		AssignSuperadmin(args)
 	case "sample-job-title":

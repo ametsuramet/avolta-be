@@ -14,11 +14,11 @@ import (
 type User struct {
 	Base
 	Email       string   `json:"email"`
-	Password    string   `json:"-"`
+	Password    string   `json:"password"`
 	FullName    string   `json:"full_name"`
 	Avatar      string   `json:"avatar"`
 	IsAdmin     bool     `json:"is_admin"`
-	RoleID      *string  `json:"-"`
+	RoleID      *string  `json:"role_id"`
 	Role        Role     `json:"role" gorm:"foreignKey:RoleID"`
 	Permissions []string `gorm:"-"`
 }
@@ -27,7 +27,7 @@ func (u *User) GetPermissions() {
 	u.Permissions = []string{}
 	if u.RoleID != nil {
 		role := Role{}
-		database.DB.Find(&role, u.RoleID)
+		database.DB.Preload("Permissions").Find(&role, u.RoleID)
 		role.GetPermissions()
 		u.Role = role
 
@@ -55,7 +55,9 @@ func GetUserFromCtx(c *gin.Context) *User {
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	newPass, _ := util.HashPassword(u.Password)
 	tx.Statement.SetColumn("password", newPass)
 
@@ -65,10 +67,13 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 func (m User) MarshalJSON() ([]byte, error) {
 	m.GetPermissions()
 	return json.Marshal(resp.UserResponse{
+		ID:          m.ID,
 		FullName:    m.FullName,
 		Permissions: m.Permissions,
 		Email:       m.Email,
 		Picture:     m.Avatar,
 		RoleName:    m.Role.Name,
+		RoleID:      m.Role.ID,
+		IsAdmin:     m.IsAdmin,
 	})
 }

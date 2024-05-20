@@ -9,29 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func OrganizationGetAllHandler(c *gin.Context) {
-	var data []model.Organization
+func LeaveCategoryGetAllHandler(c *gin.Context) {
+	var data []model.LeaveCategory
 	preloads := []string{}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
 	paginator.Paginate(&data)
-	_, ok := c.GetQuery("show_all")
-	if !ok {
-		paginator.WhereNull = []string{"parent_id"}
-	}
-
+	// search, ok := c.GetQuery("search")
+	// if ok {
+	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
+	// 		"full_name": search,
+	// 	})
+	// }
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	util.ResponsePaginatorSuccess(c, "Data List Organization Retrived", dataRecords.Records, dataRecords)
+	util.ResponsePaginatorSuccess(c, "Data List LeaveCategory Retrived", dataRecords.Records, dataRecords)
 }
 
-func OrganizationGetOneHandler(c *gin.Context) {
-	var data model.Organization
+func LeaveCategoryGetOneHandler(c *gin.Context) {
+	var data model.LeaveCategory
 
 	id := c.Params.ByName("id")
 
@@ -39,11 +40,11 @@ func OrganizationGetOneHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data Organization Retrived", data, nil)
+	util.ResponseSuccess(c, "Data LeaveCategory Retrived", data, nil)
 }
 
-func OrganizationCreateHandler(c *gin.Context) {
-	var data model.Organization
+func LeaveCategoryCreateHandler(c *gin.Context) {
+	var data model.LeaveCategory
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -59,11 +60,11 @@ func OrganizationCreateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data Organization Created", gin.H{"last_id": data.ID}, nil)
+	util.ResponseSuccess(c, "Data LeaveCategory Created", gin.H{"last_id": data.ID}, nil)
 }
 
-func OrganizationUpdateHandler(c *gin.Context) {
-	var input, data model.Organization
+func LeaveCategoryUpdateHandler(c *gin.Context) {
+	var input, data model.LeaveCategory
 	id := c.Params.ByName("id")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -78,18 +79,14 @@ func OrganizationUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data Organization Updated", nil, nil)
+	util.ResponseSuccess(c, "Data LeaveCategory Updated", nil, nil)
 }
 
-func OrganizationDeleteHandler(c *gin.Context) {
-	var input, data model.Organization
+func LeaveCategoryDeleteHandler(c *gin.Context) {
+	var input, data model.LeaveCategory
 	id := c.Params.ByName("id")
 
 	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	if err := database.DB.Model(&model.Organization{}).Where("parent_id = ?", id).Update("parent_id", nil).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -97,5 +94,5 @@ func OrganizationDeleteHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data Organization Deleted", nil, nil)
+	util.ResponseSuccess(c, "Data LeaveCategory Deleted", nil, nil)
 }
