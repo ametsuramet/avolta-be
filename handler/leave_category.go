@@ -22,6 +22,8 @@ func LeaveCategoryGetAllHandler(c *gin.Context) {
 	// 		"full_name": search,
 	// 	})
 	// }
+
+	paginator.OrderBy = []string{"name asc"}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

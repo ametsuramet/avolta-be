@@ -19,7 +19,6 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.User{})
 	database.DB.AutoMigrate(&model.Employee{})
 	database.DB.AutoMigrate(&model.PayRoll{})
-	database.DB.AutoMigrate(&model.Leave{})
 	database.DB.AutoMigrate(&model.Attendance{})
 	database.DB.AutoMigrate(&model.Incentive{})
 	database.DB.AutoMigrate(&model.Role{})
@@ -38,6 +37,7 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.AttendanceImport{})
 	database.DB.AutoMigrate(&model.AttendanceImportItem{})
 	database.DB.AutoMigrate(&model.LeaveCategory{})
+	database.DB.AutoMigrate(&model.Leave{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }

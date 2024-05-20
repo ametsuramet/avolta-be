@@ -96,6 +96,8 @@ func SetupRouter() *gin.Engine {
 			leave.POST("", middleware.PermissionMiddleware("create_leave"), handler.LeaveCreateHandler)
 			leave.PUT("/:id", middleware.PermissionMiddleware("update_leave"), handler.LeaveUpdateHandler)
 			leave.DELETE("/:id", middleware.PermissionMiddleware("delete_leave"), handler.LeaveDeleteHandler)
+			leave.PUT("/:id/Approve", middleware.PermissionMiddleware("approval_leave"), handler.LeaveApproveHandler)
+			leave.PUT("/:id/Reject", middleware.PermissionMiddleware("approval_leave"), handler.LeaveRejectHandler)
 		}
 
 		attendance := admin.Group("/attendance")
@@ -197,11 +199,11 @@ func SetupRouter() *gin.Engine {
 		leaveCategory := admin.Group("/leaveCategory")
 		leaveCategory.Use(middleware.AdminMiddleware())
 		{
-			leaveCategory.GET("", middleware.PermissionMiddleware("read_leaved"), handler.LeaveCategoryGetAllHandler)
-			leaveCategory.GET("/:id", middleware.PermissionMiddleware("read_leaved"), handler.LeaveCategoryGetOneHandler)
-			leaveCategory.POST("", middleware.PermissionMiddleware("create_leaved"), handler.LeaveCategoryCreateHandler)
-			leaveCategory.PUT("/:id", middleware.PermissionMiddleware("update_leaved"), handler.LeaveCategoryUpdateHandler)
-			leaveCategory.DELETE("/:id", middleware.PermissionMiddleware("delete_leaved"), handler.LeaveCategoryDeleteHandler)
+			leaveCategory.GET("", middleware.PermissionMiddleware("read_leave_category"), handler.LeaveCategoryGetAllHandler)
+			leaveCategory.GET("/:id", middleware.PermissionMiddleware("read_leave_category"), handler.LeaveCategoryGetOneHandler)
+			leaveCategory.POST("", middleware.PermissionMiddleware("create_leave_category"), handler.LeaveCategoryCreateHandler)
+			leaveCategory.PUT("/:id", middleware.PermissionMiddleware("update_leave_category"), handler.LeaveCategoryUpdateHandler)
+			leaveCategory.DELETE("/:id", middleware.PermissionMiddleware("delete_leave_category"), handler.LeaveCategoryDeleteHandler)
 		}
 
 		user := admin.Group("/user")

@@ -11,7 +11,7 @@ import (
 
 func LeaveGetAllHandler(c *gin.Context) {
 	var data []model.Leave
-	preloads := []string{}
+	preloads := []string{"Employee", "LeaveCategory"}
 	total, err := model.Paginate(c, &data, preloads)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -84,4 +84,62 @@ func LeaveDeleteHandler(c *gin.Context) {
 		return
 	}
 	util.ResponseSuccess(c, "Data Leave Deleted", nil, nil)
+}
+
+func LeaveApproveHandler(c *gin.Context) {
+	var data model.Leave
+	var input = struct {
+		Remarks string `json:"remarks"`
+	}{}
+	id := c.Params.ByName("id")
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	getUser, _ := c.Get("user")
+	user := getUser.(model.User)
+	data.ApproverID = &user.ID
+
+	data.Status = "APPROVED"
+	data.Remarks = input.Remarks
+
+	if err := database.DB.Model(&data).Updates(&data).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Leave Approved", nil, nil)
+}
+func LeaveRejectHandler(c *gin.Context) {
+	var data model.Leave
+	var input = struct {
+		Remarks string `json:"remarks"`
+	}{}
+	id := c.Params.ByName("id")
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	getUser, _ := c.Get("user")
+	user := getUser.(model.User)
+	data.ApproverID = &user.ID
+
+	data.Status = "REJECTED"
+	data.Remarks = input.Remarks
+	if err := database.DB.Model(&data).Updates(&data).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Leave Rejected", nil, nil)
 }

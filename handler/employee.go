@@ -203,7 +203,7 @@ func EmployeeGetOneHandler(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Preload("Schedules").Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Schedules").Preload("JobTitle").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
