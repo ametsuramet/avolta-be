@@ -5,6 +5,7 @@ import (
 	"avolta/model"
 	"avolta/util"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -87,35 +88,29 @@ func LeaveDeleteHandler(c *gin.Context) {
 }
 
 func LeaveApproveHandler(c *gin.Context) {
-	var data model.Leave
-	var input = struct {
-		Remarks string `json:"remarks"`
-	}{}
-	id := c.Params.ByName("id")
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	getUser, _ := c.Get("user")
-	user := getUser.(model.User)
-	data.ApproverID = &user.ID
-
-	data.Status = "APPROVED"
-	data.Remarks = input.Remarks
-
-	if err := database.DB.Model(&data).Updates(&data).Error; err != nil {
+	if err := approval(c, "APPROVED"); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	util.ResponseSuccess(c, "Data Leave Approved", nil, nil)
 }
+
 func LeaveRejectHandler(c *gin.Context) {
+	if err := approval(c, "REJECTED"); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Leave Rejected", nil, nil)
+}
+func LeaveReviewHandler(c *gin.Context) {
+	if err := approval(c, "REVIEWED"); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data Leave Rejected", nil, nil)
+}
+
+func approval(c *gin.Context, status string) error {
 	var data model.Leave
 	var input = struct {
 		Remarks string `json:"remarks"`
@@ -123,23 +118,21 @@ func LeaveRejectHandler(c *gin.Context) {
 	id := c.Params.ByName("id")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
+		return err
 	}
 	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
+		return err
 	}
 
 	getUser, _ := c.Get("user")
 	user := getUser.(model.User)
 	data.ApproverID = &user.ID
 
-	data.Status = "REJECTED"
-	data.Remarks = input.Remarks
+	data.Status = status
+	data.Remarks += "- **[" + user.FullName + "]** \n*" + time.Now().Format("02/01/2006 15:04") + "*\n\n" + input.Remarks + "\n\n"
 	if err := database.DB.Model(&data).Updates(&data).Error; err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
+		return err
 	}
-	util.ResponseSuccess(c, "Data Leave Rejected", nil, nil)
+
+	return nil
 }

@@ -98,6 +98,7 @@ func SetupRouter() *gin.Engine {
 			leave.DELETE("/:id", middleware.PermissionMiddleware("delete_leave"), handler.LeaveDeleteHandler)
 			leave.PUT("/:id/Approve", middleware.PermissionMiddleware("approval_leave"), handler.LeaveApproveHandler)
 			leave.PUT("/:id/Reject", middleware.PermissionMiddleware("approval_leave"), handler.LeaveRejectHandler)
+			leave.PUT("/:id/Review", middleware.PermissionMiddleware("update_leave"), handler.LeaveReviewHandler)
 		}
 
 		attendance := admin.Group("/attendance")
