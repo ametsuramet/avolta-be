@@ -6,6 +6,7 @@ import (
 	"avolta/object/constants"
 	"avolta/util"
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -140,6 +141,10 @@ func EmployeeGetAllHandler(c *gin.Context) {
 		paginator.Preloads = append(paginator.Preloads, "JobTitle")
 
 	}
+	_, ok = c.GetQuery("skip_linked")
+	if ok {
+		paginator.WhereNull = []string{"user_id"}
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -244,9 +249,24 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	if input.UserID != "" {
+		count := int64(0)
+		database.DB.Model(&model.Employee{}).Where("user_id = ?", input.UserID).Count(&count)
+		if count > 0 {
+			err := errors.New("user sudah di tautkan ke karyawan lain")
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
+	}
+	if input.UserID == "" {
+		if err := database.DB.Model(&data).Update("user_id", nil).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 	util.ResponseSuccess(c, "Data Employee Updated", nil, nil)
 }

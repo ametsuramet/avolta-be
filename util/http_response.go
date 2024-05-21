@@ -60,5 +60,5 @@ func ResponseSuccess(c *gin.Context, msg string, data interface{}, totalRecords 
 }
 
 func ResponseFail(c *gin.Context, status int, msg string) {
-	c.JSON(status, gin.H{"error": msg})
+	c.JSON(status, gin.H{"error": msg, "message": msg})
 }

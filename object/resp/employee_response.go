@@ -7,6 +7,7 @@ type SimpleEmployeeReponse struct {
 	FullName   string `json:"full_name"`
 	JobTitle   string `json:"job_title"`
 	PictureUrl string `json:"picture_url"`
+	UserID     string `json:"user_id"`
 }
 type EmployeeReponse struct {
 	ID                        string            `json:"id"`
@@ -18,6 +19,7 @@ type EmployeeReponse struct {
 	Phone                     string            `json:"phone"`
 	JobTitle                  string            `json:"job_title"`
 	JobTitleID                string            `json:"job_title_id"`
+	UserID                    string            `json:"user_id"`
 	Grade                     string            `json:"grade"`
 	Address                   string            `json:"address"`
 	Picture                   *string           `json:"picture"`

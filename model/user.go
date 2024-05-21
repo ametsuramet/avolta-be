@@ -21,6 +21,8 @@ type User struct {
 	RoleID      *string  `json:"role_id"`
 	Role        Role     `json:"role" gorm:"foreignKey:RoleID"`
 	Permissions []string `gorm:"-"`
+	EmployeeID  string   `json:"employee_id" gorm:"-"`
+	Employee    Employee `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *User) GetPermissions() {
@@ -67,13 +69,15 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 func (m User) MarshalJSON() ([]byte, error) {
 	m.GetPermissions()
 	return json.Marshal(resp.UserResponse{
-		ID:          m.ID,
-		FullName:    m.FullName,
-		Permissions: m.Permissions,
-		Email:       m.Email,
-		Picture:     m.Avatar,
-		RoleName:    m.Role.Name,
-		RoleID:      m.Role.ID,
-		IsAdmin:     m.IsAdmin,
+		ID:           m.ID,
+		FullName:     m.FullName,
+		Permissions:  m.Permissions,
+		Email:        m.Email,
+		Picture:      m.Avatar,
+		RoleName:     m.Role.Name,
+		RoleID:       m.Role.ID,
+		IsAdmin:      m.IsAdmin,
+		EmployeeID:   m.Employee.ID,
+		EmployeeName: m.Employee.FullName,
 	})
 }

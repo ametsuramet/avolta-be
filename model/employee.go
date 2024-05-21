@@ -2,6 +2,7 @@ package model
 
 import (
 	"avolta/config"
+	"avolta/database"
 	"avolta/object/resp"
 	"database/sql"
 	"encoding/json"
@@ -24,6 +25,7 @@ type Employee struct {
 	JobTitleID                sql.NullString `json:"job_title_id"`
 	JobTitle                  JobTitle       `gorm:"foreignKey:JobTitleID"`
 	Grade                     string         `json:"grade"`
+	UserID                    string         `json:"user_id"`
 	Address                   string         `json:"address"`
 	Picture                   sql.NullString `json:"picture"`
 	Cover                     string         `json:"cover"`
@@ -126,6 +128,12 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 			})
 		}
 	}
+	username := ""
+	if m.UserID != "" {
+		user := User{}
+		database.DB.Select("full_name").Find(&user, "id = ?", m.UserID)
+		username = user.FullName
+	}
 
 	return json.Marshal(resp.EmployeeReponse{
 		ID:                        m.ID,
@@ -133,7 +141,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		FirstName:                 m.FirstName,
 		MiddleName:                m.MiddleName,
 		LastName:                  m.LastName,
-		Username:                  m.Username,
+		Username:                  username,
 		Phone:                     m.Phone,
 		JobTitle:                  m.JobTitle.Name,
 		JobTitleID:                m.JobTitleID.String,
@@ -156,5 +164,6 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		PictureUrl:                pictureUrl,
 		Schedules:                 schedules,
 		EmployeeCode:              m.EmployeeCode,
+		UserID:                    m.UserID,
 	})
 }

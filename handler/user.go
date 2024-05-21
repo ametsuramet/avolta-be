@@ -11,7 +11,7 @@ import (
 
 func UserGetAllHandler(c *gin.Context) {
 	var data []model.User
-	preloads := []string{}
+	preloads := []string{"Employee"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
@@ -78,6 +78,12 @@ func UserUpdateHandler(c *gin.Context) {
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	if input.EmployeeID != "" {
+		employee := model.Employee{}
+		database.DB.Find(&employee, "id = ?", input.EmployeeID)
+		database.DB.Model(&data).Association("Employee").Append(&employee)
 	}
 	util.ResponseSuccess(c, "Data User Updated", nil, nil)
 }
