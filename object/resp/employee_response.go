@@ -39,4 +39,7 @@ type EmployeeReponse struct {
 	OrganizationName          string            `json:"organization_name"`
 	StartedWork               *time.Time        `json:"started_work"`
 	Schedules                 []ScheduleReponse `json:"schedules"`
+	TotalWorkingDays          int32             `json:"total_working_days"`
+	TotalWorkingHours         float64           `json:"total_working_hours"`
+	DailyWorkingHours         float64           `json:"daily_working_hours"`
 }

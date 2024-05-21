@@ -104,6 +104,13 @@ func AttendanceImportApproveHandler(c *gin.Context) {
 						overTime = &model.TimeOnly{scannedTime}
 					}
 				}
+				var lateIn *model.TimeOnly
+				if item.LateIn != "" {
+					scannedTime, err := time.Parse("15:04", item.LateIn)
+					if err == nil {
+						lateIn = &model.TimeOnly{scannedTime}
+					}
+				}
 
 				if err := database.DB.Create(&model.Attendance{
 					ClockIn:                clockIn,
@@ -111,8 +118,9 @@ func AttendanceImportApproveHandler(c *gin.Context) {
 					Overtime:               overTime,
 					ClockInNotes:           item.Notes,
 					EmployeeID:             &employee.ID,
-					AttendanceBulkImportID: id,
-					AttendanceImportItemID: item.ID,
+					AttendanceBulkImportID: &id,
+					AttendanceImportItemID: &item.ID,
+					LateIn:                 lateIn,
 				}).Error; err != nil {
 					return err
 				}
@@ -348,6 +356,9 @@ func AttendanceGetAllHandler(c *gin.Context) {
 }
 
 func generateReport(c *gin.Context) ([]byte, error) {
+	timezone, _ := c.Get("timezone")
+	loc, _ := time.LoadLocation(timezone.(string))
+	time.Local = loc
 	employeeIds, ok := c.GetQuery("employee_ids")
 	if !ok {
 		return []byte{}, errors.New("no employee id")
@@ -376,12 +387,12 @@ func generateReport(c *gin.Context) ([]byte, error) {
 		database.DB.Find(&employee, "id = ?", v)
 		row := 1
 
-		startDateFormat, _ := time.Parse(time.RFC3339, startDate)
-		endDateFormat, _ := time.Parse(time.RFC3339, endDate)
+		startDateFormat, _ := time.ParseInLocation(time.RFC3339, startDate, loc)
+		endDateFormat, _ := time.ParseInLocation(time.RFC3339, endDate, loc)
 
 		dateList := util.GetDates(startDateFormat, endDateFormat)
 
-		// fmt.Println("DATELIST", dateList)
+		fmt.Println("DATELIST", dateList)
 		sheet1Name := employee.FullName
 		if index == 0 {
 			xls.SetSheetName(xls.GetSheetName(index), sheet1Name)
@@ -446,7 +457,7 @@ func generateReport(c *gin.Context) ([]byte, error) {
 		firstData := row
 		for _, date := range dateList {
 			attendances := []model.Attendance{}
-			database.DB.Order("clock_in asc").Find(&attendances, "employee_id = ? and DATE(clock_in) = ?", v, date.Format("2006-01-02"))
+			database.DB.Order("clock_in asc").Find(&attendances, "employee_id = ? and DATE(clock_in) = ?", v, date.Local().Format("2006-01-02"))
 			tgl, _ := tanggal.Papar(date, "", tanggal.WIB)
 			dayFormat := tgl.Format(" ", []tanggal.Format{tanggal.NamaHari})
 			xls.SetCellValue(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(1), row), numb)
@@ -550,10 +561,21 @@ func AttendanceUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Employee").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	// if input.ClockOut != nil {
+
+	// 	scannedOverTime, err := time.Parse("15:04", util.FormatDuration(input.ClockOut.Sub(input.ClockIn)-(time.Duration(data.Employee.DailyWorkingHours)*time.Hour)))
+	// 	if err == nil {
+	// 		input.Overtime = &model.TimeOnly{scannedOverTime}
+	// 	}
+	// 	scannedDuration, err := time.Parse("15:04", util.FormatDuration(input.ClockOut.Sub(input.ClockIn)))
+	// 	if err == nil {
+	// 		input.WorkingDuration = &model.TimeOnly{scannedDuration}
+	// 	}
+	// }
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return

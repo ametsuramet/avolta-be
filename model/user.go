@@ -38,6 +38,11 @@ func (u *User) GetPermissions() {
 		}
 	}
 }
+func (u *User) CheckAdminByEmail(email string) bool {
+	count := int64(0)
+	database.DB.Find(&u, "email = ? and is_admin = 1", email).Count(&count)
+	return count > 0
+}
 func (u *User) CheckUserByEmail(email string) bool {
 	count := int64(0)
 	database.DB.Find(&u, "email = ?", email).Count(&count)

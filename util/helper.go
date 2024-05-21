@@ -57,3 +57,12 @@ func GetDates(startDate, endDate time.Time) []time.Time {
 	}
 	return dates
 }
+
+func FormatDuration(d time.Duration) string {
+	// Extract the total hours and minutes from the duration
+	hours := int(d.Hours())
+	minutes := int(d.Minutes()) % 60
+
+	// Format as "HH:mm"
+	return fmt.Sprintf("%02d:%02d", hours, minutes)
+}

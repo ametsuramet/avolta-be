@@ -12,13 +12,11 @@ import (
 
 type PayRoll struct {
 	Base
-	EmployeeID             sql.NullString `gorm:"size:30" binding:"required" json:"employee_id"`
-	Title                  string         `json:"title" binding:"required"`
+	Title                  string         `json:"title"`
 	Notes                  string         `json:"notes"`
-	StartDate              *time.Time     `json:"start_date" binding:"required"`
-	EndDate                *time.Time     `json:"end_date" binding:"required"`
+	StartDate              time.Time      `json:"start_date" binding:"required"`
+	EndDate                time.Time      `json:"end_date" binding:"required"`
 	Files                  string         `json:"files" gorm:"default:'[]'"`
-	Employee               Employee       `json:"employee" gorm:"-"`
 	TotalIncome            float64        `json:"total_income"`
 	TotalReimbursement     float64        `json:"total_reimbursement"`
 	TotalDeduction         float64        `json:"total_deduction"`
@@ -38,6 +36,8 @@ type PayRoll struct {
 	Items                  []PayRollItem  `json:"items" gorm:"-"`
 	TakeHomePayCounted     string         `json:"take_home_pay_counted" gorm:"-"`
 	TaxPaymentID           sql.NullString `json:"tax_payment_id"`
+	EmployeeID             string         `binding:"required" json:"employee_id"`
+	Employee               Employee       `gorm:"foreignKey:EmployeeID" `
 }
 
 func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
@@ -46,5 +46,12 @@ func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m PayRoll) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.PayRollReponse{})
+	return json.Marshal(resp.PayRollReponse{
+		ID:           m.ID,
+		Notes:        m.Notes,
+		StartDate:    m.StartDate.Format("2006-01-02"),
+		EndDate:      m.EndDate.Format("2006-01-02"),
+		EmployeeID:   m.EmployeeID,
+		EmployeeName: m.Employee.FullName,
+	})
 }

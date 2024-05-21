@@ -80,7 +80,7 @@ func UserUpdateHandler(c *gin.Context) {
 		return
 	}
 
-	if input.EmployeeID != "" {
+	if input.EmployeeID != "" && data.EmployeeID != input.EmployeeID {
 		employee := model.Employee{}
 		database.DB.Find(&employee, "id = ?", input.EmployeeID)
 		database.DB.Model(&data).Association("Employee").Append(&employee)

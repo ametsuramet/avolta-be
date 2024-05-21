@@ -11,7 +11,7 @@ import (
 
 func PayRollGetAllHandler(c *gin.Context) {
 	var data []model.PayRoll
-	preloads := []string{}
+	preloads := []string{"Employee"}
 	total, err := model.Paginate(c, &data, preloads)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -25,7 +25,7 @@ func PayRollGetOneHandler(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Employee").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

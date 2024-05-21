@@ -49,6 +49,9 @@ type Employee struct {
 	OrganizationID            sql.NullString `json:"organization_id"`
 	WorkingType               string         `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
 	Schedules                 []*Schedule    `json:"-" gorm:"many2many:schedule_employees;"`
+	TotalWorkingDays          int32          `json:"total_working_days"`
+	TotalWorkingHours         float64        `json:"total_working_hours"`
+	DailyWorkingHours         float64        `json:"daily_working_hours"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -59,6 +62,25 @@ func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
 		names := []string{u.FirstName, u.MiddleName, u.LastName}
 		tx.Statement.SetColumn("full_name", strings.Join(names, " "))
 	} else {
+		splitName := strings.Split(u.FullName, " ")
+		tx.Statement.SetColumn("first_name", splitName[0])
+		if len(splitName) > 1 {
+			tx.Statement.SetColumn("middle_name", splitName[1])
+		}
+		if len(splitName) > 2 {
+			tx.Statement.SetColumn("last_name", splitName[2])
+		}
+	}
+	return
+}
+func (u *Employee) BeforeUpdate(tx *gorm.DB) (err error) {
+	// fmt.Println("UPDATE EMPLOYEE")
+	if u.FullName == "" {
+		// fmt.Println("UPDATE EMPLOYEE", 1)
+		names := []string{u.FirstName, u.MiddleName, u.LastName}
+		tx.Statement.SetColumn("full_name", strings.Join(names, " "))
+	} else {
+		// fmt.Println("UPDATE EMPLOYEE", 2)
 		splitName := strings.Split(u.FullName, " ")
 		tx.Statement.SetColumn("first_name", splitName[0])
 		if len(splitName) > 1 {
@@ -165,5 +187,8 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		Schedules:                 schedules,
 		EmployeeCode:              m.EmployeeCode,
 		UserID:                    m.UserID,
+		TotalWorkingDays:          m.TotalWorkingDays,
+		TotalWorkingHours:         m.TotalWorkingHours,
+		DailyWorkingHours:         m.DailyWorkingHours,
 	})
 }

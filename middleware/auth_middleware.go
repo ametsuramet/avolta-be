@@ -50,7 +50,12 @@ func AuthMiddleware() gin.HandlerFunc {
 			var user = model.User{Base: model.Base{ID: claims.Id}}
 			user.GetUserByID()
 			// fmt.Println("user", user)
+			timezone := c.GetHeader("timezone")
+			if timezone == "" {
+				timezone = "Asia/Jakarta"
+			}
 			c.Set("user", user)
+			c.Set("timezone", timezone)
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

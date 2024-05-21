@@ -249,7 +249,7 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if input.UserID != "" {
+	if input.UserID != "" && input.UserID != data.UserID {
 		count := int64(0)
 		database.DB.Model(&model.Employee{}).Where("user_id = ?", input.UserID).Count(&count)
 		if count > 0 {

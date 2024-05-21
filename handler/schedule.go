@@ -111,12 +111,15 @@ func ScheduleCreateHandler(c *gin.Context) {
 		database.DB.Find(&employee, "id = ?", v)
 		employees = append(employees, employee)
 	}
-	database.DB.Model(&data).Association("Employees").Append(employees)
+	if len(employees) > 0 {
+		database.DB.Model(&data).Association("Employees").Append(employees)
+	}
 	util.ResponseSuccess(c, "Data Schedule Created", gin.H{"last_id": data.ID}, nil)
 }
 
 func ScheduleUpdateHandler(c *gin.Context) {
-	var input, data model.Schedule
+	var input model.Schedule
+	var data model.Schedule
 	id := c.Params.ByName("id")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -130,6 +133,15 @@ func ScheduleUpdateHandler(c *gin.Context) {
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
+	}
+	employees := []model.Employee{}
+	for _, v := range input.EmployeeIDs {
+		employee := model.Employee{}
+		database.DB.Find(&employee, "id = ?", v)
+		employees = append(employees, employee)
+	}
+	if len(employees) > 0 {
+		database.DB.Model(&data).Association("Employees").Append(employees)
 	}
 	util.ResponseSuccess(c, "Data Schedule Updated", nil, nil)
 }
