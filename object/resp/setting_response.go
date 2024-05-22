@@ -10,4 +10,6 @@ type SettingReponse struct {
 	PayRollExpenseAccountID          *string `json:"pay_roll_expense_account_id"`
 	PayRollAssetAccountID            *string `json:"pay_roll_asset_account_id"`
 	PayRollTaxAccountID              *string `json:"pay_roll_tax_account_id"`
+	IsEffectiveRateAverage           bool    `json:"is_effective_rate_average"`
+	IsGrossUp                        bool    `json:"is_gross_up"`
 }

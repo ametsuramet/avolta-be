@@ -21,6 +21,7 @@ import (
 
 type PayRoll struct {
 	Base
+	PayRollNumber                   string          `json:"pay_roll_number"`
 	Title                           string          `json:"title"`
 	Notes                           string          `json:"notes"`
 	StartDate                       time.Time       `json:"start_date" binding:"required"`
@@ -62,6 +63,8 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 
 	m.GetItems()
 	items := []resp.PayRollItemReponse{}
+	transactions := []resp.TransactionReponse{}
+
 	for _, v := range m.Items {
 		items = append(items, resp.PayRollItemReponse{
 			ID:             v.ID,
@@ -78,11 +81,83 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 		})
 	}
 
+	for _, v := range m.Transactions {
+		accountSourceId := ""
+		accountSourceName := ""
+		if v.AccountSourceID != nil {
+			accountSourceId = *v.AccountSourceID
+			accountSourceName = v.AccountSource.Name
+		}
+		accountDestinationId := ""
+		accountDestinationName := ""
+		if v.AccountDestinationID != nil {
+			accountDestinationId = *v.AccountDestinationID
+			accountDestinationName = v.AccountDestination.Name
+		}
+		transactions = append(transactions, resp.TransactionReponse{
+			ID:                     v.ID,
+			Description:            v.Description,
+			Notes:                  v.Notes,
+			Credit:                 v.Credit,
+			Debit:                  v.Debit,
+			Amount:                 v.Amount,
+			Date:                   v.Date.Format("2006-01-02 15:04:05"),
+			IsIncome:               v.IsIncome,
+			IsExpense:              v.IsExpense,
+			IsJournal:              v.IsJournal,
+			IsAccountReceivable:    v.IsAccountReceivable,
+			IsAccountPayable:       v.IsAccountPayable,
+			AccountSourceID:        accountSourceId,
+			AccountSourceName:      accountSourceName,
+			AccountDestinationID:   accountDestinationId,
+			AccountDestinationName: accountDestinationName,
+			EmployeeID:             v.EmployeeID,
+			EmployeeName:           v.Employee.FullName,
+		})
+	}
+
+	payableTransactions := []resp.TransactionReponse{}
+	for _, v := range m.PayableTransactions {
+		accountSourceId := ""
+		accountSourceName := ""
+		if v.AccountSourceID != nil {
+			accountSourceId = *v.AccountSourceID
+			accountSourceName = v.AccountSource.Name
+		}
+		accountDestinationId := ""
+		accountDestinationName := ""
+		if v.AccountDestinationID != nil {
+			accountDestinationId = *v.AccountDestinationID
+			accountDestinationName = v.AccountDestination.Name
+		}
+		payableTransactions = append(payableTransactions, resp.TransactionReponse{
+			ID:                     v.ID,
+			Description:            v.Description,
+			Notes:                  v.Notes,
+			Credit:                 v.Credit,
+			Debit:                  v.Debit,
+			Amount:                 v.Amount,
+			Date:                   v.Date.Format("2006-01-02 15:04:05"),
+			IsIncome:               v.IsIncome,
+			IsExpense:              v.IsExpense,
+			IsJournal:              v.IsJournal,
+			IsAccountReceivable:    v.IsAccountReceivable,
+			IsAccountPayable:       v.IsAccountPayable,
+			AccountSourceID:        accountSourceId,
+			AccountSourceName:      accountSourceName,
+			AccountDestinationID:   accountDestinationId,
+			AccountDestinationName: accountDestinationName,
+			EmployeeID:             v.EmployeeID,
+			EmployeeName:           v.Employee.FullName,
+		})
+	}
+
 	m.TakeHomePayCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay)))))
 	m.TakeHomePayReimbursementCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay + m.TotalReimbursement)))))
 
 	return json.Marshal(resp.PayRollReponse{
 		ID:                              m.ID,
+		PayRollNumber:                   m.PayRollNumber,
 		Notes:                           m.Notes,
 		StartDate:                       m.StartDate.Format("2006-01-02"),
 		EndDate:                         m.EndDate.Format("2006-01-02"),
@@ -105,6 +180,8 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 		TakeHomePayCounted:              m.TakeHomePayCounted,
 		TakeHomePayReimbursementCounted: m.TakeHomePayReimbursementCounted,
 		Status:                          m.Status,
+		Transactions:                    transactions,
+		PayableTransactions:             payableTransactions,
 	})
 }
 
@@ -114,6 +191,164 @@ func (m *PayRoll) GetEmployee() {
 	m.Employee = employee
 }
 
+func (m *PayRoll) RunPayRoll(c *gin.Context) error {
+	m.GetItems()
+
+	if err := database.DB.Transaction(func(tx *gorm.DB) error {
+		var setting Setting
+		if err := database.DB.First(&setting).Error; err != nil {
+			return err
+		}
+
+		now := time.Now()
+
+		// GET REIMBURSEMENT
+		reimbursementItem := PayRollItem{}
+		tx.Find(&reimbursementItem, "pay_roll_id = ? AND reimbursement_id is not null", m.ID)
+		_, totalReimbursement, _, _ := m.GetDeductible()
+
+		m.TotalReimbursement = totalReimbursement
+
+		// CREATE TRANSACTION
+		// TAKE HOME PAY
+		if err := tx.Create(&Transaction{
+
+			Description:          "Take Home Pay (" + m.PayRollNumber + ")",
+			Debit:                m.TakeHomePay,
+			AccountDestinationID: setting.PayRollExpenseAccountID,
+			IsExpense:            true,
+			Date:                 now,
+			PayRollID:            m.ID,
+			EmployeeID:           m.EmployeeID,
+		}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&Transaction{
+
+			Description:          "Hutang Take Home Pay (" + m.PayRollNumber + ")",
+			Credit:               m.TakeHomePay,
+			AccountDestinationID: setting.PayRollPayableAccountID,
+			IsAccountPayable:     true,
+			Date:                 now,
+			PayRollID:            m.ID,
+			EmployeeID:           m.EmployeeID,
+		}).Error; err != nil {
+			return err
+		}
+
+		// REIMBURSEMENT
+		fmt.Println("TOTAL REIMBURSEMENT", totalReimbursement)
+		if totalReimbursement > 0 {
+			reimbursementItems := m.GetReimbursementItems()
+
+			for _, v := range reimbursementItems {
+				if v.ReimbursementID != nil {
+					var reimbursement Reimbursement
+					if err := tx.Find(&reimbursement, "id = ?", v.ReimbursementID).Error; err != nil {
+						return err
+					}
+					if err := tx.Find(&reimbursement, "id = ?", v.ReimbursementID).Updates(gin.H{
+						"status": "FINISHED",
+						"notes":  "[MOVED TO PAYROLL] " + reimbursement.Notes,
+					}).Error; err != nil {
+						return err
+					}
+
+					if err := tx.Create(&Transaction{
+
+						Description:          "MOVE TO PAYROLL (" + reimbursement.Notes + " -> " + m.Title + ")",
+						Credit:               reimbursement.Total,
+						AccountDestinationID: &reimbursement.AccountExpenseID,
+						IsExpense:            true,
+						Date:                 now,
+						ReimbursementID:      &reimbursement.ID,
+						EmployeeID:           reimbursement.EmployeeID,
+						PayRollID:            m.ID,
+					}).Error; err != nil {
+						return err
+					}
+					if err := tx.Create(&Transaction{
+
+						Description:          "MOVE TO PAYROLL (" + reimbursement.Notes + " -> " + m.Title + ")",
+						Debit:                reimbursement.Total,
+						AccountDestinationID: &reimbursement.AccountPayableID,
+						IsAccountPayable:     true,
+						Date:                 now,
+						ReimbursementID:      &reimbursement.ID,
+						EmployeeID:           reimbursement.EmployeeID,
+						PayRollID:            m.ID,
+					}).Error; err != nil {
+						return err
+					}
+				}
+			}
+
+			if err := tx.Create(&Transaction{
+
+				Description:          "Reimbursement (" + m.PayRollNumber + ")",
+				Debit:                m.TotalReimbursement,
+				AccountDestinationID: setting.PayRollExpenseAccountID,
+				IsExpense:            true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+			if err := tx.Create(&Transaction{
+
+				Description:          "Hutang Reimbursement (" + m.PayRollNumber + ")",
+				Credit:               m.TotalReimbursement,
+				AccountDestinationID: setting.PayRollPayableAccountID,
+				IsAccountPayable:     true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+		}
+
+		if m.TotalTax > 0 {
+			//  TAX TRANSACTION
+			if err := tx.Create(&Transaction{
+
+				Description:          "Pajak (" + m.PayRollNumber + ")",
+				Debit:                m.TotalTax,
+				AccountDestinationID: setting.PayRollExpenseAccountID,
+				IsExpense:            true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+
+			if err := tx.Create(&Transaction{
+
+				Description:          "Hutang Pajak (" + m.PayRollNumber + ")",
+				Credit:               m.TotalTax,
+				AccountDestinationID: setting.PayRollTaxAccountID,
+				IsAccountPayable:     true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Model(&m).Update("status", "RUNNING").Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
 func (m *PayRoll) CreateDefaultItems(c *gin.Context) error {
 	m.GetEmployee()
 
@@ -382,6 +617,18 @@ func (m *PayRoll) GetItems() {
 	items := []PayRollItem{}
 	database.DB.Order("created_at asc").Find(&items, "pay_roll_id = ?", m.ID)
 	m.Items = items
+}
+
+func (m *PayRoll) GetTransactions() {
+	transactions := []Transaction{}
+	database.DB.Preload("AccountSource").Preload("AccountDestination").Joins("LEFT JOIN accounts as acc_source ON acc_source.id = transactions.account_source_id").Joins("LEFT JOIN accounts as acc_dest ON acc_dest.id = transactions.account_destination_id").Select("transactions.*, acc_source.is_tax is_source_tax, acc_source.name account_source_name, acc_dest.name account_destination_name, acc_dest.is_tax is_destination_tax").Find(&transactions, "transactions.pay_roll_id = ?", m.ID)
+	m.Transactions = transactions
+}
+
+func (m *PayRoll) GetPayableTransactions() {
+	transactions := []Transaction{}
+	database.DB.Preload("AccountSource").Preload("AccountDestination").Joins("LEFT JOIN accounts as acc_source ON acc_source.id = transactions.account_source_id").Joins("LEFT JOIN accounts as acc_dest ON acc_dest.id = transactions.account_destination_id").Select("transactions.*, acc_source.is_tax is_source_tax, acc_source.name account_source_name, acc_dest.name account_destination_name, acc_dest.is_tax is_destination_tax").Where("(transactions.is_account_payable = true and transactions.tax_payment_id is  null and acc_dest.is_tax = false) or (transactions.pay_roll_payable_id is not null )").Find(&transactions, "transactions.pay_roll_id = ? and transactions.reimbursement_id is null", m.ID)
+	m.PayableTransactions = transactions
 }
 
 func (m *PayRoll) RegularTaxTariff(taxAmount float64, taxable float64) {

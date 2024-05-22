@@ -12,13 +12,29 @@ import (
 
 func PayRollGetAllHandler(c *gin.Context) {
 	var data []model.PayRoll
-	preloads := []string{"Employee"}
-	total, err := model.Paginate(c, &data, preloads)
+	preloads := []string{}
+	paginator := util.NewPaginator(c)
+	paginator.Preloads = preloads
+
+	paginator.Paginate(&data)
+	// search, ok := c.GetQuery("search")
+	// if ok {
+	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
+	// 		"full_name": search,
+	// 	})
+	// }
+	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data List PayRoll Retrived", data, &total)
+
+	// for i := range data {
+	// 	data[i].GetTransactions()
+	// 	data[i].GetPayableTransactions()
+	// }
+
+	util.ResponsePaginatorSuccess(c, "Data List PayRoll Retrived", dataRecords.Records, dataRecords)
 }
 
 func PayRollGetOneHandler(c *gin.Context) {
@@ -30,7 +46,8 @@ func PayRollGetOneHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	// data.CountTax()
+	data.GetTransactions()
+	data.GetPayableTransactions()
 	util.ResponseSuccess(c, "Data PayRoll Retrived", data, nil)
 }
 
@@ -57,6 +74,23 @@ func PayRollCreateHandler(c *gin.Context) {
 	util.ResponseSuccess(c, "Data PayRoll Created", gin.H{"last_id": data.ID}, nil)
 }
 
+func PayRollProcessHandler(c *gin.Context) {
+	var data model.PayRoll
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := data.RunPayRoll(c); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.ResponseSuccess(c, "Data PayRoll Processed", nil, nil)
+
+}
 func PayRollUpdateHandler(c *gin.Context) {
 	var input, data model.PayRoll
 	id := c.Params.ByName("id")

@@ -2,12 +2,15 @@ package resp
 
 type PayRollReponse struct {
 	ID                              string               `json:"id"`
+	PayRollNumber                   string               `json:"pay_roll_number"`
 	Notes                           string               `json:"notes"`
 	StartDate                       string               `json:"start_date"`
 	EndDate                         string               `json:"end_date"`
 	EmployeeID                      string               `json:"employee_id"`
 	EmployeeName                    string               `json:"employee_name"`
 	Items                           []PayRollItemReponse `json:"items"`
+	Transactions                    []TransactionReponse `json:"transactions"`
+	PayableTransactions             []TransactionReponse `json:"payable_transactions"`
 	TaxSummary                      CountTaxSummary      `gorm:"-" json:"tax_summary"`
 	IsGrossUp                       bool                 `json:"is_gross_up"`
 	IsEffectiveRateAverage          bool                 `json:"is_effective_rate_average"`

@@ -40,6 +40,8 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Leave{})
 	database.DB.AutoMigrate(&model.Company{})
 	database.DB.AutoMigrate(&model.Setting{})
+	database.DB.AutoMigrate(&model.Reimbursement{})
+	database.DB.AutoMigrate(&model.ReimbursementItem{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -223,7 +225,7 @@ func GenAccounts() {
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
-		Name:             "Pembayaran Gaji",
+		Name:             "Pengeluaran Gaji",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
 	})

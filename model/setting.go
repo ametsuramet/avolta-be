@@ -22,6 +22,8 @@ type Setting struct {
 	PayRollAssetAccount              Account `gorm:"foreignKey:PayRollAssetAccountID" json:"pay_roll_asset_account"`
 	PayRollTaxAccountID              *string `json:"pay_roll_tax_account_id"`
 	PayRollTaxAccount                Account `gorm:"foreignKey:PayRollTaxAccountID" json:"pay_roll_tax_account"`
+	IsEffectiveRateAverage           bool    `json:"is_effective_rate_average"`
+	IsGrossUp                        bool    `json:"is_gross_up"`
 }
 
 func (u *Setting) BeforeCreate(tx *gorm.DB) (err error) {
@@ -42,5 +44,7 @@ func (m Setting) MarshalJSON() ([]byte, error) {
 		PayRollExpenseAccountID:          m.PayRollExpenseAccountID,
 		PayRollAssetAccountID:            m.PayRollAssetAccountID,
 		PayRollTaxAccountID:              m.PayRollTaxAccountID,
+		IsEffectiveRateAverage:           m.IsEffectiveRateAverage,
+		IsGrossUp:                        m.IsGrossUp,
 	})
 }

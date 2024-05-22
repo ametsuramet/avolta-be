@@ -10,19 +10,21 @@ import (
 
 type PayRollItem struct {
 	Base
-	ItemType         string  `json:"item_type" gorm:"type:enum('SALARY', 'ALLOWANCE', 'OVERTIME', 'DEDUCTION', 'REIMBURSEMENT')"`
-	AccountPayableID *string `json:"account_payable_id"`
-	Title            string  `json:"title"`
-	Notes            string  `json:"notes"`
-	IsDefault        bool    `json:"is_default"`
-	IsDeductible     bool    `json:"is_deductible"`
-	IsTax            bool    `json:"is_tax"`
-	TaxAutoCount     bool    `json:"tax_auto_count"`
-	IsTaxCost        bool    `json:"is_tax_cost"`
-	IsTaxAllowance   bool    `json:"is_tax_allowance"`
-	Amount           float64 `json:"amount"`
-	PayRollID        string  `json:"pay_roll_id"`
-	PayRoll          PayRoll `gorm:"foreignKey:PayRollID" json:"-"`
+	ItemType         string        `json:"item_type" gorm:"type:enum('SALARY', 'ALLOWANCE', 'OVERTIME', 'DEDUCTION', 'REIMBURSEMENT')"`
+	AccountPayableID *string       `json:"account_payable_id"`
+	Title            string        `json:"title"`
+	Notes            string        `json:"notes"`
+	IsDefault        bool          `json:"is_default"`
+	IsDeductible     bool          `json:"is_deductible"`
+	IsTax            bool          `json:"is_tax"`
+	TaxAutoCount     bool          `json:"tax_auto_count"`
+	IsTaxCost        bool          `json:"is_tax_cost"`
+	IsTaxAllowance   bool          `json:"is_tax_allowance"`
+	Amount           float64       `json:"amount"`
+	PayRollID        string        `json:"pay_roll_id"`
+	PayRoll          PayRoll       `gorm:"foreignKey:PayRollID" json:"-"`
+	ReimbursementID  *string       `json:"reimbursement_id"`
+	Reimbursement    Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
 }
 
 type PayRollItemReq struct {

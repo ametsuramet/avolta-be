@@ -84,6 +84,7 @@ func SetupRouter() *gin.Engine {
 			payRoll.GET("/:id", middleware.PermissionMiddleware("read_pay_roll"), handler.PayRollGetOneHandler)
 			payRoll.POST("", middleware.PermissionMiddleware("create_pay_roll"), handler.PayRollCreateHandler)
 			payRoll.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollUpdateHandler)
+			payRoll.PUT("/:id/Process", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollProcessHandler)
 			payRoll.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollDeleteHandler)
 		}
 		payRollItem := admin.Group("/payRollItem")
@@ -236,8 +237,29 @@ func SetupRouter() *gin.Engine {
 		setting := admin.Group("/setting")
 		setting.Use(middleware.AdminMiddleware())
 		{
-			setting.GET("", middleware.PermissionMiddleware("menu_setting"), handler.SettingGetOneHandler)
+			setting.GET("/autonumber", handler.SettingAutoNumberHandler)
+			setting.GET("", handler.SettingGetOneHandler)
 			setting.PUT("", middleware.PermissionMiddleware("menu_setting"), handler.SettingUpdateHandler)
+		}
+
+		reimbursement := admin.Group("/reimbursement")
+		reimbursement.Use()
+		{
+			reimbursement.GET("", handler.ReimbursementGetAllHandler)
+			reimbursement.GET("/:id", handler.ReimbursementGetOneHandler)
+			reimbursement.POST("", handler.ReimbursementCreateHandler)
+			reimbursement.PUT("/:id", handler.ReimbursementUpdateHandler)
+			reimbursement.DELETE("/:id", handler.ReimbursementDeleteHandler)
+		}
+
+		reimbursementItem := admin.Group("/reimbursementItem")
+		reimbursementItem.Use()
+		{
+			reimbursementItem.GET("", handler.ReimbursementItemGetAllHandler)
+			reimbursementItem.GET("/:id", handler.ReimbursementItemGetOneHandler)
+			reimbursementItem.POST("", handler.ReimbursementItemCreateHandler)
+			reimbursementItem.PUT("/:id", handler.ReimbursementItemUpdateHandler)
+			reimbursementItem.DELETE("/:id", handler.ReimbursementItemDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

@@ -11,22 +11,32 @@ import (
 
 type Transaction struct {
 	Base
-	Description          string    `json:"description"`
-	Notes                string    `json:"notes"`
-	Credit               float64   `json:"credit"`
-	Debit                float64   `json:"debit"`
-	Amount               float64   `json:"amount"`
-	Date                 time.Time `json:"date"`
-	IsIncome             bool      `json:"is_income"`
-	IsExpense            bool      `json:"is_expense"`
-	IsJournal            bool      `json:"is_journal"`
-	IsAccountReceivable  bool      `json:"is_account_receivable"`
-	IsAccountPayable     bool      `json:"is_account_payable"`
-	AccountSourceID      string    `json:"account_source_id"`
-	AccountDestinationID string    `json:"account_destination_id"`
-	EmployeeID           string    `json:"employee_id"`
-	Images               []Image   `json:"images" gorm:"-"`
-	PayRollID            string    `json:"pay_roll_id"`
+	Description            string        `json:"description"`
+	Notes                  string        `json:"notes"`
+	Credit                 float64       `json:"credit"`
+	Debit                  float64       `json:"debit"`
+	Amount                 float64       `json:"amount"`
+	Date                   time.Time     `json:"date"`
+	IsIncome               bool          `json:"is_income"`
+	IsExpense              bool          `json:"is_expense"`
+	IsJournal              bool          `json:"is_journal"`
+	IsAccountReceivable    bool          `json:"is_account_receivable"`
+	IsAccountPayable       bool          `json:"is_account_payable"`
+	AccountSourceID        *string       `json:"account_source_id"`
+	AccountSourceName      string        `json:"account_source_name" gorm:"-"`
+	AccountSource          Account       `gorm:"foreignKey:AccountSourceID" json:"-"`
+	AccountDestinationID   *string       `json:"account_destination_id"`
+	AccountDestinationName string        `json:"account_destination_name" gorm:"-"`
+	AccountDestination     Account       `gorm:"foreignKey:AccountDestinationID" json:"-"`
+	EmployeeID             string        `json:"employee_id"`
+	Employee               Employee      `gorm:"foreignKey:EmployeeID" json:"-"`
+	Images                 []Image       `json:"images" gorm:"-"`
+	PayRollID              string        `json:"pay_roll_id"`
+	PayRoll                PayRoll       `gorm:"foreignKey:PayRollID" json:"-"`
+	ReimbursementID        *string       `json:"reimbursement_id"`
+	Reimbursement          Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
+	TaxPaymentID           string        `json:"tax_payment_id"`
+	PayRollPayableID       string        `json:"pay_roll_payable_id"`
 }
 
 func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
@@ -35,5 +45,36 @@ func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Transaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.TransactionReponse{})
+	accountSourceId := ""
+	accountSourceName := ""
+	if m.AccountSourceID != nil {
+		accountSourceId = *m.AccountSourceID
+		accountSourceName = m.AccountSource.Name
+	}
+	accountDestinationId := ""
+	accountDestinationName := ""
+	if m.AccountDestinationID != nil {
+		accountDestinationId = *m.AccountDestinationID
+		accountDestinationName = m.AccountDestination.Name
+	}
+	return json.Marshal(resp.TransactionReponse{
+		ID:                     m.ID,
+		Description:            m.Description,
+		Notes:                  m.Notes,
+		Credit:                 m.Credit,
+		Debit:                  m.Debit,
+		Amount:                 m.Amount,
+		Date:                   m.Date.Format("2006-01-02 15:04:05"),
+		IsIncome:               m.IsIncome,
+		IsExpense:              m.IsExpense,
+		IsJournal:              m.IsJournal,
+		IsAccountReceivable:    m.IsAccountReceivable,
+		IsAccountPayable:       m.IsAccountPayable,
+		AccountSourceID:        accountSourceId,
+		AccountSourceName:      accountSourceName,
+		AccountDestinationID:   accountDestinationId,
+		AccountDestinationName: accountDestinationName,
+		EmployeeID:             m.EmployeeID,
+		EmployeeName:           m.Employee.FullName,
+	})
 }
