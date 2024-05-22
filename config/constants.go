@@ -95,3 +95,20 @@ var AccountName map[string]string = map[string]string{
 }
 
 var DaysOfWeekAbbr = []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+
+const (
+	SALARY        = "SALARY"
+	ALLOWANCE     = "ALLOWANCE"
+	OVERTIME      = "OVERTIME"
+	DEDUCTION     = "DEDUCTION"
+	REIMBURSEMENT = "REIMBURSEMENT"
+	DRAFT         = "DRAFT"
+	RUNNING       = "RUNNING"
+	FINISHED      = "FINISHED"
+	REQUEST       = "REQUEST"
+	APPROVED      = "APPROVED"
+	PAID          = "PAID"
+	PROCESSING    = "PROCESSING"
+	REJECTED      = "REJECTED"
+	CANCELED      = "CANCELED"
+)

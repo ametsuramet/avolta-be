@@ -86,6 +86,15 @@ func SetupRouter() *gin.Engine {
 			payRoll.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollUpdateHandler)
 			payRoll.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollDeleteHandler)
 		}
+		payRollItem := admin.Group("/payRollItem")
+		payRollItem.Use(middleware.AdminMiddleware())
+		{
+			// payRollItem.GET("", middleware.PermissionMiddleware("read_pay_roll"), handler.PayRollItemGetAllHandler)
+			// payRollItem.GET("/:id", middleware.PermissionMiddleware("read_pay_roll"), handler.PayRollItemGetOneHandler)
+			payRollItem.POST("", middleware.PermissionMiddleware("create_pay_roll"), handler.PayRollItemCreateHandler)
+			payRollItem.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollItemUpdateHandler)
+			payRollItem.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollItemDeleteHandler)
+		}
 
 		leave := admin.Group("/leave")
 		leave.Use(middleware.AdminMiddleware())
@@ -215,6 +224,20 @@ func SetupRouter() *gin.Engine {
 			user.POST("", middleware.PermissionMiddleware("create_user"), handler.UserCreateHandler)
 			user.PUT("/:id", middleware.PermissionMiddleware("update_user"), handler.UserUpdateHandler)
 			user.DELETE("/:id", middleware.PermissionMiddleware("delete_user"), handler.UserDeleteHandler)
+		}
+
+		company := admin.Group("/company")
+		company.Use(middleware.AdminMiddleware())
+		{
+			company.GET("", middleware.PermissionMiddleware("menu_company"), handler.CompanyGetOneHandler)
+			company.PUT("", middleware.PermissionMiddleware("menu_company"), handler.CompanyUpdateHandler)
+		}
+
+		setting := admin.Group("/setting")
+		setting.Use(middleware.AdminMiddleware())
+		{
+			setting.GET("", middleware.PermissionMiddleware("menu_setting"), handler.SettingGetOneHandler)
+			setting.PUT("", middleware.PermissionMiddleware("menu_setting"), handler.SettingUpdateHandler)
 		}
 
 		// DONT REMOVE THIS LINE

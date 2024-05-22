@@ -1,0 +1,18 @@
+package constants
+
+const (
+	SALARY        = "SALARY"
+	ALLOWANCE     = "ALLOWANCE"
+	OVERTIME      = "OVERTIME"
+	DEDUCTION     = "DEDUCTION"
+	REIMBURSEMENT = "REIMBURSEMENT"
+	DRAFT         = "DRAFT"
+	RUNNING       = "RUNNING"
+	FINISHED      = "FINISHED"
+	REQUEST       = "REQUEST"
+	APPROVED      = "APPROVED"
+	PAID          = "PAID"
+	PROCESSING    = "PROCESSING"
+	REJECTED      = "REJECTED"
+	CANCELED      = "CANCELED"
+)

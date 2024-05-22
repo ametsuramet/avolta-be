@@ -12,13 +12,54 @@ import (
 
 func LeaveGetAllHandler(c *gin.Context) {
 	var data []model.Leave
-	preloads := []string{"Employee", "LeaveCategory"}
-	total, err := model.Paginate(c, &data, preloads)
+	preloads := []string{}
+	paginator := util.NewPaginator(c)
+	paginator.Preloads = preloads
+
+	paginator.Paginate(&data)
+	// search, ok := c.GetQuery("search")
+	// if ok {
+	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
+	// 		"full_name": search,
+	// 	})
+	// }
+
+	startDate, ok := c.GetQuery("start_date")
+	if ok {
+		paginator.WhereMoreEqual = append(paginator.WhereMoreEqual, map[string]interface{}{
+			"start_date": startDate,
+		})
+
+	}
+	endDate, ok := c.GetQuery("end_date")
+	if ok {
+		paginator.WhereLessEqual = append(paginator.WhereLessEqual, map[string]interface{}{
+			"start_date": endDate,
+		})
+
+	}
+
+	employeeId, ok := c.GetQuery("employee_id")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"employee_id": employeeId,
+		})
+
+	}
+	status, ok := c.GetQuery("status")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"status": status,
+		})
+
+	}
+	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data List Leave Retrived", data, &total)
+
+	util.ResponsePaginatorSuccess(c, "Data List Leave Retrived", dataRecords.Records, dataRecords)
 }
 
 func LeaveGetOneHandler(c *gin.Context) {

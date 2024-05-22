@@ -40,6 +40,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "pay_roll", "is_default": true, "is_active": true},
 		{"name": "company", "is_default": true, "is_active": true},
 		{"name": "report", "is_default": true, "is_active": true},
+		{"name": "system", "is_default": true, "is_active": true},
 	}
 	var imports = []map[string]interface{}{
 		{"name": "dashboard", "is_default": true, "is_active": true},
@@ -49,6 +50,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "pay_roll", "is_default": true, "is_active": true},
 		{"name": "company", "is_default": true, "is_active": true},
+
 		{"name": "report", "is_default": true, "is_active": true},
 	}
 

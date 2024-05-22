@@ -38,6 +38,8 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.AttendanceImportItem{})
 	database.DB.AutoMigrate(&model.LeaveCategory{})
 	database.DB.AutoMigrate(&model.Leave{})
+	database.DB.AutoMigrate(&model.Company{})
+	database.DB.AutoMigrate(&model.Setting{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -221,6 +223,14 @@ func GenAccounts() {
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
+		Name:             "Pembayaran Gaji",
+		IsDeletable:      true,
+		Type:             config.TYPE_EXPENSE,
+	})
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_OPERATING,
 		Name:             "Peralatan Kantor",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
@@ -250,14 +260,7 @@ func GenAccounts() {
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
 	})
-	database.DB.Create(&model.Account{
-		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
-		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
-		Category:         config.CATEGORY_OPERATING,
-		Name:             "Pembayaran Gaji",
-		IsDeletable:      true,
-		Type:             config.TYPE_EXPENSE,
-	})
+
 	database.DB.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
@@ -343,6 +346,54 @@ func GenAccounts() {
 		Category:         config.CATEGORY_PRODUCTION_COST,
 		Name:             "Biaya Produksi",
 		Type:             config.TYPE_COST,
+	})
+
+	// Hutang Pajak - PPh 21
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang Pajak - PPh 21",
+		IsTax:            true,
+		Type:             config.TYPE_LIABILITY,
+	})
+
+	// Hutang Pajak - PPh 22
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang Pajak - PPh 22",
+		IsTax:            true,
+		Type:             config.TYPE_LIABILITY,
+	})
+	// Hutang Pajak - PPh 23
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang Pajak - PPh 23",
+		IsTax:            true,
+		Type:             config.TYPE_LIABILITY,
+	})
+	// Hutang Pajak - PPh 29
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang Pajak - PPh 29",
+		IsTax:            true,
+		Type:             config.TYPE_LIABILITY,
+	})
+
+	// Hutang Pajak Lainnya
+	database.DB.Create(&model.Account{
+		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang Pajak Lainnya",
+		IsTax:            true,
+		Type:             config.TYPE_LIABILITY,
 	})
 
 }

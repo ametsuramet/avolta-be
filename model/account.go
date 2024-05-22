@@ -38,5 +38,24 @@ func (u *Account) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Account) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.AccountReponse{})
+	return json.Marshal(resp.AccountReponse{
+		ID:                    m.ID,
+		Name:                  m.Name,
+		Code:                  m.Code,
+		Color:                 m.Color,
+		Description:           m.Description,
+		IsDeletable:           m.IsDeletable,
+		IsReport:              m.IsReport,
+		IsAccountReport:       m.IsAccountReport,
+		IsCashflowReport:      m.IsCashflowReport,
+		IsPDF:                 m.IsPDF,
+		Type:                  m.Type,
+		Category:              m.Category,
+		CashflowGroup:         m.CashflowGroup,
+		CashflowSubGroup:      m.CashflowSubGroup,
+		IsTax:                 m.IsTax,
+		TypeLabel:             m.TypeLabel,
+		CashflowGroupLabel:    m.CashflowGroupLabel,
+		CashflowSubGroupLabel: m.CashflowSubGroupLabel,
+	})
 }

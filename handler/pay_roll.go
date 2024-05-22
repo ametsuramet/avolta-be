@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func PayRollGetAllHandler(c *gin.Context) {
@@ -29,6 +30,7 @@ func PayRollGetOneHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	// data.CountTax()
 	util.ResponseSuccess(c, "Data PayRoll Retrived", data, nil)
 }
 
@@ -40,12 +42,15 @@ func PayRollCreateHandler(c *gin.Context) {
 		return
 	}
 
-	// getUser, _ := c.Get("user")
-	// user := getUser.(model.User)
-
-	// data.AuthorID = user.ID
-
-	if err := database.DB.Create(&data).Error; err != nil {
+	if err := database.DB.Transaction(func(tx *gorm.DB) error {
+		if err := database.DB.Create(&data).Error; err != nil {
+			return err
+		}
+		data.GetEmployee()
+		data.CreateDefaultItems(c)
+		data.CountTax()
+		return nil
+	}); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -64,10 +69,24 @@ func PayRollUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
+
+	if err := database.DB.Transaction(func(tx *gorm.DB) error {
+		if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
+			return err
+		}
+		database.DB.Model(&data).Update("is_gross_up", input.IsGrossUp)
+		database.DB.Model(&data).Update("is_effective_rate_average", input.IsEffectiveRateAverage)
+
+		data.IsGrossUp = input.IsGrossUp
+		data.IsEffectiveRateAverage = input.IsEffectiveRateAverage
+
+		data.CountTax()
+		return nil
+	}); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
 	util.ResponseSuccess(c, "Data PayRoll Updated", nil, nil)
 }
 
