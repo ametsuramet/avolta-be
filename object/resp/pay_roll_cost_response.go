@@ -7,4 +7,5 @@ type PayRollCostReponse struct {
 	BpjsTkJht   bool    `json:"bpjs_tk_jht"`
 	BpjsTkJp    bool    `json:"bpjs_tk_jp"`
 	Tariff      float64 `json:"tariff"`
+	DebtDeposit bool    `json:"debt_deposit"`
 }

@@ -43,8 +43,8 @@ type PayRoll struct {
 	IsEffectiveRateAverage          bool            `json:"is_effective_rate_average"`
 	Status                          string          `json:"status" gorm:"type:enum('DRAFT', 'RUNNING', 'FINISHED');default:'DRAFT'"`
 	Attachments                     []string        `json:"attachments" gorm:"-"`
-	Transactions                    []Transaction   `json:"transactions" gorm:"-"`
-	PayableTransactions             []Transaction   `json:"payable_transactions" gorm:"-"`
+	Transactions                    []Transaction   `json:"transactions" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	PayableTransactions             []Transaction   `json:"payable_transactions" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Items                           []PayRollItem   `json:"items" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Costs                           []PayRollCost   `json:"costs" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TakeHomePayCounted              string          `json:"take_home_pay_counted" gorm:"-"`
@@ -98,6 +98,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			BpjsTkJht:   v.BpjsTkJht,
 			BpjsTkJp:    v.BpjsTkJp,
 			Tariff:      v.Tariff,
+			DebtDeposit: v.DebtDeposit,
 		})
 	}
 
@@ -565,6 +566,16 @@ func (m *PayRoll) BpjsCount() error {
 		}).Error; err != nil {
 			return err
 		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Pungutan BPJS Kesehatan",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeeCost,
+			Tariff:        m.BpjsSetting.BpjsKesRateEmployee,
+			DebtDeposit:   true,
+		}).Error; err != nil {
+			return err
+		}
 	}
 	if m.BpjsSetting.BpjsTkJhtEnabled {
 		employeerCost, employeeCost, _ := m.BpjsSetting.CalculateBPJSTkJht(totalSalaryAndAllowance)
@@ -591,6 +602,17 @@ func (m *PayRoll) BpjsCount() error {
 		}).Error; err != nil {
 			return err
 		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Pungutan BPJS Ketenagakerjaan JHT",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeeCost,
+			Tariff:        m.BpjsSetting.BpjsTkJhtRateEmployee,
+			BpjsTkJht:     true,
+			DebtDeposit:   true,
+		}).Error; err != nil {
+			return err
+		}
 	}
 	if m.BpjsSetting.BpjsTkJpEnabled {
 		employeerCost, employeeCost, _ := m.BpjsSetting.CalculateBPJSTkJp(totalSalaryAndAllowance)
@@ -614,6 +636,17 @@ func (m *PayRoll) BpjsCount() error {
 			Amount:        employeerCost,
 			Tariff:        m.BpjsSetting.BpjsTkJpRateEmployer,
 			BpjsTkJp:      true,
+		}).Error; err != nil {
+			return err
+		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Pungutan BPJS Ketenagakerjaan JP",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeeCost,
+			Tariff:        m.BpjsSetting.BpjsTkJpRateEmployee,
+			BpjsTkJp:      true,
+			DebtDeposit:   true,
 		}).Error; err != nil {
 			return err
 		}
@@ -794,7 +827,7 @@ func (m *PayRoll) GetPayRollCost() {
 }
 func (m *PayRoll) GetTotalPayRollCost() float64 {
 	items := []PayRollCost{}
-	database.DB.Order("created_at asc").Find(&items, "pay_roll_id = ?", m.ID)
+	database.DB.Order("created_at asc").Where("debt_deposit", 0).Find(&items, "pay_roll_id = ?", m.ID)
 	// m.Items = items
 	totalCost := float64(0)
 	for _, v := range items {

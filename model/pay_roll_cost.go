@@ -19,6 +19,7 @@ type PayRollCost struct {
 	Tariff        float64     `json:"tariff"`
 	BpjsTkJht     bool        `json:"bpjs_tk_jht"`
 	BpjsTkJp      bool        `json:"bpjs_tk_jp"`
+	DebtDeposit   bool        `json:"debt_deposit"`
 }
 
 func (u *PayRollCost) BeforeCreate(tx *gorm.DB) (err error) {
