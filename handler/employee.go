@@ -268,6 +268,30 @@ func EmployeeUpdateHandler(c *gin.Context) {
 			return
 		}
 	}
+	if input.BasicSalary == 0 {
+		if err := database.DB.Model(&data).Update("basic_salary", 0).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if input.PositionalAllowance == 0 {
+		if err := database.DB.Model(&data).Update("positional_allowance", 0).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if input.TransportAllowance == 0 {
+		if err := database.DB.Model(&data).Update("transport_allowance", 0).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if input.MealAllowance == 0 {
+		if err := database.DB.Model(&data).Update("meal_allowance", 0).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	util.ResponseSuccess(c, "Data Employee Updated", nil, nil)
 }
 

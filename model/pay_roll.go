@@ -4,6 +4,7 @@ import (
 	"avolta/config"
 	"avolta/database"
 	"avolta/object/resp"
+	"avolta/service"
 	"avolta/util"
 	"database/sql"
 	"encoding/json"
@@ -37,6 +38,7 @@ type PayRoll struct {
 	TakeHomePay                     float64         `json:"take_home_pay"`
 	TotalPayable                    float64         `json:"total_payable"`
 	TaxAllowance                    float64         `json:"tax_allowance"`
+	TaxTariff                       float64         `json:"tax_tariff"`
 	IsGrossUp                       bool            `json:"is_gross_up"`
 	IsEffectiveRateAverage          bool            `json:"is_effective_rate_average"`
 	Status                          string          `json:"status" gorm:"type:enum('DRAFT', 'RUNNING', 'FINISHED');default:'DRAFT'"`
@@ -44,15 +46,18 @@ type PayRoll struct {
 	Transactions                    []Transaction   `json:"transactions" gorm:"-"`
 	PayableTransactions             []Transaction   `json:"payable_transactions" gorm:"-"`
 	Items                           []PayRollItem   `json:"items" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Costs                           []PayRollCost   `json:"costs" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TakeHomePayCounted              string          `json:"take_home_pay_counted" gorm:"-"`
 	TakeHomePayReimbursementCounted string          `json:"take_home_pay_reimbursement_counted" gorm:"-"`
 	TaxPaymentID                    sql.NullString  `json:"tax_payment_id"`
 	EmployeeID                      string          `binding:"required" json:"employee_id"`
 	Employee                        Employee        `gorm:"foreignKey:EmployeeID" `
 	TaxSummary                      CountTaxSummary `gorm:"-" json:"tax_summary"`
+	BpjsSetting                     *service.Bpjs   `gorm:"-" `
 }
 
 func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
+
 	if u.ID == "" {
 		tx.Statement.SetColumn("id", uuid.New().String())
 	}
@@ -62,6 +67,7 @@ func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
 func (m PayRoll) MarshalJSON() ([]byte, error) {
 
 	m.GetItems()
+
 	items := []resp.PayRollItemReponse{}
 	transactions := []resp.TransactionReponse{}
 
@@ -78,6 +84,20 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			IsTaxCost:      v.IsTaxCost,
 			IsTaxAllowance: v.IsTaxAllowance,
 			Amount:         v.Amount,
+			Tariff:         v.Tariff,
+		})
+	}
+
+	m.GetPayRollCost()
+	costs := []resp.PayRollCostReponse{}
+	for _, v := range m.Costs {
+		costs = append(costs, resp.PayRollCostReponse{
+			ID:          v.ID,
+			Description: v.Description,
+			Amount:      v.Amount,
+			BpjsTkJht:   v.BpjsTkJht,
+			BpjsTkJp:    v.BpjsTkJp,
+			Tariff:      v.Tariff,
 		})
 	}
 
@@ -182,6 +202,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 		Status:                          m.Status,
 		Transactions:                    transactions,
 		PayableTransactions:             payableTransactions,
+		Costs:                           costs,
 	})
 }
 
@@ -337,6 +358,33 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				return err
 			}
 		}
+		m.GetPayRollCost()
+
+		for _, v := range m.Costs {
+			if err := tx.Create(&Transaction{
+				Description:          v.Description + " (" + m.PayRollNumber + ")",
+				Debit:                v.Amount,
+				AccountDestinationID: setting.PayRollExpenseAccountID,
+				IsExpense:            true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+
+			if err := tx.Create(&Transaction{
+				Description:          "Hutang " + v.Description + " (" + m.PayRollNumber + ")",
+				Credit:               v.Amount,
+				AccountDestinationID: setting.PayRollCostAccountID,
+				IsAccountPayable:     true,
+				Date:                 now,
+				PayRollID:            m.ID,
+				EmployeeID:           m.EmployeeID,
+			}).Error; err != nil {
+				return err
+			}
+		}
 
 		if err := tx.Model(&m).Update("status", "RUNNING").Error; err != nil {
 			return err
@@ -354,22 +402,24 @@ func (m *PayRoll) CreateDefaultItems(c *gin.Context) error {
 
 	//  CREATE BASIC SALARY
 	if err := database.DB.Create(&PayRollItem{
-		ItemType:  config.SALARY,
-		IsDefault: true,
-		Amount:    m.Employee.BasicSalary,
-		PayRollID: m.ID,
-		Title:     "Gaji Pokok",
+		ItemType:    config.SALARY,
+		IsDefault:   true,
+		Amount:      m.Employee.BasicSalary,
+		PayRollID:   m.ID,
+		Title:       "Gaji Pokok",
+		BpjsCounted: true,
 	}).Error; err != nil {
 		return err
 	}
 
 	//  CREATE POSITIONAL ALLOWANCE
 	if err := database.DB.Create(&PayRollItem{
-		ItemType:  config.ALLOWANCE,
-		IsDefault: false,
-		Amount:    m.Employee.PositionalAllowance,
-		PayRollID: m.ID,
-		Title:     "Tunjangan Jabatan",
+		ItemType:    config.ALLOWANCE,
+		IsDefault:   false,
+		Amount:      m.Employee.PositionalAllowance,
+		PayRollID:   m.ID,
+		Title:       "Tunjangan Jabatan",
+		BpjsCounted: true,
 	}).Error; err != nil {
 		return err
 	}
@@ -457,14 +507,8 @@ func (m *PayRoll) CreateDefaultItems(c *gin.Context) error {
 	}
 
 	// BPJS
-	if err := database.DB.Create(&PayRollItem{
-		ItemType:     config.DEDUCTION,
-		IsDefault:    false,
-		IsDeductible: false,
-		Amount:       0,
-		PayRollID:    m.ID,
-		Title:        "BPJS",
-	}).Error; err != nil {
+
+	if err := m.BpjsCount(); err != nil {
 		return err
 	}
 
@@ -485,6 +529,130 @@ func (m *PayRoll) CreateDefaultItems(c *gin.Context) error {
 	return nil
 }
 
+func (m *PayRoll) BpjsCount() error {
+	if m.BpjsSetting == nil {
+		return nil
+	}
+	totalSalaryAndAllowance := float64(0)
+	m.GetItems()
+	for _, item := range m.Items {
+		if item.BpjsCounted && item.ItemType != config.DEDUCTION {
+			totalSalaryAndAllowance += item.Amount
+		}
+	}
+
+	if m.BpjsSetting.BpjsKesEnabled {
+		employeerCost, employeeCost, _ := m.BpjsSetting.CalculateBPJSKes(totalSalaryAndAllowance)
+		payrollItem := PayRollItem{
+			ItemType:     config.DEDUCTION,
+			IsDefault:    false,
+			IsDeductible: false,
+			Amount:       employeeCost,
+			PayRollID:    m.ID,
+			Title:        "BPJS Kesehatan",
+			Tariff:       m.BpjsSetting.BpjsKesRateEmployee,
+		}
+
+		if err := database.DB.Create(&payrollItem).Error; err != nil {
+			return err
+		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Biaya BPJS Kesehatan",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeerCost,
+			Tariff:        m.BpjsSetting.BpjsKesRateEmployer,
+		}).Error; err != nil {
+			return err
+		}
+	}
+	if m.BpjsSetting.BpjsTkJhtEnabled {
+		employeerCost, employeeCost, _ := m.BpjsSetting.CalculateBPJSTkJht(totalSalaryAndAllowance)
+		payrollItem := PayRollItem{
+			ItemType:     config.DEDUCTION,
+			IsDefault:    false,
+			IsDeductible: false,
+			Amount:       employeeCost,
+			PayRollID:    m.ID,
+			Title:        "BPJS Ketenagakerjaan JHT",
+			Tariff:       m.BpjsSetting.BpjsTkJhtRateEmployee,
+		}
+
+		if err := database.DB.Create(&payrollItem).Error; err != nil {
+			return err
+		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Biaya BPJS Ketenagakerjaan JHT",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeerCost,
+			Tariff:        m.BpjsSetting.BpjsTkJhtRateEmployer,
+			BpjsTkJht:     true,
+		}).Error; err != nil {
+			return err
+		}
+	}
+	if m.BpjsSetting.BpjsTkJpEnabled {
+		employeerCost, employeeCost, _ := m.BpjsSetting.CalculateBPJSTkJp(totalSalaryAndAllowance)
+		payrollItem := PayRollItem{
+			ItemType:     config.DEDUCTION,
+			IsDefault:    false,
+			IsDeductible: false,
+			Amount:       employeeCost,
+			PayRollID:    m.ID,
+			Title:        "BPJS Ketenagakerjaan JP",
+			Tariff:       m.BpjsSetting.BpjsTkJpRateEmployee,
+		}
+
+		if err := database.DB.Create(&payrollItem).Error; err != nil {
+			return err
+		}
+		if err := database.DB.Create(&PayRollCost{
+			Description:   "Biaya BPJS Ketenagakerjaan JP",
+			PayRollID:     m.ID,
+			PayRollItemID: payrollItem.ID,
+			Amount:        employeerCost,
+			Tariff:        m.BpjsSetting.BpjsTkJpRateEmployer,
+			BpjsTkJp:      true,
+		}).Error; err != nil {
+			return err
+		}
+	}
+	if m.BpjsSetting.BpjsTkJkmEnabled {
+		employeeCost := m.BpjsSetting.CalculateBPJSTkJkm(totalSalaryAndAllowance)
+		payrollItem := PayRollItem{
+			ItemType:     config.DEDUCTION,
+			IsDefault:    false,
+			IsDeductible: false,
+			Amount:       employeeCost,
+			PayRollID:    m.ID,
+			Title:        "BPJS Ketenagakerjaan JKM",
+			Tariff:       m.BpjsSetting.BpjsTkJkmEmployee,
+		}
+
+		if err := database.DB.Create(&payrollItem).Error; err != nil {
+			return err
+		}
+	}
+	if m.BpjsSetting.BpjsTkJkkEnabled {
+		employeeCost, tariff := m.BpjsSetting.CalculateBPJSTkJkk(totalSalaryAndAllowance, m.Employee.WorkSafetyRisks)
+		payrollItem := PayRollItem{
+			ItemType:     config.DEDUCTION,
+			IsDefault:    false,
+			IsDeductible: false,
+			Amount:       employeeCost,
+			PayRollID:    m.ID,
+			Title:        "BPJS Ketenagakerjaan JKK",
+			Tariff:       tariff,
+		}
+
+		if err := database.DB.Create(&payrollItem).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 func (m *PayRoll) GetDeductible() (float64, float64, float64, float64) {
 	var totalIncome, totalReimbursement, totalDeductible, totalNonDeductible float64 = 0, 0, 0, 0
 	for _, item := range m.Items {
@@ -581,6 +749,7 @@ func (m *PayRoll) EffectiveRateAverageTariff(category string, grossSalary float6
 	taxAmount := grossSalary * taxTariff
 	fmt.Printf("GROSS SALARY %s * TAXTARIFF %s = TAXAMOUNT %s \n", ac.FormatMoney(grossSalary), ac.FormatMoney(taxTariff), ac.FormatMoney(taxAmount))
 	m.TotalTax = taxAmount
+	m.TaxTariff = taxTariff
 }
 
 func (m *PayRoll) RefreshTax() {
@@ -617,6 +786,22 @@ func (m *PayRoll) GetItems() {
 	items := []PayRollItem{}
 	database.DB.Order("created_at asc").Find(&items, "pay_roll_id = ?", m.ID)
 	m.Items = items
+}
+func (m *PayRoll) GetPayRollCost() {
+	items := []PayRollCost{}
+	database.DB.Order("created_at asc").Find(&items, "pay_roll_id = ?", m.ID)
+	m.Costs = items
+}
+func (m *PayRoll) GetTotalPayRollCost() float64 {
+	items := []PayRollCost{}
+	database.DB.Order("created_at asc").Find(&items, "pay_roll_id = ?", m.ID)
+	// m.Items = items
+	totalCost := float64(0)
+	for _, v := range items {
+		totalCost += v.Amount
+	}
+
+	return totalCost
 }
 
 func (m *PayRoll) GetTransactions() {
@@ -783,7 +968,7 @@ func (m *PayRoll) CountTax() error {
 	// 1. GET NET INCOME
 	m.GetItems()
 
-	yearlyNetIncome := m.NetIncome * 12
+	yearlyNetIncome := (m.NetIncome + m.GetTotalPayRollCost()) * 12
 
 	taxable := yearlyNetIncome - nonTaxable
 
@@ -802,12 +987,15 @@ func (m *PayRoll) CountTax() error {
 		database.DB.Model(&m).Update("total_tax", 0)
 
 	}
+
 	if nonTaxable != 0 && countTaxRecord > 0 {
 		if m.IsEffectiveRateAverage {
 			fmt.Println("NON_TAXABLE_CATEGORY", nonTaxableCategory)
-			m.EffectiveRateAverageTariff(nonTaxableCategory, m.NetIncomeBeforeTaxCost)
+			m.EffectiveRateAverageTariff(nonTaxableCategory, m.NetIncomeBeforeTaxCost+m.GetTotalPayRollCost())
 		} else {
+			m.TaxTariff = 0
 			m.RegularTaxTariff(taxAmount, taxable)
+			database.DB.Model(&m).Update("tax_tariff", 0)
 
 		}
 	}

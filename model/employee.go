@@ -52,6 +52,7 @@ type Employee struct {
 	TotalWorkingDays          int32          `json:"total_working_days"`
 	TotalWorkingHours         float64        `json:"total_working_hours"`
 	DailyWorkingHours         float64        `json:"daily_working_hours"`
+	WorkSafetyRisks           string         `gorm:"type:ENUM('very_low','low','middle', 'high','very_high') DEFAULT 'very_low'" json:"work_safety_risks"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {

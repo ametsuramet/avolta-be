@@ -9,6 +9,7 @@ type PayRollReponse struct {
 	EmployeeID                      string               `json:"employee_id"`
 	EmployeeName                    string               `json:"employee_name"`
 	Items                           []PayRollItemReponse `json:"items"`
+	Costs                           []PayRollCostReponse `json:"costs"`
 	Transactions                    []TransactionReponse `json:"transactions"`
 	PayableTransactions             []TransactionReponse `json:"payable_transactions"`
 	TaxSummary                      CountTaxSummary      `gorm:"-" json:"tax_summary"`

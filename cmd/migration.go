@@ -42,6 +42,7 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Setting{})
 	database.DB.AutoMigrate(&model.Reimbursement{})
 	database.DB.AutoMigrate(&model.ReimbursementItem{})
+	database.DB.AutoMigrate(&model.PayRollCost{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -280,27 +281,27 @@ func GenAccounts() {
 		Type:             config.TYPE_EXPENSE,
 	})
 
-	database.DB.Create(&model.Account{
-		CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
-		CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
-		Category:         config.CATEGORY_EXPENSE,
-		Name:             "Penyusutan Tanah - Bangunan",
-		Type:             config.TYPE_EXPENSE,
-	})
-	database.DB.Create(&model.Account{
-		CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
-		CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
-		Category:         config.CATEGORY_EXPENSE,
-		Name:             "Penyusutan Kendaraan",
-		Type:             config.TYPE_EXPENSE,
-	})
-	database.DB.Create(&model.Account{
-		CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
-		CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
-		Category:         config.CATEGORY_EXPENSE,
-		Name:             "Penyusutan Lainnya",
-		Type:             config.TYPE_EXPENSE,
-	})
+	// database.DB.Create(&model.Account{
+	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
+	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
+	// 	Category:         config.CATEGORY_EXPENSE,
+	// 	Name:             "Penyusutan Tanah - Bangunan",
+	// 	Type:             config.TYPE_EXPENSE,
+	// })
+	// database.DB.Create(&model.Account{
+	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
+	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
+	// 	Category:         config.CATEGORY_EXPENSE,
+	// 	Name:             "Penyusutan Kendaraan",
+	// 	Type:             config.TYPE_EXPENSE,
+	// })
+	// database.DB.Create(&model.Account{
+	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
+	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
+	// 	Category:         config.CATEGORY_EXPENSE,
+	// 	Name:             "Penyusutan Lainnya",
+	// 	Type:             config.TYPE_EXPENSE,
+	// })
 
 	// RECEIVABLE
 	database.DB.Create(&model.Account{
@@ -324,6 +325,13 @@ func GenAccounts() {
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Gaji / Reimbursement",
+		Type:             config.TYPE_LIABILITY,
+	})
+	database.DB.Create(&model.Account{
+		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
+		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
+		Category:         config.CATEGORY_DEBT,
+		Name:             "Hutang BPJS",
 		Type:             config.TYPE_LIABILITY,
 	})
 	// COST

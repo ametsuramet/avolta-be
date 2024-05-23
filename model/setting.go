@@ -15,15 +15,22 @@ type Setting struct {
 	PayRollStaticCharacter           string  `json:"pay_roll_static_character" gorm:"default:'PAYROLL'"`
 	PayRollAutoNumberCharacterLength int     `json:"pay_roll_auto_number_character_length" gorm:"default:5"`
 	PayRollPayableAccountID          *string `json:"pay_roll_payable_account_id"`
-	PayRollPayableAccount            Account `gorm:"foreignKey:PayRollPayableAccountID" json:"pay_roll_payable_account"`
+	PayRollPayableAccount            Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollPayableAccountID" json:"pay_roll_payable_account"`
 	PayRollExpenseAccountID          *string `json:"pay_roll_expense_account_id"`
-	PayRollExpenseAccount            Account `gorm:"foreignKey:PayRollExpenseAccountID" json:"pay_roll_expense_account"`
+	PayRollExpenseAccount            Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollExpenseAccountID" json:"pay_roll_expense_account"`
 	PayRollAssetAccountID            *string `json:"pay_roll_asset_account_id"`
-	PayRollAssetAccount              Account `gorm:"foreignKey:PayRollAssetAccountID" json:"pay_roll_asset_account"`
+	PayRollAssetAccount              Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollAssetAccountID" json:"pay_roll_asset_account"`
 	PayRollTaxAccountID              *string `json:"pay_roll_tax_account_id"`
-	PayRollTaxAccount                Account `gorm:"foreignKey:PayRollTaxAccountID" json:"pay_roll_tax_account"`
+	PayRollTaxAccount                Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollTaxAccountID" json:"pay_roll_tax_account"`
+	PayRollCostAccountID             *string `json:"pay_roll_cost_account_id"`
+	PayRollCostAccount               Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollCostAccountID" json:"pay_roll_cost_account"`
 	IsEffectiveRateAverage           bool    `json:"is_effective_rate_average"`
 	IsGrossUp                        bool    `json:"is_gross_up"`
+	BpjsKes                          bool    `json:"bpjs_kes"`
+	BpjsTkJht                        bool    `json:"bpjs_tk_jht"`
+	BpjsTkJkm                        bool    `json:"bpjs_tk_jkm"`
+	BpjsTkJp                         bool    `json:"bpjs_tk_jp"`
+	BpjsTkJkk                        bool    `json:"bpjs_tk_jkk"`
 }
 
 func (u *Setting) BeforeCreate(tx *gorm.DB) (err error) {
@@ -44,7 +51,13 @@ func (m Setting) MarshalJSON() ([]byte, error) {
 		PayRollExpenseAccountID:          m.PayRollExpenseAccountID,
 		PayRollAssetAccountID:            m.PayRollAssetAccountID,
 		PayRollTaxAccountID:              m.PayRollTaxAccountID,
+		PayRollCostAccountID:             m.PayRollCostAccountID,
 		IsEffectiveRateAverage:           m.IsEffectiveRateAverage,
 		IsGrossUp:                        m.IsGrossUp,
+		BpjsKes:                          m.BpjsKes,
+		BpjsTkJht:                        m.BpjsTkJht,
+		BpjsTkJkm:                        m.BpjsTkJkm,
+		BpjsTkJp:                         m.BpjsTkJp,
+		BpjsTkJkk:                        m.BpjsTkJkk,
 	})
 }

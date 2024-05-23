@@ -48,7 +48,7 @@ func PayRollItemCreateHandler(c *gin.Context) {
 	var data model.PayRollItem
 	var payRoll model.PayRoll
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -63,7 +63,19 @@ func PayRollItemCreateHandler(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Create(&input).Error; err != nil {
+	if err := database.DB.Create(&model.PayRollItem{
+		ItemType:       input.ItemType,
+		Title:          input.Title,
+		Notes:          input.Notes,
+		IsDefault:      input.IsDefault,
+		IsDeductible:   input.IsDeductible,
+		IsTax:          input.IsTax,
+		TaxAutoCount:   input.TaxAutoCount,
+		IsTaxCost:      input.IsTaxCost,
+		IsTaxAllowance: input.IsTaxAllowance,
+		Amount:         input.Amount,
+		PayRollID:      input.PayRollID,
+	}).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -105,14 +117,10 @@ func PayRollItemUpdateHandler(c *gin.Context) {
 }
 
 func PayRollItemDeleteHandler(c *gin.Context) {
-	var input, data model.PayRollItem
+	var data model.PayRollItem
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
-		util.ResponseFail(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	if err := database.DB.Model(&data).Delete(&input, "id = ?", id).Error; err != nil {
+	if err := database.DB.Model(&data).Unscoped().Delete(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

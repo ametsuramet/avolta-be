@@ -262,6 +262,16 @@ func SetupRouter() *gin.Engine {
 			reimbursementItem.DELETE("/:id", handler.ReimbursementItemDeleteHandler)
 		}
 
+		// payRollCost := admin.Group("/payRollCost")
+		// payRollCost.Use()
+		// {
+		// 	payRollCost.GET("", handler.PayRollCostGetAllHandler)
+		// 	payRollCost.GET("/:id", handler.PayRollCostGetOneHandler)
+		// 	payRollCost.POST("", handler.PayRollCostCreateHandler)
+		// 	payRollCost.PUT("/:id", handler.PayRollCostUpdateHandler)
+		// 	payRollCost.DELETE("/:id", handler.PayRollCostDeleteHandler)
+		// }
+
 		// DONT REMOVE THIS LINE
 
 	}

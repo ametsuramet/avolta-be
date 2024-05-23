@@ -12,4 +12,5 @@ type PayRollItemReponse struct {
 	IsTaxCost      bool    `json:"is_tax_cost"`
 	IsTaxAllowance bool    `json:"is_tax_allowance"`
 	Amount         float64 `json:"amount"`
+	Tariff         float64 `json:"tariff"`
 }

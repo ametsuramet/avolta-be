@@ -3,6 +3,7 @@ package handler
 import (
 	"avolta/database"
 	"avolta/model"
+	"avolta/service"
 	"avolta/util"
 	"net/http"
 
@@ -48,24 +49,42 @@ func PayRollGetOneHandler(c *gin.Context) {
 	}
 	data.GetTransactions()
 	data.GetPayableTransactions()
+	// data.CountTax()
 	util.ResponseSuccess(c, "Data PayRoll Retrived", data, nil)
 }
 
 func PayRollCreateHandler(c *gin.Context) {
 	var data model.PayRoll
+	var setting model.Setting
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	if err := database.DB.First(&setting).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	data.BpjsSetting = service.InitBPJS()
+	data.BpjsSetting.BpjsKesEnabled = setting.BpjsKes
+	data.BpjsSetting.BpjsTkJhtEnabled = setting.BpjsTkJht
+	data.BpjsSetting.BpjsTkJkmEnabled = setting.BpjsTkJkm
+	data.BpjsSetting.BpjsTkJpEnabled = setting.BpjsTkJp
+	data.BpjsSetting.BpjsTkJkkEnabled = setting.BpjsTkJkk
+
 	if err := database.DB.Transaction(func(tx *gorm.DB) error {
 		if err := database.DB.Create(&data).Error; err != nil {
 			return err
 		}
 		data.GetEmployee()
-		data.CreateDefaultItems(c)
-		data.CountTax()
+		if err := data.CreateDefaultItems(c); err != nil {
+			return err
+		}
+		if err := data.CountTax(); err != nil {
+			return err
+		}
 		return nil
 	}); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

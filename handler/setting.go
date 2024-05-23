@@ -79,5 +79,35 @@ func SettingUpdateHandler(c *gin.Context) {
 			return
 		}
 	}
+	if !input.BpjsKes {
+		if err := database.DB.Model(&data).Update("bpjs_kes", false).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if !input.BpjsTkJht {
+		if err := database.DB.Model(&data).Update("bpjs_tk_jht", false).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if !input.BpjsTkJkm {
+		if err := database.DB.Model(&data).Update("bpjs_tk_jkm", false).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if !input.BpjsTkJp {
+		if err := database.DB.Model(&data).Update("bpjs_tk_jp", false).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+	if !input.BpjsTkJkk {
+		if err := database.DB.Model(&data).Update("bpjs_tk_jkk", false).Error; err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	util.ResponseSuccess(c, "Data Setting Updated", nil, nil)
 }

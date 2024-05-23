@@ -25,6 +25,9 @@ type PayRollItem struct {
 	PayRoll          PayRoll       `gorm:"foreignKey:PayRollID" json:"-"`
 	ReimbursementID  *string       `json:"reimbursement_id"`
 	Reimbursement    Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
+	Bpjs             bool          `json:"bpjs"`
+	BpjsCounted      bool          `json:"bpjs_counted"`
+	Tariff           float64       `json:"tariff"`
 }
 
 type PayRollItemReq struct {
