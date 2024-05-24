@@ -16,43 +16,44 @@ import (
 
 type Employee struct {
 	Base
-	Email                     string         `json:"email"`
-	FirstName                 string         `json:"first_name"`
-	MiddleName                string         `json:"middle_name"`
-	LastName                  string         `json:"last_name"`
-	Username                  string         `json:"username"`
-	Phone                     string         `json:"phone"`
-	JobTitleID                sql.NullString `json:"job_title_id"`
-	JobTitle                  JobTitle       `gorm:"foreignKey:JobTitleID"`
-	Grade                     string         `json:"grade"`
-	UserID                    string         `json:"user_id"`
-	Address                   string         `json:"address"`
-	Picture                   sql.NullString `json:"picture"`
-	Cover                     string         `json:"cover"`
-	StartedWork               sql.NullTime   `json:"started_work"`
-	DateOfBirth               sql.NullTime   `json:"date_of_birth"`
-	EmployeeIdentityNumber    string         `json:"employee_identity_number"`
-	EmployeeCode              string         `json:"employee_code"`
-	FullName                  string         `json:"full_name"`
-	ConnectedTo               sql.NullString `json:"connected_to"`
-	Flag                      bool           `json:"flag"`
-	BasicSalary               float64        `json:"basic_salary"`
-	PositionalAllowance       float64        `json:"positional_allowance"`
-	TransportAllowance        float64        `json:"transport_allowance"`
-	MealAllowance             float64        `json:"meal_allowance"`
-	NonTaxableIncomeLevelCode string         `json:"non_taxable_income_level_code"`
-	PayRolls                  []PayRoll      `json:"pay_rolls"`
-	TaxPayerNumber            string         `json:"tax_payer_number"`
-	Gender                    string         `json:"gender"`
-	Attendance                []Attendance   `json:"attendance" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Organization              Organization   `gorm:"foreignKey:OrganizationID"`
-	OrganizationID            sql.NullString `json:"organization_id"`
-	WorkingType               string         `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
-	Schedules                 []*Schedule    `json:"-" gorm:"many2many:schedule_employees;"`
-	TotalWorkingDays          int32          `json:"total_working_days"`
-	TotalWorkingHours         float64        `json:"total_working_hours"`
-	DailyWorkingHours         float64        `json:"daily_working_hours"`
-	WorkSafetyRisks           string         `gorm:"type:ENUM('very_low','low','middle', 'high','very_high') DEFAULT 'very_low'" json:"work_safety_risks"`
+	Email                     string          `json:"email"`
+	FirstName                 string          `json:"first_name"`
+	MiddleName                string          `json:"middle_name"`
+	LastName                  string          `json:"last_name"`
+	Username                  string          `json:"username"`
+	Phone                     string          `json:"phone"`
+	JobTitleID                sql.NullString  `json:"job_title_id"`
+	JobTitle                  JobTitle        `gorm:"foreignKey:JobTitleID"`
+	Grade                     string          `json:"grade"`
+	UserID                    string          `json:"user_id"`
+	Address                   string          `json:"address"`
+	Picture                   sql.NullString  `json:"picture"`
+	Cover                     string          `json:"cover"`
+	StartedWork               sql.NullTime    `json:"started_work"`
+	DateOfBirth               sql.NullTime    `json:"date_of_birth"`
+	EmployeeIdentityNumber    string          `json:"employee_identity_number"`
+	EmployeeCode              string          `json:"employee_code"`
+	FullName                  string          `json:"full_name"`
+	ConnectedTo               sql.NullString  `json:"connected_to"`
+	Flag                      bool            `json:"flag"`
+	BasicSalary               float64         `json:"basic_salary"`
+	PositionalAllowance       float64         `json:"positional_allowance"`
+	TransportAllowance        float64         `json:"transport_allowance"`
+	MealAllowance             float64         `json:"meal_allowance"`
+	NonTaxableIncomeLevelCode string          `json:"non_taxable_income_level_code"`
+	PayRolls                  []PayRoll       `json:"pay_rolls" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Reimbursements            []Reimbursement `json:"reimbursements" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TaxPayerNumber            string          `json:"tax_payer_number"`
+	Gender                    string          `json:"gender"`
+	Attendance                []Attendance    `json:"attendance" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Organization              Organization    `gorm:"foreignKey:OrganizationID"`
+	OrganizationID            sql.NullString  `json:"organization_id"`
+	WorkingType               string          `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
+	Schedules                 []*Schedule     `json:"-" gorm:"many2many:schedule_employees;"`
+	TotalWorkingDays          int32           `json:"total_working_days"`
+	TotalWorkingHours         float64         `json:"total_working_hours"`
+	DailyWorkingHours         float64         `json:"daily_working_hours"`
+	WorkSafetyRisks           string          `gorm:"type:ENUM('very_low','low','middle', 'high','very_high') DEFAULT 'very_low'" json:"work_safety_risks"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {

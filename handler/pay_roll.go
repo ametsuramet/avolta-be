@@ -157,3 +157,18 @@ func PayRollDeleteHandler(c *gin.Context) {
 	}
 	util.ResponseSuccess(c, "Data PayRoll Deleted", nil, nil)
 }
+
+func PayRollPaymentHandler(c *gin.Context) {
+	var input, data model.PayRoll
+	id := c.Params.ByName("id")
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data PayRoll Paid", nil, nil)
+}

@@ -85,6 +85,7 @@ func SetupRouter() *gin.Engine {
 			payRoll.POST("", middleware.PermissionMiddleware("create_pay_roll"), handler.PayRollCreateHandler)
 			payRoll.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollUpdateHandler)
 			payRoll.PUT("/:id/Process", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollProcessHandler)
+			payRoll.PUT("/:id/Payment", middleware.PermissionMiddleware("payment_pay_roll"), handler.PayRollPaymentHandler)
 			payRoll.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollDeleteHandler)
 		}
 		payRollItem := admin.Group("/payRollItem")
@@ -243,19 +244,19 @@ func SetupRouter() *gin.Engine {
 		}
 
 		reimbursement := admin.Group("/reimbursement")
-		reimbursement.Use()
+		reimbursement.Use(middleware.AdminMiddleware())
 		{
-			reimbursement.GET("", handler.ReimbursementGetAllHandler)
-			reimbursement.GET("/:id", handler.ReimbursementGetOneHandler)
-			reimbursement.POST("", handler.ReimbursementCreateHandler)
-			reimbursement.PUT("/:id", handler.ReimbursementUpdateHandler)
-			reimbursement.PUT("/:id/Approval/:type", handler.ReimbursementApprovalHandler)
-			reimbursement.PUT("/:id/Payment", handler.ReimbursemenPaymentHandler)
-			reimbursement.DELETE("/:id", handler.ReimbursementDeleteHandler)
+			reimbursement.GET("", middleware.PermissionMiddleware("read_reimbursement"), handler.ReimbursementGetAllHandler)
+			reimbursement.GET("/:id", middleware.PermissionMiddleware("read_reimbursement"), handler.ReimbursementGetOneHandler)
+			reimbursement.POST("", middleware.PermissionMiddleware("create_reimbursement"), handler.ReimbursementCreateHandler)
+			reimbursement.PUT("/:id", middleware.PermissionMiddleware("update_reimbursement"), handler.ReimbursementUpdateHandler)
+			reimbursement.PUT("/:id/Approval/:type", middleware.PermissionMiddleware("approvel_reimbursement"), handler.ReimbursementApprovalHandler)
+			reimbursement.PUT("/:id/Payment", middleware.PermissionMiddleware("payment_reimbursement"), handler.ReimbursemenPaymentHandler)
+			reimbursement.DELETE("/:id", middleware.PermissionMiddleware("delete_reimbursement"), handler.ReimbursementDeleteHandler)
 		}
 
 		reimbursementItem := admin.Group("/reimbursementItem")
-		reimbursementItem.Use()
+		reimbursementItem.Use(middleware.AdminMiddleware())
 		{
 			reimbursementItem.GET("", handler.ReimbursementItemGetAllHandler)
 			reimbursementItem.GET("/:id", handler.ReimbursementItemGetOneHandler)

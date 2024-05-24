@@ -24,10 +24,10 @@ type Reimbursement struct {
 	Total            float64             `json:"total"`
 	Balance          float64             `json:"balance"`
 	Status           string              `json:"status" gorm:"type:enum('DRAFT', 'REQUEST', 'PROCESSING', 'APPROVED', 'REJECTED', 'PAID', 'FINISHED', 'CANCELED');default:'DRAFT'"`
-	Items            []ReimbursementItem `json:"items"`
+	Items            []ReimbursementItem `json:"items" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	EmployeeID       string              `json:"employee_id"`
 	Employee         Employee            `gorm:"foreignKey:EmployeeID" json:"-"`
-	Transactions     []Transaction       `json:"transactions,omitempty"`
+	Transactions     []Transaction       `json:"transactions" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Attachment       string              `json:"attachment"`
 }
 

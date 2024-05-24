@@ -137,6 +137,29 @@ func DefaultPermission(search string) []model.Permission {
 	})
 
 	permissions = append(permissions, model.Permission{
+		Name:      "Reimbursement Approval",
+		Key:       "approval_reimbursement",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "leave",
+	})
+	permissions = append(permissions, model.Permission{
+		Name:      "Reimbursement Payment",
+		Key:       "payment_reimbursement",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "leave",
+	})
+
+	permissions = append(permissions, model.Permission{
+		Name:      "Reimbursement Pay Roll",
+		Key:       "pay_roll_reimbursement",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "pay_roll",
+	})
+
+	permissions = append(permissions, model.Permission{
 		Name:      "Payment Invoice",
 		Key:       "payment_invoice",
 		IsDefault: true,
