@@ -14,6 +14,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "schedule", "is_default": true, "is_active": true},
 		{"name": "job_title", "is_default": true, "is_active": true},
 		{"name": "attendance", "is_default": true, "is_active": true},
+		{"name": "reimbursement", "is_default": true, "is_active": true},
 		{"name": "employee", "is_default": true, "is_active": true},
 		{"name": "transaction", "is_default": true, "is_active": true},
 		{"name": "incentive", "is_default": true, "is_active": true},

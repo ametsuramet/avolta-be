@@ -249,6 +249,8 @@ func SetupRouter() *gin.Engine {
 			reimbursement.GET("/:id", handler.ReimbursementGetOneHandler)
 			reimbursement.POST("", handler.ReimbursementCreateHandler)
 			reimbursement.PUT("/:id", handler.ReimbursementUpdateHandler)
+			reimbursement.PUT("/:id/Approval/:type", handler.ReimbursementApprovalHandler)
+			reimbursement.PUT("/:id/Payment", handler.ReimbursemenPaymentHandler)
 			reimbursement.DELETE("/:id", handler.ReimbursementDeleteHandler)
 		}
 

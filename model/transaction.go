@@ -31,16 +31,20 @@ type Transaction struct {
 	EmployeeID             string        `json:"employee_id"`
 	Employee               Employee      `gorm:"foreignKey:EmployeeID" json:"-"`
 	Images                 []Image       `json:"images" gorm:"-"`
-	PayRollID              string        `json:"pay_roll_id"`
+	PayRollID              *string       `json:"pay_roll_id"`
 	PayRoll                PayRoll       `gorm:"foreignKey:PayRollID" json:"-"`
 	ReimbursementID        *string       `json:"reimbursement_id"`
 	Reimbursement          Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
 	TaxPaymentID           string        `json:"tax_payment_id"`
 	PayRollPayableID       string        `json:"pay_roll_payable_id"`
+	IsPayRollPayment       bool          `json:"is_pay_roll_payment"`
+	IsReimbursementPayment bool          `json:"is_reimbursement_payment"`
 }
 
 func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.SetColumn("id", uuid.New().String())
+	if u.ID == "" {
+		tx.Statement.SetColumn("id", uuid.New().String())
+	}
 	return
 }
 

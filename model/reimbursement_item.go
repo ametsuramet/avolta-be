@@ -17,6 +17,12 @@ type ReimbursementItem struct {
 	Files           string        `json:"files" gorm:"default:'[]'"`
 	Attachments     []string      `json:"attachments" gorm:"-"`
 }
+type ReimbursementItemReq struct {
+	Amount          float64 `json:"amount" form:"amount"`
+	Notes           string  `json:"notes" form:"notes"`
+	ReimbursementID string  `json:"reimbursement_id"`
+	Files           string  `json:"files" gorm:"default:'[]'"`
+}
 
 func (u *ReimbursementItem) BeforeCreate(tx *gorm.DB) (err error) {
 	if u.ID == "" {

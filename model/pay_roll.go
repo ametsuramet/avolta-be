@@ -240,7 +240,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 			AccountDestinationID: setting.PayRollExpenseAccountID,
 			IsExpense:            true,
 			Date:                 now,
-			PayRollID:            m.ID,
+			PayRollID:            &m.ID,
 			EmployeeID:           m.EmployeeID,
 		}).Error; err != nil {
 			return err
@@ -252,7 +252,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 			AccountDestinationID: setting.PayRollPayableAccountID,
 			IsAccountPayable:     true,
 			Date:                 now,
-			PayRollID:            m.ID,
+			PayRollID:            &m.ID,
 			EmployeeID:           m.EmployeeID,
 		}).Error; err != nil {
 			return err
@@ -266,42 +266,41 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 			for _, v := range reimbursementItems {
 				if v.ReimbursementID != nil {
 					var reimbursement Reimbursement
-					if err := tx.Find(&reimbursement, "id = ?", v.ReimbursementID).Error; err != nil {
+					if err := tx.Find(&reimbursement, "id = ?", &v.ReimbursementID).Error; err != nil {
 						return err
 					}
-					if err := tx.Find(&reimbursement, "id = ?", v.ReimbursementID).Updates(gin.H{
-						"status": "FINISHED",
-						"notes":  "[MOVED TO PAYROLL] " + reimbursement.Notes,
-					}).Error; err != nil {
+					reimbursement.Status = "FINISHED"
+					reimbursement.Notes = "[MOVED TO PAYROLL] -> " + m.PayRollNumber
+					if err := tx.Model(&reimbursement).Updates(&reimbursement).Error; err != nil {
 						return err
 					}
 
-					if err := tx.Create(&Transaction{
+					// if err := tx.Create(&Transaction{
 
-						Description:          "MOVE TO PAYROLL (" + reimbursement.Notes + " -> " + m.Title + ")",
-						Credit:               reimbursement.Total,
-						AccountDestinationID: &reimbursement.AccountExpenseID,
-						IsExpense:            true,
-						Date:                 now,
-						ReimbursementID:      &reimbursement.ID,
-						EmployeeID:           reimbursement.EmployeeID,
-						PayRollID:            m.ID,
-					}).Error; err != nil {
-						return err
-					}
-					if err := tx.Create(&Transaction{
+					// 	Description:          "MOVE TO PAYROLL (" + reimbursement.Name + " -> " + m.PayRollNumber + ")",
+					// 	Credit:               reimbursement.Total,
+					// 	AccountDestinationID: reimbursement.AccountExpenseID,
+					// 	IsExpense:            true,
+					// 	Date:                 now,
+					// 	ReimbursementID:      &reimbursement.ID,
+					// 	EmployeeID:           reimbursement.EmployeeID,
+					// 	PayRollID:            &m.ID,
+					// }).Error; err != nil {
+					// 	return err
+					// }
+					// if err := tx.Create(&Transaction{
 
-						Description:          "MOVE TO PAYROLL (" + reimbursement.Notes + " -> " + m.Title + ")",
-						Debit:                reimbursement.Total,
-						AccountDestinationID: &reimbursement.AccountPayableID,
-						IsAccountPayable:     true,
-						Date:                 now,
-						ReimbursementID:      &reimbursement.ID,
-						EmployeeID:           reimbursement.EmployeeID,
-						PayRollID:            m.ID,
-					}).Error; err != nil {
-						return err
-					}
+					// 	Description:          "MOVE TO PAYROLL (" + reimbursement.Name + " -> " + m.PayRollNumber + ")",
+					// 	Debit:                reimbursement.Total,
+					// 	AccountDestinationID: reimbursement.AccountPayableID,
+					// 	IsAccountPayable:     true,
+					// 	Date:                 now,
+					// 	ReimbursementID:      &reimbursement.ID,
+					// 	EmployeeID:           reimbursement.EmployeeID,
+					// 	PayRollID:            &m.ID,
+					// }).Error; err != nil {
+					// 	return err
+					// }
 				}
 			}
 
@@ -312,7 +311,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollExpenseAccountID,
 				IsExpense:            true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err
@@ -324,7 +323,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollPayableAccountID,
 				IsAccountPayable:     true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err
@@ -340,7 +339,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollExpenseAccountID,
 				IsExpense:            true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err
@@ -353,7 +352,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollTaxAccountID,
 				IsAccountPayable:     true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err
@@ -368,7 +367,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollExpenseAccountID,
 				IsExpense:            true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err
@@ -380,7 +379,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 				AccountDestinationID: setting.PayRollCostAccountID,
 				IsAccountPayable:     true,
 				Date:                 now,
-				PayRollID:            m.ID,
+				PayRollID:            &m.ID,
 				EmployeeID:           m.EmployeeID,
 			}).Error; err != nil {
 				return err

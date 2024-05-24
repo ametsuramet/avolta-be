@@ -24,6 +24,12 @@ type Setting struct {
 	PayRollTaxAccount                Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollTaxAccountID" json:"pay_roll_tax_account"`
 	PayRollCostAccountID             *string `json:"pay_roll_cost_account_id"`
 	PayRollCostAccount               Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollCostAccountID" json:"pay_roll_cost_account"`
+	ReimbursementPayableAccountID    *string `json:"reimbursement_payable_account_id"`
+	ReimbursementPayableAccount      Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:ReimbursementPayableAccountID" json:"reimbursement_payable_account"`
+	ReimbursementExpenseAccountID    *string `json:"reimbursement_expense_account_id"`
+	ReimbursementExpenseAccount      Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:ReimbursementExpenseAccountID" json:"reimbursement_expense_account"`
+	ReimbursementAssetAccountID      *string `json:"reimbursement_asset_account_id"`
+	ReimbursementAssetAccount        Account `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:ReimbursementAssetAccountID" json:"reimbursement_asset_account"`
 	IsEffectiveRateAverage           bool    `json:"is_effective_rate_average"`
 	IsGrossUp                        bool    `json:"is_gross_up"`
 	BpjsKes                          bool    `json:"bpjs_kes"`
@@ -52,6 +58,9 @@ func (m Setting) MarshalJSON() ([]byte, error) {
 		PayRollAssetAccountID:            m.PayRollAssetAccountID,
 		PayRollTaxAccountID:              m.PayRollTaxAccountID,
 		PayRollCostAccountID:             m.PayRollCostAccountID,
+		ReimbursementPayableAccountID:    m.ReimbursementPayableAccountID,
+		ReimbursementExpenseAccountID:    m.ReimbursementExpenseAccountID,
+		ReimbursementAssetAccountID:      m.ReimbursementAssetAccountID,
 		IsEffectiveRateAverage:           m.IsEffectiveRateAverage,
 		IsGrossUp:                        m.IsGrossUp,
 		BpjsKes:                          m.BpjsKes,

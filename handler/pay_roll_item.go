@@ -64,17 +64,18 @@ func PayRollItemCreateHandler(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&model.PayRollItem{
-		ItemType:       input.ItemType,
-		Title:          input.Title,
-		Notes:          input.Notes,
-		IsDefault:      input.IsDefault,
-		IsDeductible:   input.IsDeductible,
-		IsTax:          input.IsTax,
-		TaxAutoCount:   input.TaxAutoCount,
-		IsTaxCost:      input.IsTaxCost,
-		IsTaxAllowance: input.IsTaxAllowance,
-		Amount:         input.Amount,
-		PayRollID:      input.PayRollID,
+		ItemType:        input.ItemType,
+		Title:           input.Title,
+		Notes:           input.Notes,
+		IsDefault:       input.IsDefault,
+		IsDeductible:    input.IsDeductible,
+		IsTax:           input.IsTax,
+		TaxAutoCount:    input.TaxAutoCount,
+		IsTaxCost:       input.IsTaxCost,
+		IsTaxAllowance:  input.IsTaxAllowance,
+		Amount:          input.Amount,
+		PayRollID:       input.PayRollID,
+		ReimbursementID: input.ReimbursementID,
 	}).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return

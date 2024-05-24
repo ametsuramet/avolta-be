@@ -37,7 +37,7 @@ func FileUploadHandler(c *gin.Context) {
 
 	util.ResponseSuccess(c, "file uploaded", gin.H{
 		"path":     destination,
-		"filename": filename,
+		"filename": file.Filename,
 		"url":      fmt.Sprintf("%s/%s", config.App.Server.BaseURL, destination),
 	}, nil)
 }

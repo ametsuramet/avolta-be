@@ -44,9 +44,10 @@ func ReimbursementItemGetOneHandler(c *gin.Context) {
 }
 
 func ReimbursementItemCreateHandler(c *gin.Context) {
-	var data model.ReimbursementItem
+	var input model.ReimbursementItemReq
+	var reimbursement model.Reimbursement
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -54,12 +55,23 @@ func ReimbursementItemCreateHandler(c *gin.Context) {
 	// getUser, _ := c.Get("user")
 	// user := getUser.(model.User)
 
-	// data.AuthorID = user.ID
+	var data = model.ReimbursementItem{
+		Amount:          input.Amount,
+		Notes:           input.Notes,
+		ReimbursementID: input.ReimbursementID,
+		Files:           input.Files,
+	}
 
 	if err := database.DB.Create(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	if err := database.DB.Preload("Items").Find(&reimbursement, "id = ?", input.ReimbursementID).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	util.ResponseSuccess(c, "Data ReimbursementItem Created", gin.H{"last_id": data.ID}, nil)
 }
 

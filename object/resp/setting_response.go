@@ -18,4 +18,7 @@ type SettingReponse struct {
 	BpjsTkJkm                        bool    `json:"bpjs_tk_jkm"`
 	BpjsTkJp                         bool    `json:"bpjs_tk_jp"`
 	BpjsTkJkk                        bool    `json:"bpjs_tk_jkk"`
+	ReimbursementPayableAccountID    *string `json:"reimbursement_payable_account_id"`
+	ReimbursementExpenseAccountID    *string `json:"reimbursement_expense_account_id"`
+	ReimbursementAssetAccountID      *string `json:"reimbursement_asset_account_id"`
 }
