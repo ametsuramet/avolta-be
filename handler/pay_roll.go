@@ -159,14 +159,14 @@ func PayRollDeleteHandler(c *gin.Context) {
 }
 
 func PayRollPaymentHandler(c *gin.Context) {
-	var input, data model.PayRoll
+	var data model.PayRoll
 	id := c.Params.ByName("id")
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+	if err := data.Payment(c); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

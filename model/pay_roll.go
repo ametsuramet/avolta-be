@@ -56,6 +56,14 @@ type PayRoll struct {
 	BpjsSetting                     *service.Bpjs   `gorm:"-" `
 }
 
+type PayRollPayment struct {
+	TransactionRefID     string    `json:"transaction_ref_id"`
+	Date                 time.Time `json:"date"`
+	Amount               float64   `json:"amount"`
+	AccountDestinationID string    `json:"account_destination_id"`
+	Description          string    `json:"description"`
+}
+
 func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
 
 	if u.ID == "" {
@@ -134,6 +142,8 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			AccountDestinationName: accountDestinationName,
 			EmployeeID:             v.EmployeeID,
 			EmployeeName:           v.Employee.FullName,
+			IsPayRollPayment:       v.IsPayRollPayment,
+			IsReimbursementPayment: v.IsReimbursementPayment,
 		})
 	}
 
@@ -170,6 +180,8 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			AccountDestinationName: accountDestinationName,
 			EmployeeID:             v.EmployeeID,
 			EmployeeName:           v.Employee.FullName,
+			IsPayRollPayment:       v.IsPayRollPayment,
+			IsReimbursementPayment: v.IsReimbursementPayment,
 		})
 	}
 
@@ -213,6 +225,30 @@ func (m *PayRoll) GetEmployee() {
 	m.Employee = employee
 }
 
+func (m *PayRoll) Payment(c *gin.Context) error {
+	var data PayRollPayment
+
+	if err := c.ShouldBindJSON(&data); err != nil {
+		return err
+	}
+	var setting Setting
+	if err := database.DB.First(&setting).Error; err != nil {
+		return err
+	}
+	if err := database.DB.Create(&Transaction{
+		Description:          data.Description + " (" + m.PayRollNumber + ")",
+		Debit:                data.Amount,
+		AccountDestinationID: setting.PayRollPayableAccountID,
+		Date:                 data.Date,
+		PayRollID:            &m.ID,
+		EmployeeID:           m.EmployeeID,
+		IsPayRollPayment:     true,
+		TransactionRefID:     &data.TransactionRefID,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
+}
 func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 	m.GetItems()
 

@@ -39,6 +39,8 @@ type Transaction struct {
 	PayRollPayableID       string        `json:"pay_roll_payable_id"`
 	IsPayRollPayment       bool          `json:"is_pay_roll_payment"`
 	IsReimbursementPayment bool          `json:"is_reimbursement_payment"`
+	TransactionRefID       *string       `json:"transaction_ref_id"`
+	TransactionRefs        []Transaction `json:"transaction_refs" gorm:"foreignKey:TransactionRefID"`
 }
 
 func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
@@ -61,6 +63,28 @@ func (m Transaction) MarshalJSON() ([]byte, error) {
 		accountDestinationId = *m.AccountDestinationID
 		accountDestinationName = m.AccountDestination.Name
 	}
+
+	transaction_refs := []resp.TransactionReponse{}
+	for _, v := range m.TransactionRefs {
+		transaction_refs = append(transaction_refs, resp.TransactionReponse{
+			ID:                     v.ID,
+			Description:            v.Description,
+			Notes:                  v.Notes,
+			Credit:                 v.Credit,
+			Debit:                  v.Debit,
+			Amount:                 v.Amount,
+			Date:                   v.Date.Format("2006-01-02 15:04:05"),
+			IsIncome:               v.IsIncome,
+			IsExpense:              v.IsExpense,
+			IsJournal:              v.IsJournal,
+			IsAccountReceivable:    v.IsAccountReceivable,
+			IsAccountPayable:       v.IsAccountPayable,
+			AccountDestinationID:   *v.AccountDestinationID,
+			AccountDestinationName: v.AccountDestination.Name,
+			EmployeeID:             v.EmployeeID,
+			EmployeeName:           v.Employee.FullName,
+		})
+	}
 	return json.Marshal(resp.TransactionReponse{
 		ID:                     m.ID,
 		Description:            m.Description,
@@ -80,5 +104,8 @@ func (m Transaction) MarshalJSON() ([]byte, error) {
 		AccountDestinationName: accountDestinationName,
 		EmployeeID:             m.EmployeeID,
 		EmployeeName:           m.Employee.FullName,
+		TransactionRefs:        transaction_refs,
+		IsPayRollPayment:       m.IsPayRollPayment,
+		IsReimbursementPayment: m.IsReimbursementPayment,
 	})
 }
