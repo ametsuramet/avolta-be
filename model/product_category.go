@@ -1,16 +1,14 @@
 package model
 
 import (
-	"avolta/object/resp"
-	"encoding/json"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ProductCategory struct {
 	Base
-	Name string
+	Name     string    `json:"name"`
+	Products []Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
 }
 
 func (u *ProductCategory) BeforeCreate(tx *gorm.DB) (err error) {
@@ -20,6 +18,6 @@ func (u *ProductCategory) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m ProductCategory) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ProductCategoryReponse{})
-}
+// func (m ProductCategory) MarshalJSON() ([]byte, error) {
+// 	return json.Marshal(resp.ProductCategoryResponse{})
+// }

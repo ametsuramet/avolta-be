@@ -1,3 +1,3 @@
 package resp
 
-type GenPermissionReponse struct{}
+type GenPermissionResponse struct{}

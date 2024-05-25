@@ -10,7 +10,10 @@ import (
 
 type Shop struct {
 	Base
-	Name string
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Code        string `json:"code"`
+	Sales       []Sale `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *Shop) BeforeCreate(tx *gorm.DB) (err error) {
@@ -21,5 +24,10 @@ func (u *Shop) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Shop) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ShopReponse{})
+	return json.Marshal(resp.ShopResponse{
+		ID:          m.ID,
+		Name:        m.Name,
+		Code:        m.Code,
+		Description: m.Description,
+	})
 }

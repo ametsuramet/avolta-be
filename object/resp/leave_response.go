@@ -1,6 +1,6 @@
 package resp
 
-type LeaveReponse struct {
+type LeaveResponse struct {
 	ID              string `json:"id"`
 	Name            string `json:"name"`
 	RequestType     string `json:"request_type"`

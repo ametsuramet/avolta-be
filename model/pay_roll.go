@@ -76,11 +76,11 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 
 	m.GetItems()
 
-	items := []resp.PayRollItemReponse{}
-	transactions := []resp.TransactionReponse{}
+	items := []resp.PayRollItemResponse{}
+	transactions := []resp.TransactionResponse{}
 
 	for _, v := range m.Items {
-		items = append(items, resp.PayRollItemReponse{
+		items = append(items, resp.PayRollItemResponse{
 			ID:             v.ID,
 			ItemType:       v.ItemType,
 			Title:          v.Title,
@@ -97,9 +97,9 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 	}
 
 	m.GetPayRollCost()
-	costs := []resp.PayRollCostReponse{}
+	costs := []resp.PayRollCostResponse{}
 	for _, v := range m.Costs {
-		costs = append(costs, resp.PayRollCostReponse{
+		costs = append(costs, resp.PayRollCostResponse{
 			ID:          v.ID,
 			Description: v.Description,
 			Amount:      v.Amount,
@@ -123,7 +123,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			accountDestinationId = *v.AccountDestinationID
 			accountDestinationName = v.AccountDestination.Name
 		}
-		transactions = append(transactions, resp.TransactionReponse{
+		transactions = append(transactions, resp.TransactionResponse{
 			ID:                     v.ID,
 			Description:            v.Description,
 			Notes:                  v.Notes,
@@ -147,7 +147,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 		})
 	}
 
-	payableTransactions := []resp.TransactionReponse{}
+	payableTransactions := []resp.TransactionResponse{}
 	for _, v := range m.PayableTransactions {
 		accountSourceId := ""
 		accountSourceName := ""
@@ -161,7 +161,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 			accountDestinationId = *v.AccountDestinationID
 			accountDestinationName = v.AccountDestination.Name
 		}
-		payableTransactions = append(payableTransactions, resp.TransactionReponse{
+		payableTransactions = append(payableTransactions, resp.TransactionResponse{
 			ID:                     v.ID,
 			Description:            v.Description,
 			Notes:                  v.Notes,
@@ -188,7 +188,7 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 	m.TakeHomePayCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay)))))
 	m.TakeHomePayReimbursementCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay + m.TotalReimbursement)))))
 
-	return json.Marshal(resp.PayRollReponse{
+	return json.Marshal(resp.PayRollResponse{
 		ID:                              m.ID,
 		PayRollNumber:                   m.PayRollNumber,
 		Notes:                           m.Notes,

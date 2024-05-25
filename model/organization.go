@@ -36,15 +36,15 @@ func (m Organization) MarshalJSON() ([]byte, error) {
 		parent = m.Parent.Name
 		parentId = *m.ParentId
 	}
-	employees := []resp.SimpleEmployeeReponse{}
-	// subOrganizations := []resp.OrganizationReponse{}
+	employees := []resp.SimpleEmployeeResponse{}
+	// subOrganizations := []resp.OrganizationResponse{}
 
 	for _, v := range m.Employee {
 		var pictureUrl string
 		if v.Picture.Valid {
 			pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, v.Picture.String)
 		}
-		employees = append(employees, resp.SimpleEmployeeReponse{
+		employees = append(employees, resp.SimpleEmployeeResponse{
 			ID:         v.ID,
 			FullName:   v.FullName,
 			JobTitle:   v.JobTitle.Name,
@@ -54,7 +54,7 @@ func (m Organization) MarshalJSON() ([]byte, error) {
 
 	subOrganizations := m.GetSuborganizationResponse()
 
-	return json.Marshal(resp.OrganizationReponse{
+	return json.Marshal(resp.OrganizationResponse{
 		ID:               m.ID,
 		Parent:           parent,
 		ParentId:         parentId,
@@ -66,9 +66,9 @@ func (m Organization) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (m *Organization) GetSuborganizationResponse() []resp.OrganizationReponse {
+func (m *Organization) GetSuborganizationResponse() []resp.OrganizationResponse {
 	m.SubOrganizations = m.GetSuborganization()
-	subOrganizations := []resp.OrganizationReponse{}
+	subOrganizations := []resp.OrganizationResponse{}
 	for _, v := range m.SubOrganizations {
 
 		parentName := m.Name
@@ -78,14 +78,14 @@ func (m *Organization) GetSuborganizationResponse() []resp.OrganizationReponse {
 		// 	parentId = v.Parent.ID
 		// }
 
-		employees := []resp.SimpleEmployeeReponse{}
+		employees := []resp.SimpleEmployeeResponse{}
 
 		for _, v := range m.Employee {
 			var pictureUrl string
 			if v.Picture.Valid {
 				pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, v.Picture.String)
 			}
-			employees = append(employees, resp.SimpleEmployeeReponse{
+			employees = append(employees, resp.SimpleEmployeeResponse{
 				ID:         v.ID,
 				FullName:   v.FullName,
 				JobTitle:   v.JobTitle.Name,
@@ -93,7 +93,7 @@ func (m *Organization) GetSuborganizationResponse() []resp.OrganizationReponse {
 			})
 		}
 
-		subOrganizations = append(subOrganizations, resp.OrganizationReponse{
+		subOrganizations = append(subOrganizations, resp.OrganizationResponse{
 			ID:               v.ID,
 			Parent:           parentName,
 			ParentId:         parentId,

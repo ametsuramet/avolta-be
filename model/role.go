@@ -36,7 +36,7 @@ func (m Role) MarshalJSON() ([]byte, error) {
 	for _, v := range m.Permissions {
 		permissions = append(permissions, v.Key)
 	}
-	return json.Marshal(resp.RoleReponse{
+	return json.Marshal(resp.RoleResponse{
 		ID:           m.ID,
 		Name:         m.Name,
 		Description:  m.Description,

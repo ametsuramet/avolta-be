@@ -19,5 +19,5 @@ func (u *Incentive) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Incentive) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.IncentiveReponse{})
+	return json.Marshal(resp.IncentiveResponse{})
 }

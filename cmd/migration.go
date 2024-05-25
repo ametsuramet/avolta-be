@@ -43,6 +43,11 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Reimbursement{})
 	database.DB.AutoMigrate(&model.ReimbursementItem{})
 	database.DB.AutoMigrate(&model.PayRollCost{})
+	database.DB.AutoMigrate(&model.Sale{})
+	database.DB.AutoMigrate(&model.SaleReceipt{})
+	database.DB.AutoMigrate(&model.Product{})
+	database.DB.AutoMigrate(&model.ProductCategory{})
+	database.DB.AutoMigrate(&model.Shop{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -439,6 +444,23 @@ func GenLeaveCategories() {
 		})
 	}
 }
+
+func GenProductCategories() {
+	cats := []string{
+		"Makanan Ringan",
+		"Minuman Ringan",
+		"Peralatan Mandi",
+		"Kopi",
+		"Produk Lainnya",
+	}
+
+	for _, v := range cats {
+		database.DB.Create(&model.ProductCategory{
+			Name: v,
+		})
+	}
+}
+
 func GenSuperAdmin() {
 	database.DB.Create(&model.Role{
 		Name:         "SUPERADMIN",

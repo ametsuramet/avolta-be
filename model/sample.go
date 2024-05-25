@@ -21,5 +21,5 @@ func (u *Sample) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Sample) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.SampleReponse{})
+	return json.Marshal(resp.SampleResponse{})
 }

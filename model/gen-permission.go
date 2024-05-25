@@ -19,5 +19,5 @@ func (u *GenPermission) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m GenPermission) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.GenPermissionReponse{})
+	return json.Marshal(resp.GenPermissionResponse{})
 }

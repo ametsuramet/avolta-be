@@ -2,6 +2,7 @@ package model
 
 import (
 	"avolta/object/resp"
+	"avolta/util"
 	"encoding/json"
 
 	"github.com/google/uuid"
@@ -10,7 +11,13 @@ import (
 
 type Product struct {
 	Base
-	Name string
+	Name              string          `json:"name"`
+	SKU               string          `json:"sku"`
+	Barcode           string          `json:"barcode"`
+	SellingPrice      float64         `json:"selling_price"`
+	ProductCategoryID *string         `json:"product_category_id"`
+	ProductCategory   ProductCategory `json:"product_category" gorm:"foreignKey:ProductCategoryID"`
+	Sale              []Sale          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *Product) BeforeCreate(tx *gorm.DB) (err error) {
@@ -21,5 +28,13 @@ func (u *Product) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Product) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ProductReponse{})
+	return json.Marshal(resp.ProductResponse{
+		ID:                  m.ID,
+		Name:                m.Name,
+		SKU:                 m.SKU,
+		Barcode:             m.Barcode,
+		SellingPrice:        m.SellingPrice,
+		ProductCategoryID:   util.SavedString(m.ProductCategoryID),
+		ProductCategoryName: m.ProductCategory.Name,
+	})
 }

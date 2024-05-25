@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -121,4 +122,31 @@ func IntegerToRoman(number int) string {
 	}
 
 	return roman.String()
+}
+
+func ExtractPercentage(s string) float64 {
+	re := regexp.MustCompile(`\d+(\.\d+)?`)
+
+	match := re.FindString(s)
+	if match == "" {
+		return 0
+	}
+
+	number, err := strconv.ParseFloat(match, 64)
+	if err != nil {
+		return 0
+	}
+
+	return number
+}
+
+func ParseThousandSeparatedNumber(s string) float64 {
+	s = strings.Replace(s, ",", "", -1)
+
+	number, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0
+	}
+
+	return number
 }

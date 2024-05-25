@@ -16,12 +16,12 @@ func ProductCategoryGetAllHandler(c *gin.Context) {
 	paginator.Preloads = preloads
 
 	paginator.Paginate(&data)
-	// search, ok := c.GetQuery("search")
-	// if ok {
-	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
-	// 		"full_name": search,
-	// 	})
-	// }
+	search, ok := c.GetQuery("search")
+	if ok {
+		paginator.Search = append(paginator.Search, map[string]interface{}{
+			"name": search,
+		})
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

@@ -23,5 +23,5 @@ func (u *Image) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Image) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ImageReponse{})
+	return json.Marshal(resp.ImageResponse{})
 }

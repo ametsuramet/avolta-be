@@ -54,6 +54,7 @@ type Employee struct {
 	TotalWorkingHours         float64         `json:"total_working_hours"`
 	DailyWorkingHours         float64         `json:"daily_working_hours"`
 	WorkSafetyRisks           string          `gorm:"type:ENUM('very_low','low','middle', 'high','very_high') DEFAULT 'very_low'" json:"work_safety_risks"`
+	Sales                     []Sale          `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -111,7 +112,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 	if m.Picture.Valid {
 		pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Picture.String)
 	}
-	schedules := []resp.ScheduleReponse{}
+	schedules := []resp.ScheduleResponse{}
 	for _, v := range m.Schedules {
 		if v != nil {
 			weekDay := ""
@@ -134,7 +135,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 			if v.EndTime != nil {
 				endTime = v.EndTime.Format("15:04")
 			}
-			schedules = append(schedules, resp.ScheduleReponse{
+			schedules = append(schedules, resp.ScheduleResponse{
 				Name:         v.Name,
 				ScheduleType: v.ScheduleType,
 				WeekDay:      weekDay,
@@ -159,7 +160,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		username = user.FullName
 	}
 
-	return json.Marshal(resp.EmployeeReponse{
+	return json.Marshal(resp.EmployeeResponse{
 		ID:                        m.ID,
 		Email:                     m.Email,
 		FirstName:                 m.FirstName,

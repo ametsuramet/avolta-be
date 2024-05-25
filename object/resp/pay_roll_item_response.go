@@ -1,6 +1,6 @@
 package resp
 
-type PayRollItemReponse struct {
+type PayRollItemResponse struct {
 	ID             string  `json:"id"`
 	ItemType       string  `json:"item_type"`
 	Title          string  `json:"title"`

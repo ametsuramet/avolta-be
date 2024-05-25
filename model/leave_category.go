@@ -22,7 +22,7 @@ func (u *LeaveCategory) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m LeaveCategory) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.LeaveCategoryReponse{
+	return json.Marshal(resp.LeaveCategoryResponse{
 		ID:          m.ID,
 		Name:        m.Name,
 		Description: m.Description,

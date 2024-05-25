@@ -25,6 +25,11 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "user", "is_default": true, "is_active": true},
 		{"name": "organization", "is_default": true, "is_active": true},
+		{"name": "product", "is_default": true, "is_active": true},
+		{"name": "product_category", "is_default": true, "is_active": true},
+		{"name": "sale", "is_default": true, "is_active": true},
+		{"name": "sale_receipt", "is_default": true, "is_active": true},
+		{"name": "shop", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},
@@ -47,6 +52,8 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "dashboard", "is_default": true, "is_active": true},
 		{"name": "employee", "is_default": true, "is_active": true},
 		{"name": "attendance", "is_default": true, "is_active": true},
+		{"name": "product", "is_default": true, "is_active": true},
+		{"name": "sale", "is_default": true, "is_active": true},
 		{"name": "leave", "is_default": true, "is_active": true},
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "pay_roll", "is_default": true, "is_active": true},

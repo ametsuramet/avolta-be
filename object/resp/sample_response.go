@@ -1,3 +1,3 @@
 package resp
 
-type SampleReponse struct{}
+type SampleResponse struct{}

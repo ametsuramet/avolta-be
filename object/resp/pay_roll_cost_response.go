@@ -1,6 +1,6 @@
 package resp
 
-type PayRollCostReponse struct {
+type PayRollCostResponse struct {
 	ID          string  `json:"id"`
 	Description string  `json:"description"`
 	Amount      float64 `json:"amount"`

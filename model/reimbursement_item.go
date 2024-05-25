@@ -32,5 +32,5 @@ func (u *ReimbursementItem) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m ReimbursementItem) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ReimbursementItemReponse{})
+	return json.Marshal(resp.ReimbursementItemResponse{})
 }

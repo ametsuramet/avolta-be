@@ -41,7 +41,7 @@ func (m Company) MarshalJSON() ([]byte, error) {
 	if m.Logo != "" {
 		logoURL = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Logo)
 	}
-	return json.Marshal(resp.CompanyReponse{
+	return json.Marshal(resp.CompanyResponse{
 		ID:                    m.ID,
 		Name:                  m.Name,
 		Logo:                  m.Logo,

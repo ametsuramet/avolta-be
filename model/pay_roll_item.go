@@ -53,5 +53,5 @@ func (u *PayRollItem) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m PayRollItem) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.PayRollItemReponse{})
+	return json.Marshal(resp.PayRollItemResponse{})
 }

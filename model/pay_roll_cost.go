@@ -30,5 +30,5 @@ func (u *PayRollCost) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m PayRollCost) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.PayRollCostReponse{})
+	return json.Marshal(resp.PayRollCostResponse{})
 }

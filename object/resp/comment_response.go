@@ -1,3 +1,3 @@
 package resp
 
-type CommentReponse struct{}
+type CommentResponse struct{}

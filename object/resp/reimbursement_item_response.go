@@ -1,6 +1,6 @@
 package resp
 
-type ReimbursementItemReponse struct {
+type ReimbursementItemResponse struct {
 	ID          string   `json:"id" `
 	Amount      float64  `json:"amount" `
 	Notes       string   `json:"notes" `

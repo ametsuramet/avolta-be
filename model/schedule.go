@@ -60,7 +60,7 @@ func (m Schedule) MarshalJSON() ([]byte, error) {
 		endTime = m.EndTime.Format("15:04")
 	}
 
-	employees := []resp.EmployeeReponse{}
+	employees := []resp.EmployeeResponse{}
 	for _, v := range m.Employees {
 		var picture *string
 		var dateOfBirth, startedWork *time.Time
@@ -77,7 +77,7 @@ func (m Schedule) MarshalJSON() ([]byte, error) {
 		if v.Picture.Valid {
 			pictureUrl = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, v.Picture.String)
 		}
-		employees = append(employees, resp.EmployeeReponse{
+		employees = append(employees, resp.EmployeeResponse{
 			ID:                        v.ID,
 			Email:                     v.Email,
 			FirstName:                 v.FirstName,
@@ -107,7 +107,7 @@ func (m Schedule) MarshalJSON() ([]byte, error) {
 		})
 	}
 
-	return json.Marshal(resp.ScheduleReponse{
+	return json.Marshal(resp.ScheduleResponse{
 		ID:           m.ID,
 		Name:         m.Name,
 		ScheduleType: m.ScheduleType,

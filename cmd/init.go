@@ -13,6 +13,8 @@ func Init(args []string) {
 		GenPermissions()
 	case "gen-leave-category":
 		GenLeaveCategories()
+	case "gen-product-category":
+		GenProductCategories()
 	case "assign-superadmin":
 		AssignSuperadmin(args)
 	case "sample-job-title":

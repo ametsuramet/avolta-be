@@ -2,7 +2,7 @@ package resp
 
 import "time"
 
-type AttendanceReponse struct {
+type AttendanceResponse struct {
 	ID                     string     `json:"id"`
 	ClockIn                time.Time  `json:"clock_in"`
 	ClockOut               *time.Time `json:"clock_out"`

@@ -67,7 +67,7 @@ func (m Leave) MarshalJSON() ([]byte, error) {
 		employeePicture = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Employee.Picture.String)
 	}
 
-	return json.Marshal(resp.LeaveReponse{
+	return json.Marshal(resp.LeaveResponse{
 		ID:              m.ID,
 		Name:            m.Name,
 		RequestType:     m.RequestType,

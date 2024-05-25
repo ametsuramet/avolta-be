@@ -1,6 +1,6 @@
 package resp
 
-type SettingReponse struct {
+type SettingResponse struct {
 	ID                               string  `json:"id"`
 	PayRollAutoNumber                bool    `json:"pay_roll_auto_number"`
 	PayRollAutoFormat                string  `json:"pay_roll_auto_format"`

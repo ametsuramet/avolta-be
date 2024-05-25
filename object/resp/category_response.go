@@ -1,3 +1,3 @@
 package resp
 
-type CategoryReponse struct{}
+type CategoryResponse struct{}

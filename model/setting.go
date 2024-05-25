@@ -47,7 +47,7 @@ func (u *Setting) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Setting) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.SettingReponse{
+	return json.Marshal(resp.SettingResponse{
 		ID:                               m.ID,
 		PayRollAutoNumber:                m.PayRollAutoNumber,
 		PayRollAutoFormat:                m.PayRollAutoFormat,

@@ -277,17 +277,18 @@ func SetupRouter() *gin.Engine {
 		// }
 
 		product := admin.Group("/product")
-		product.Use()
+		product.Use(middleware.AdminMiddleware())
 		{
 			product.GET("", handler.ProductGetAllHandler)
 			product.GET("/:id", handler.ProductGetOneHandler)
 			product.POST("", handler.ProductCreateHandler)
 			product.PUT("/:id", handler.ProductUpdateHandler)
 			product.DELETE("/:id", handler.ProductDeleteHandler)
+			product.POST("/import", middleware.PermissionMiddleware("import_product"), handler.ProductImportHandler)
 		}
 
 		productCategory := admin.Group("/productCategory")
-		productCategory.Use()
+		productCategory.Use(middleware.AdminMiddleware())
 		{
 			productCategory.GET("", handler.ProductCategoryGetAllHandler)
 			productCategory.GET("/:id", handler.ProductCategoryGetOneHandler)
@@ -297,13 +298,34 @@ func SetupRouter() *gin.Engine {
 		}
 
 		shop := admin.Group("/shop")
-		shop.Use()
+		shop.Use(middleware.AdminMiddleware())
 		{
 			shop.GET("", handler.ShopGetAllHandler)
 			shop.GET("/:id", handler.ShopGetOneHandler)
 			shop.POST("", handler.ShopCreateHandler)
 			shop.PUT("/:id", handler.ShopUpdateHandler)
 			shop.DELETE("/:id", handler.ShopDeleteHandler)
+		}
+
+		sale := admin.Group("/sale")
+		sale.Use(middleware.AdminMiddleware())
+		{
+			sale.GET("", handler.SaleGetAllHandler)
+			sale.GET("/:id", handler.SaleGetOneHandler)
+			sale.POST("", handler.SaleCreateHandler)
+			sale.PUT("/:id", handler.SaleUpdateHandler)
+			sale.DELETE("/:id", handler.SaleDeleteHandler)
+			sale.POST("/import", middleware.PermissionMiddleware("import_sale"), handler.SaleImportHandler)
+		}
+
+		saleReceipt := admin.Group("/saleReceipt")
+		saleReceipt.Use(middleware.AdminMiddleware())
+		{
+			saleReceipt.GET("", handler.SaleReceiptGetAllHandler)
+			saleReceipt.GET("/:id", handler.SaleReceiptGetOneHandler)
+			saleReceipt.POST("", handler.SaleReceiptCreateHandler)
+			saleReceipt.PUT("/:id", handler.SaleReceiptUpdateHandler)
+			saleReceipt.DELETE("/:id", handler.SaleReceiptDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

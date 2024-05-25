@@ -23,5 +23,5 @@ func (u *Category) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Category) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.CategoryReponse{})
+	return json.Marshal(resp.CategoryResponse{})
 }

@@ -106,7 +106,7 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 		duration = m.WorkingDuration.Format("15:04")
 	}
 
-	return json.Marshal(resp.AttendanceReponse{
+	return json.Marshal(resp.AttendanceResponse{
 		ID:                     m.ID,
 		ClockIn:                m.ClockIn,
 		ClockOut:               m.ClockOut,

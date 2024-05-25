@@ -64,9 +64,9 @@ func (m Transaction) MarshalJSON() ([]byte, error) {
 		accountDestinationName = m.AccountDestination.Name
 	}
 
-	transaction_refs := []resp.TransactionReponse{}
+	transaction_refs := []resp.TransactionResponse{}
 	for _, v := range m.TransactionRefs {
-		transaction_refs = append(transaction_refs, resp.TransactionReponse{
+		transaction_refs = append(transaction_refs, resp.TransactionResponse{
 			ID:                     v.ID,
 			Description:            v.Description,
 			Notes:                  v.Notes,
@@ -85,7 +85,7 @@ func (m Transaction) MarshalJSON() ([]byte, error) {
 			EmployeeName:           v.Employee.FullName,
 		})
 	}
-	return json.Marshal(resp.TransactionReponse{
+	return json.Marshal(resp.TransactionResponse{
 		ID:                     m.ID,
 		Description:            m.Description,
 		Notes:                  m.Notes,

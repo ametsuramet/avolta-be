@@ -1,3 +1,3 @@
 package resp
 
-type PermissionReponse struct{}
+type PermissionResponse struct{}

@@ -1,3 +1,3 @@
 package resp
 
-type RollReponse struct{}
+type RollResponse struct{}

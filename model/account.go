@@ -38,7 +38,7 @@ func (u *Account) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m Account) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.AccountReponse{
+	return json.Marshal(resp.AccountResponse{
 		ID:                    m.ID,
 		Name:                  m.Name,
 		Code:                  m.Code,

@@ -1,3 +1,3 @@
 package resp
 
-type IncentiveReponse struct{}
+type IncentiveResponse struct{}

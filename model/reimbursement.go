@@ -49,7 +49,7 @@ func (m Reimbursement) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	return json.Marshal(resp.ReimbursementReponse{
+	return json.Marshal(resp.ReimbursementResponse{
 		ID:      m.ID,
 		Date:    m.Date.Format(time.RFC3339),
 		Notes:   m.Notes,
@@ -58,8 +58,8 @@ func (m Reimbursement) MarshalJSON() ([]byte, error) {
 		Total:   m.Total,
 		Balance: m.Balance,
 		Status:  m.Status,
-		Items: func(items []ReimbursementItem) []resp.ReimbursementItemReponse {
-			var newItems = []resp.ReimbursementItemReponse{}
+		Items: func(items []ReimbursementItem) []resp.ReimbursementItemResponse {
+			var newItems = []resp.ReimbursementItemResponse{}
 			for _, v := range items {
 				attachments := []string{}
 				files := []string{}
@@ -67,14 +67,14 @@ func (m Reimbursement) MarshalJSON() ([]byte, error) {
 				for _, file := range files {
 					attachments = append(attachments, fmt.Sprintf("%s/%s", config.App.Server.BaseURL, file))
 				}
-				newItems = append(newItems, resp.ReimbursementItemReponse{ID: v.ID, Amount: v.Amount, Notes: v.Notes, Attachments: attachments})
+				newItems = append(newItems, resp.ReimbursementItemResponse{ID: v.ID, Amount: v.Amount, Notes: v.Notes, Attachments: attachments})
 			}
 			return newItems
 		}(m.Items),
 		EmployeeID:   m.EmployeeID,
 		EmployeeName: m.Employee.FullName,
-		Transactions: func(items []Transaction) []resp.TransactionReponse {
-			var newItems = []resp.TransactionReponse{}
+		Transactions: func(items []Transaction) []resp.TransactionResponse {
+			var newItems = []resp.TransactionResponse{}
 			for _, v := range items {
 				accountSourceName := ""
 				if v.AccountSourceID != nil {
@@ -84,7 +84,7 @@ func (m Reimbursement) MarshalJSON() ([]byte, error) {
 				if v.AccountDestinationID != nil {
 					accountDestinationName = v.AccountDestination.Name
 				}
-				newItems = append(newItems, resp.TransactionReponse{ID: v.ID, Date: v.Date.Format(time.RFC3339), Amount: v.Amount, Credit: v.Credit, Debit: v.Debit, Notes: v.Notes, Description: v.Description, AccountSourceName: accountSourceName, AccountDestinationName: accountDestinationName})
+				newItems = append(newItems, resp.TransactionResponse{ID: v.ID, Date: v.Date.Format(time.RFC3339), Amount: v.Amount, Credit: v.Credit, Debit: v.Debit, Notes: v.Notes, Description: v.Description, AccountSourceName: accountSourceName, AccountDestinationName: accountDestinationName})
 			}
 			return newItems
 		}(m.Transactions),

@@ -1,3 +1,3 @@
 package resp
 
-type ProductCategoryReponse struct{}
+type ProductCategoryResponse struct{}
