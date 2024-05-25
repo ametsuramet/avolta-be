@@ -346,6 +346,11 @@ func AttendanceGetAllHandler(c *gin.Context) {
 	}
 
 	paginator.OrderBy = []string{"clock_in asc"}
+	orderBy, ok := c.GetQuery("order_by")
+	if ok {
+		paginator.OrderBy = []string{orderBy}
+
+	}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {

@@ -69,6 +69,24 @@ func FormatDuration(d time.Duration) string {
 	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
 
+func SavedString(str *string) string {
+	if str != nil {
+		return *str
+	}
+	return ""
+}
+func FileURL(str string) string {
+	if str != "" {
+		return fmt.Sprintf("%s/%s", config.App.Server.BaseURL, str)
+	}
+	return ""
+}
+func SavedFloat(str *float64) float64 {
+	if str != nil {
+		return *str
+	}
+	return 0
+}
 func IntegerToRoman(number int) string {
 	maxRomanNumber := 3999
 	if number > maxRomanNumber {

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"avolta/config"
+	"avolta/database"
 	"avolta/model"
 	"avolta/object/auth"
 	"avolta/util"
@@ -75,6 +76,22 @@ func AdminMiddleware() gin.HandlerFunc {
 		user.GetPermissions()
 		// fmt.Println("PERMISSIONS", user.Permissions)
 		c.Set("permissions", user.Permissions)
+		c.Next()
+	}
+}
+func UserMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		getUser, _ := c.Get("user")
+		user := getUser.(model.User)
+		employee := model.Employee{}
+		if err := database.DB.Find(&employee, "user_id = ?", user.ID).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": "user not liked yet with employee data"})
+			c.Abort()
+		}
+		user.Employee = employee
+
+		c.Set("employee", employee)
+
 		c.Next()
 	}
 }

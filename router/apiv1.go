@@ -13,7 +13,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"http://localhost:3033", "https://avolta.web.app"},
+		AllowOrigins:  []string{"http://localhost:3033", "http://localhost:3034", "https://avolta.web.app", "https://avoltafe.web.app"},
 		AllowMethods:  []string{"PUT", "PATCH", "GET", "POST", "DELETE", "HEAD"},
 		AllowHeaders:  []string{"Origin", "Authorization", "Content-Length", "Content-Type", "Access-Control-Allow-Origin", "API-KEY", "Currency-Code", "Cache-Control", "X-Requested-With", "Content-Disposition", "Content-Description"},
 		ExposeHeaders: []string{"Content-Length", "Content-Disposition", "Content-Description"},
@@ -25,6 +25,7 @@ func SetupRouter() *gin.Engine {
 
 	// v1.GET("/data", middleware.AuthMiddleware(), handler.GetData)
 
+	UserRouter(v1)
 	admin := v1.Group("/admin")
 
 	admin.Use()
@@ -274,6 +275,36 @@ func SetupRouter() *gin.Engine {
 		// 	payRollCost.PUT("/:id", handler.PayRollCostUpdateHandler)
 		// 	payRollCost.DELETE("/:id", handler.PayRollCostDeleteHandler)
 		// }
+
+		product := admin.Group("/product")
+		product.Use()
+		{
+			product.GET("", handler.ProductGetAllHandler)
+			product.GET("/:id", handler.ProductGetOneHandler)
+			product.POST("", handler.ProductCreateHandler)
+			product.PUT("/:id", handler.ProductUpdateHandler)
+			product.DELETE("/:id", handler.ProductDeleteHandler)
+		}
+
+		productCategory := admin.Group("/productCategory")
+		productCategory.Use()
+		{
+			productCategory.GET("", handler.ProductCategoryGetAllHandler)
+			productCategory.GET("/:id", handler.ProductCategoryGetOneHandler)
+			productCategory.POST("", handler.ProductCategoryCreateHandler)
+			productCategory.PUT("/:id", handler.ProductCategoryUpdateHandler)
+			productCategory.DELETE("/:id", handler.ProductCategoryDeleteHandler)
+		}
+
+		shop := admin.Group("/shop")
+		shop.Use()
+		{
+			shop.GET("", handler.ShopGetAllHandler)
+			shop.GET("/:id", handler.ShopGetOneHandler)
+			shop.POST("", handler.ShopCreateHandler)
+			shop.PUT("/:id", handler.ShopUpdateHandler)
+			shop.DELETE("/:id", handler.ShopDeleteHandler)
+		}
 
 		// DONT REMOVE THIS LINE
 

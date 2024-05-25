@@ -4,6 +4,7 @@ import (
 	"avolta/config"
 	"avolta/database"
 	"avolta/object/resp"
+	"avolta/service"
 	"avolta/util"
 	"encoding/json"
 	"fmt"
@@ -21,10 +22,10 @@ type Attendance struct {
 	ClockOutNotes          string               `json:"clock_out_notes"`
 	ClockInPicture         string               `json:"clock_in_picture"`
 	ClockOutPicture        string               `json:"clock_out_picture"`
-	ClockInLat             float64              `json:"clock_in_lat" gorm:"type:DECIMAL(10,8)"`
-	ClockInLng             float64              `json:"clock_in_lng" gorm:"type:DECIMAL(11,8)"`
-	ClockOutLat            float64              `json:"clock_out_lat" gorm:"type:DECIMAL(10,8)"`
-	ClockOutLng            float64              `json:"clock_out_lng" gorm:"type:DECIMAL(11,8)"`
+	ClockInLat             *float64             `json:"clock_in_lat" gorm:"type:DECIMAL(10,8)"`
+	ClockInLng             *float64             `json:"clock_in_lng" gorm:"type:DECIMAL(11,8)"`
+	ClockOutLat            *float64             `json:"clock_out_lat" gorm:"type:DECIMAL(10,8)"`
+	ClockOutLng            *float64             `json:"clock_out_lng" gorm:"type:DECIMAL(11,8)"`
 	EmployeeID             *string              `json:"employee_id"`
 	Employee               Employee             `gorm:"foreignKey:EmployeeID"`
 	BreakStart             *TimeOnly            `json:"break_start" gorm:"type:TIME"`
@@ -38,9 +39,29 @@ type Attendance struct {
 	AttendanceImportItem   AttendanceImportItem `gorm:"foreignKey:AttendanceImportItemID"`
 }
 
+type AttendanceReq struct {
+	ClockIn         time.Time  `json:"clock_in"`
+	ClockOut        *time.Time `json:"clock_out"`
+	ClockInNotes    *string    `json:"clock_in_notes"`
+	ClockOutNotes   *string    `json:"clock_out_notes"`
+	ClockInLat      *float64   `json:"clock_in_lat" gorm:"type:DECIMAL(10,8)"`
+	ClockInLng      *float64   `json:"clock_in_lng" gorm:"type:DECIMAL(11,8)"`
+	ClockOutLat     *float64   `json:"clock_out_lat" gorm:"type:DECIMAL(10,8)"`
+	ClockOutLng     *float64   `json:"clock_out_lng" gorm:"type:DECIMAL(11,8)"`
+	ClockInPicture  *string    `json:"clock_in_picture"`
+	ClockOutPicture *string    `json:"clock_out_picture"`
+}
+
 func (u *Attendance) BeforeCreate(tx *gorm.DB) (err error) {
 	if u.ID == "" {
 		tx.Statement.SetColumn("id", uuid.New().String())
+	}
+
+	if u.ClockInLat != nil && u.ClockInLng != nil {
+		location, err := service.GetLocationName(*u.ClockInLat, *u.ClockInLng)
+		if err == nil {
+			tx.Statement.SetColumn("clock_in_notes", location)
+		}
 	}
 	return
 }
@@ -84,12 +105,12 @@ func (m Attendance) MarshalJSON() ([]byte, error) {
 		ClockOut:               m.ClockOut,
 		ClockInNotes:           m.ClockInNotes,
 		ClockOutNotes:          m.ClockOutNotes,
-		ClockInPicture:         m.ClockInPicture,
-		ClockOutPicture:        m.ClockOutPicture,
-		ClockInLat:             m.ClockInLat,
-		ClockInLng:             m.ClockInLng,
-		ClockOutLat:            m.ClockOutLat,
-		ClockOutLng:            m.ClockOutLng,
+		ClockInPicture:         util.FileURL(m.ClockInPicture),
+		ClockOutPicture:        util.FileURL(m.ClockOutPicture),
+		ClockInLat:             util.SavedFloat(m.ClockInLat),
+		ClockInLng:             util.SavedFloat(m.ClockInLng),
+		ClockOutLat:            util.SavedFloat(m.ClockOutLat),
+		ClockOutLng:            util.SavedFloat(m.ClockOutLng),
 		EmployeeName:           m.Employee.FullName,
 		EmployeeID:             m.EmployeeID,
 		EmployeeJobTitle:       m.Employee.JobTitle.Name,

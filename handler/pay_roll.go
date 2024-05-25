@@ -13,7 +13,7 @@ import (
 
 func PayRollGetAllHandler(c *gin.Context) {
 	var data []model.PayRoll
-	preloads := []string{}
+	preloads := []string{"Employee"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
