@@ -16,9 +16,39 @@ func TodayAttendanceHandler(c *gin.Context) {
 	employee := getEmployee.(model.Employee)
 	now := time.Now().In(loc)
 	var data model.Attendance
-	database.DB.Find(&data, "DATE(clock_in) = ? and employee_id = ? and clock_out is null", now.Format("2006-01-02"), employee.ID)
+	database.DB.Find(&data, "DATE(clock_in) = ? and employee_id = ?", now.Format("2006-01-02"), employee.ID)
 
 	util.ResponsePaginatorSuccess(c, "Post Attandance Succeed", data, nil)
+}
+func ClockoutAttendanceHandler(c *gin.Context) {
+	var data model.Attendance
+
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var input model.AttendanceReq
+
+	if err := c.ShouldBindBodyWithJSON(&input); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	data.ClockOut = input.ClockOut
+	data.ClockOutLat = input.ClockOutLat
+	data.ClockOutLng = input.ClockOutLng
+	data.ClockOutNotes = util.SavedString(input.ClockOutNotes)
+	data.ClockOutPicture = util.SavedString(input.ClockOutPicture)
+
+	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Checkout Attendance Succeed", nil, nil)
+
 }
 func PostAttendanceHandler(c *gin.Context) {
 	getEmployee, _ := c.Get("employee")

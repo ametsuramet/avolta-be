@@ -25,6 +25,7 @@ func UserRouter(v1 *gin.RouterGroup) {
 		{
 			attendance.GET("/today", frontend.TodayAttendanceHandler)
 			attendance.POST("", frontend.PostAttendanceHandler)
+			attendance.PUT("/clockout/:id", frontend.ClockoutAttendanceHandler)
 		}
 	}
 }

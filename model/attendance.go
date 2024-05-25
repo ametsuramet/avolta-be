@@ -81,6 +81,13 @@ func (u *Attendance) AfterUpdate(tx *gorm.DB) (err error) {
 			duration := &TimeOnly{scannedDuration}
 			tx.Model(&Attendance{}).Where("id = ?", u.ID).Update("working_duration", duration)
 		}
+
+		if u.ClockOutLat != nil && u.ClockOutLng != nil {
+			location, err := service.GetLocationName(*u.ClockOutLat, *u.ClockOutLng)
+			if err == nil {
+				tx.Model(&Attendance{}).Where("id = ?", u.ID).Update("clock_out_notes", location)
+			}
+		}
 	}
 	return
 }
