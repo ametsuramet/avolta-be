@@ -1,9 +1,11 @@
 package model
 
 import (
+	"avolta/database"
 	"avolta/object/resp"
 	"avolta/util"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -41,12 +43,40 @@ func (u *Sale) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m Sale) MarshalJSON() ([]byte, error) {
+func (m Sale) GetIncentive(shopId string, sick float64, leave float64, absent float64) float64 {
+	product := Product{}
+	database.DB.Select("product_category_id").Find(&product, "id = ?", m.ProductID)
+
+	incentiveSetting := IncentiveSetting{}
+	database.DB.Find(&incentiveSetting, "shop_id = ? and product_category_id = ?", shopId, product.ProductCategoryID)
+
+	// if sick > incentiveSetting.SickLeaveThreshold {
+	// 	return 0
+	// }
+	// if leave > incentiveSetting.OtherLeaveThreshold {
+	// 	return 0
+	// }
+	// if absent > incentiveSetting.AbsentThreshold {
+	// 	return 0
+	// }
+	commissionPercent := float64(0)
+	if m.Total > incentiveSetting.MinimumSalesTarget {
+		commissionPercent = incentiveSetting.MinimumSalesCommission
+	}
+	if m.Total > incentiveSetting.MaximumSalesTarget {
+		commissionPercent = incentiveSetting.MaximumSalesCommission
+	}
+	fmt.Println(incentiveSetting.MinimumSalesTarget, incentiveSetting.MaximumSalesCommission, commissionPercent)
+	// ADD OTHER CRITERIA HERE
+	return m.Total * commissionPercent
+}
+
+func (m Sale) MapToResp() resp.SaleResponse {
 	employeePicture := ""
 	if m.Employee.Picture.Valid {
 		employeePicture = util.GetURL(m.Employee.Picture.String)
 	}
-	return json.Marshal(resp.SaleResponse{
+	return resp.SaleResponse{
 		ID:              m.ID,
 		Date:            m.Date.Format("2006-01-02 15:04:05"),
 		Code:            m.Code,
@@ -65,5 +95,8 @@ func (m Sale) MarshalJSON() ([]byte, error) {
 		EmployeeName:    m.Employee.FullName,
 		EmployeePicture: employeePicture,
 		IncentiveID:     m.IncentiveID,
-	})
+	}
+}
+func (m Sale) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.MapToResp())
 }

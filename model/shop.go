@@ -24,11 +24,14 @@ func (u *Shop) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m Shop) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.ShopResponse{
+func (m Shop) MapToResp() resp.ShopResponse {
+	return resp.ShopResponse{
 		ID:          m.ID,
 		Name:        m.Name,
 		Code:        m.Code,
 		Description: m.Description,
-	})
+	}
+}
+func (m Shop) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.MapToResp())
 }

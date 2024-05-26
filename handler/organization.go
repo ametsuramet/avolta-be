@@ -15,7 +15,6 @@ func OrganizationGetAllHandler(c *gin.Context) {
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
-	paginator.Paginate(&data)
 	_, ok := c.GetQuery("show_all")
 	if !ok {
 		paginator.WhereNull = []string{"parent_id"}

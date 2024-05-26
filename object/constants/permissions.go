@@ -30,6 +30,10 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "sale", "is_default": true, "is_active": true},
 		{"name": "sale_receipt", "is_default": true, "is_active": true},
 		{"name": "shop", "is_default": true, "is_active": true},
+		{"name": "incentive_shop", "is_default": true, "is_active": true},
+		{"name": "incentive_setting", "is_default": true, "is_active": true},
+		{"name": "incentive_report", "is_default": true, "is_active": true},
+		{"name": "incentive", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},
@@ -58,7 +62,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "pay_roll", "is_default": true, "is_active": true},
 		{"name": "company", "is_default": true, "is_active": true},
-
+		{"name": "incentive", "is_default": true, "is_active": true},
 		{"name": "report", "is_default": true, "is_active": true},
 	}
 
@@ -148,14 +152,14 @@ func DefaultPermission(search string) []model.Permission {
 		Key:       "approval_reimbursement",
 		IsDefault: true,
 		IsActive:  true,
-		Group:     "leave",
+		Group:     "reimbursement",
 	})
 	permissions = append(permissions, model.Permission{
 		Name:      "Reimbursement Payment",
 		Key:       "payment_reimbursement",
 		IsDefault: true,
 		IsActive:  true,
-		Group:     "leave",
+		Group:     "reimbursement",
 	})
 
 	permissions = append(permissions, model.Permission{
@@ -179,6 +183,21 @@ func DefaultPermission(search string) []model.Permission {
 		IsDefault: true,
 		IsActive:  true,
 		Group:     "miscellaneous",
+	})
+
+	permissions = append(permissions, model.Permission{
+		Name:      "Incentive Approval",
+		Key:       "approval_incentive",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "incentive",
+	})
+	permissions = append(permissions, model.Permission{
+		Name:      "Incentive Payment",
+		Key:       "payment_incentive",
+		IsDefault: true,
+		IsActive:  true,
+		Group:     "incentive",
 	})
 
 	if search != "" && len(search) > 1 {

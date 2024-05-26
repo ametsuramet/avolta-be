@@ -12,12 +12,23 @@ import (
 func IncentiveGetAllHandler(c *gin.Context) {
 	var data []model.Incentive
 	preloads := []string{}
-	total, err := model.Paginate(c, &data, preloads)
+	paginator := util.NewPaginator(c)
+	paginator.Preloads = preloads
+
+	// search, ok := c.GetQuery("search")
+	// if ok {
+	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
+	// 		"full_name": search,
+	// 	})
+	// }
+
+	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data List Incentive Retrived", data, &total)
+
+	util.ResponsePaginatorSuccess(c, "Data List Incentive Retrived", dataRecords.Records, dataRecords)
 }
 
 func IncentiveGetOneHandler(c *gin.Context) {

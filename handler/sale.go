@@ -27,7 +27,6 @@ func SaleGetAllHandler(c *gin.Context) {
 		"JOIN employees ON employees.id = sales.employee_id": nil,
 	})
 
-	paginator.Paginate(&data)
 	search, ok := c.GetQuery("search")
 	if ok {
 		paginator.Search = append(paginator.Search, map[string]interface{}{

@@ -33,7 +33,6 @@ func ReimbursementGetAllHandler(c *gin.Context) {
 
 	}
 
-	paginator.Paginate(&data)
 	// search, ok := c.GetQuery("search")
 	// if ok {
 	// 	paginator.Search = append(paginator.Search, map[string]interface{}{

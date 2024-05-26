@@ -21,9 +21,29 @@ func SettingAutoNumberHandler(c *gin.Context) {
 	nextNumber := ""
 	if data.PayRollAutoNumber {
 		if err := database.DB.Order("created_at desc").First(&payRoll).Error; err != nil {
-			nextNumber = model.GenerateInvoiceBillNumber(data, "00")
+			nextNumber = model.GenerateInvoiceBillNumber(model.AutoNumber{AutoNumber: data.PayRollAutoNumber, AutoFormat: data.PayRollAutoFormat, StaticCharacter: data.PayRollStaticCharacter, AutoNumberCharacterLength: data.PayRollAutoNumberCharacterLength}, "00")
 		} else {
-			nextNumber = model.ExtractNumber(data, payRoll.PayRollNumber)
+			nextNumber = model.ExtractNumber(model.AutoNumber{AutoNumber: data.PayRollAutoNumber, AutoFormat: data.PayRollAutoFormat, StaticCharacter: data.PayRollStaticCharacter, AutoNumberCharacterLength: data.PayRollAutoNumberCharacterLength}, payRoll.PayRollNumber)
+		}
+	}
+
+	util.ResponseSuccess(c, "Data Setting Retrived", nextNumber, nil)
+}
+func SettingIncentiveAutoNumberHandler(c *gin.Context) {
+	var data model.Setting
+	var incentive model.IncentiveReport
+
+	if err := database.DB.First(&data).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	nextNumber := ""
+	if data.IncentiveAutoNumber {
+		if err := database.DB.Order("created_at desc").First(&incentive).Error; err != nil {
+			nextNumber = model.GenerateInvoiceBillNumber(model.AutoNumber{AutoNumber: data.IncentiveAutoNumber, AutoFormat: data.IncentiveAutoFormat, StaticCharacter: data.IncentiveStaticCharacter, AutoNumberCharacterLength: data.IncentiveAutoNumberCharacterLength}, "00")
+		} else {
+			nextNumber = model.ExtractNumber(model.AutoNumber{AutoNumber: data.IncentiveAutoNumber, AutoFormat: data.IncentiveAutoFormat, StaticCharacter: data.IncentiveStaticCharacter, AutoNumberCharacterLength: data.IncentiveAutoNumberCharacterLength}, incentive.ReportNumber)
 		}
 	}
 

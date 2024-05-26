@@ -15,7 +15,6 @@ func IncentiveShopGetAllHandler(c *gin.Context) {
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
-	paginator.Paginate(&data)
 	// search, ok := c.GetQuery("search")
 	// if ok {
 	// 	paginator.Search = append(paginator.Search, map[string]interface{}{

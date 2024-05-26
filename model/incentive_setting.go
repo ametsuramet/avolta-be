@@ -11,9 +11,9 @@ import (
 type IncentiveSetting struct {
 	Base
 	ShopID                 string          `json:"shop_id"`
-	Shop                   Shop            `json:"shop" gorm:"foreignKey:ShopID"`
+	Shop                   Shop            `json:"-" gorm:"foreignKey:ShopID"`
 	ProductCategoryID      string          `json:"product_category_id"`
-	ProductCategory        ProductCategory `json:"product_category" gorm:"foreignKey:ProductCategoryID"`
+	ProductCategory        ProductCategory `json:"-" gorm:"foreignKey:ProductCategoryID"`
 	MinimumSalesTarget     float64         `json:"minimum_sales_target"`
 	MaximumSalesTarget     float64         `json:"maximum_sales_target"`
 	MinimumSalesCommission float64         `json:"minimum_sales_commission"`
@@ -31,5 +31,18 @@ func (u *IncentiveSetting) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (m IncentiveSetting) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.IncentiveSettingResponse{})
+	return json.Marshal(resp.IncentiveSettingResponse{
+		ID:                     m.ID,
+		ShopID:                 m.ShopID,
+		ShopName:               m.Shop.Name,
+		ProductCategoryID:      m.ProductCategoryID,
+		ProductCategoryName:    m.ProductCategory.Name,
+		MinimumSalesTarget:     m.MinimumSalesTarget,
+		MaximumSalesTarget:     m.MaximumSalesTarget,
+		MinimumSalesCommission: m.MinimumSalesCommission,
+		MaximumSalesCommission: m.MaximumSalesCommission,
+		SickLeaveThreshold:     m.SickLeaveThreshold,
+		OtherLeaveThreshold:    m.OtherLeaveThreshold,
+		AbsentThreshold:        m.AbsentThreshold,
+	})
 }

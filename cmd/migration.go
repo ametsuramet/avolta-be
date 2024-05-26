@@ -48,6 +48,10 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.Product{})
 	database.DB.AutoMigrate(&model.ProductCategory{})
 	database.DB.AutoMigrate(&model.Shop{})
+	database.DB.AutoMigrate(&model.Incentive{})
+	database.DB.AutoMigrate(&model.IncentiveShop{})
+	database.DB.AutoMigrate(&model.IncentiveSetting{})
+	database.DB.AutoMigrate(&model.IncentiveReport{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }

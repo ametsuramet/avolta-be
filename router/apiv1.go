@@ -240,6 +240,7 @@ func SetupRouter() *gin.Engine {
 		setting.Use(middleware.AdminMiddleware())
 		{
 			setting.GET("/autonumber", handler.SettingAutoNumberHandler)
+			setting.GET("/incentive/autonumber", handler.SettingIncentiveAutoNumberHandler)
 			setting.GET("", handler.SettingGetOneHandler)
 			setting.PUT("", middleware.PermissionMiddleware("menu_setting"), handler.SettingUpdateHandler)
 		}
@@ -329,23 +330,35 @@ func SetupRouter() *gin.Engine {
 		}
 
 		incentiveSetting := admin.Group("/incentiveSetting")
-		incentiveSetting.Use()
+		incentiveSetting.Use(middleware.AdminMiddleware())
 		{
 			incentiveSetting.GET("", handler.IncentiveSettingGetAllHandler)
 			incentiveSetting.GET("/:id", handler.IncentiveSettingGetOneHandler)
 			incentiveSetting.POST("", handler.IncentiveSettingCreateHandler)
 			incentiveSetting.PUT("/:id", handler.IncentiveSettingUpdateHandler)
 			incentiveSetting.DELETE("/:id", handler.IncentiveSettingDeleteHandler)
+			incentiveSetting.POST("/import", middleware.PermissionMiddleware("import_incentive"), handler.IncentiveImportHandler)
 		}
 
 		incentiveShop := admin.Group("/incentiveShop")
-		incentiveShop.Use()
+		incentiveShop.Use(middleware.AdminMiddleware())
 		{
 			incentiveShop.GET("", handler.IncentiveShopGetAllHandler)
 			incentiveShop.GET("/:id", handler.IncentiveShopGetOneHandler)
-			incentiveShop.POST("", handler.IncentiveShopCreateHandler)
-			incentiveShop.PUT("/:id", handler.IncentiveShopUpdateHandler)
+			// incentiveShop.POST("", handler.IncentiveShopCreateHandler)
+			// incentiveShop.PUT("/:id", handler.IncentiveShopUpdateHandler)
 			incentiveShop.DELETE("/:id", handler.IncentiveShopDeleteHandler)
+		}
+
+		incentiveReport := admin.Group("/incentiveReport")
+		incentiveReport.Use(middleware.AdminMiddleware())
+		{
+			incentiveReport.GET("", handler.IncentiveReportGetAllHandler)
+			incentiveReport.GET("/:id", handler.IncentiveReportGetOneHandler)
+			incentiveReport.POST("", handler.IncentiveReportCreateHandler)
+			incentiveReport.PUT("/:id", handler.IncentiveReportUpdateHandler)
+			incentiveReport.PUT("/:id/AddEmployee", handler.IncentiveReportAddEmployeeHandler)
+			incentiveReport.DELETE("/:id", handler.IncentiveReportDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

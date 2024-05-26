@@ -27,6 +27,18 @@ func (u *IncentiveShop) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+func (m IncentiveShop) MapToResp() resp.IncentiveShopResponse {
+	return resp.IncentiveShopResponse{
+		ID:                 m.ID,
+		ShopID:             m.ShopID,
+		ShopName:           m.Shop.Name,
+		IncentiveID:        m.IncentiveID,
+		TotalSales:         m.TotalSales,
+		TotalIncludedSales: m.TotalIncludedSales,
+		TotalExcludedSales: m.TotalExcludedSales,
+		TotalIncentive:     m.TotalIncentive,
+	}
+}
 func (m IncentiveShop) MarshalJSON() ([]byte, error) {
-	return json.Marshal(resp.IncentiveShopResponse{})
+	return json.Marshal(m.MapToResp())
 }

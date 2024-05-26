@@ -1,6 +1,8 @@
 package model
 
 import (
+	"avolta/database"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -9,6 +11,39 @@ type ProductCategory struct {
 	Base
 	Name     string    `json:"name"`
 	Products []Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
+}
+
+type ProductCategorySales struct {
+	ID     string  `json:"id"`
+	ShopID string  `json:"shop_id"`
+	Name   string  `json:"name"`
+	Total  float64 `json:"total"`
+}
+
+func (m ProductCategorySales) GetIncentive() float64 {
+
+	incentiveSetting := IncentiveSetting{}
+	database.DB.Find(&incentiveSetting, "shop_id = ? and product_category_id = ?", m.ShopID, m.ID)
+
+	// if sick > incentiveSetting.SickLeaveThreshold {
+	// 	return 0
+	// }
+	// if leave > incentiveSetting.OtherLeaveThreshold {
+	// 	return 0
+	// }
+	// if absent > incentiveSetting.AbsentThreshold {
+	// 	return 0
+	// }
+	commissionPercent := float64(0)
+	if m.Total > incentiveSetting.MinimumSalesTarget {
+		commissionPercent = incentiveSetting.MinimumSalesCommission
+	}
+	if m.Total > incentiveSetting.MaximumSalesTarget {
+		commissionPercent = incentiveSetting.MaximumSalesCommission
+	}
+	// fmt.Println(incentiveSetting.MinimumSalesTarget, incentiveSetting.MaximumSalesCommission, commissionPercent)
+	// ADD OTHER CRITERIA HERE
+	return m.Total * commissionPercent
 }
 
 func (u *ProductCategory) BeforeCreate(tx *gorm.DB) (err error) {

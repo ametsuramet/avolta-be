@@ -82,11 +82,11 @@ func NullTimeConv(check time.Time) sql.NullTime {
 	return sql.NullTime{Time: check, Valid: true}
 }
 
-func ExtractNumber(data Setting, number string) string {
+func ExtractNumber(data AutoNumber, number string) string {
 	re2 := regexp.MustCompile(`{(.*?)}`)
 	pattern := "0.{1}"
-	if data.PayRollAutoNumberCharacterLength > 0 {
-		pattern = fmt.Sprintf("(\\d{%d})", data.PayRollAutoNumberCharacterLength)
+	if data.AutoNumberCharacterLength > 0 {
+		pattern = fmt.Sprintf("(\\d{%d})", data.AutoNumberCharacterLength)
 
 	}
 	re := regexp.MustCompile(pattern)
@@ -98,11 +98,11 @@ func ExtractNumber(data Setting, number string) string {
 		}
 	}
 	values := []any{}
-	for _, v := range re2.FindAllStringSubmatch(data.PayRollAutoFormat, -1) {
+	for _, v := range re2.FindAllStringSubmatch(data.AutoFormat, -1) {
 		if len(v) > 0 {
 
 			if v[1] == config.STATIC_CHARACTER {
-				values = append(values, data.PayRollStaticCharacter)
+				values = append(values, data.StaticCharacter)
 			} else if v[1] == config.AUTO_NUMERIC {
 				values = append(values, "(\\d+)")
 			} else if v[1] == config.MONTH_ROMAN {
@@ -123,7 +123,7 @@ func ExtractNumber(data Setting, number string) string {
 			}
 		}
 	}
-	pattern2 := strings.ReplaceAll(fmt.Sprintf(re2.ReplaceAllString(data.PayRollAutoFormat, "%s"), values...), "/", "\\/")
+	pattern2 := strings.ReplaceAll(fmt.Sprintf(re2.ReplaceAllString(data.AutoFormat, "%s"), values...), "/", "\\/")
 	re3 := regexp.MustCompile(pattern2)
 
 	for _, v := range re3.FindAllStringSubmatch(number, -1) {
@@ -134,24 +134,24 @@ func ExtractNumber(data Setting, number string) string {
 
 	return GenerateInvoiceBillNumber(data, "00")
 }
-func GenerateInvoiceBillNumber(data Setting, before string) string {
+func GenerateInvoiceBillNumber(data AutoNumber, before string) string {
 
 	re := regexp.MustCompile(`{(.*?)}`)
 	values := []any{}
-	for _, v := range re.FindAllStringSubmatch(data.PayRollAutoFormat, -1) {
+	for _, v := range re.FindAllStringSubmatch(data.AutoFormat, -1) {
 		if len(v) > 0 {
 			if v[1] == config.STATIC_CHARACTER {
-				values = append(values, data.PayRollStaticCharacter)
+				values = append(values, data.StaticCharacter)
 			} else if v[1] == config.AUTO_NUMERIC {
 
 				numberBefore, err := strconv.Atoi(before)
 				if err != nil {
 					values = append(values, before)
 				} else {
-					if data.PayRollAutoNumberCharacterLength == 0 {
+					if data.AutoNumberCharacterLength == 0 {
 						values = append(values, fmt.Sprintf("%d", numberBefore+1))
 					} else {
-						length := strconv.Itoa(data.PayRollAutoNumberCharacterLength)
+						length := strconv.Itoa(data.AutoNumberCharacterLength)
 
 						values = append(values, fmt.Sprintf("%0"+length+"d", numberBefore+1))
 					}
@@ -176,5 +176,12 @@ func GenerateInvoiceBillNumber(data Setting, before string) string {
 		}
 	}
 
-	return fmt.Sprintf(re.ReplaceAllString(data.PayRollAutoFormat, "%s"), values...)
+	return fmt.Sprintf(re.ReplaceAllString(data.AutoFormat, "%s"), values...)
+}
+
+type AutoNumber struct {
+	AutoNumber                bool
+	AutoFormat                string
+	StaticCharacter           string
+	AutoNumberCharacterLength int
 }
