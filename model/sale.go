@@ -12,22 +12,26 @@ import (
 
 type Sale struct {
 	Base
-	Date           time.Time   `json:"date"`
-	Code           string      `json:"code"`
-	SaleReceiptID  *string     `json:"sale_receipt_id"`
-	SaleReceipt    SaleReceipt `json:"sale_receipt" gorm:"foreignKey:SaleReceiptID"`
-	ProductID      string      `json:"product_id"`
-	Product        Product     `json:"product" gorm:"foreignKey:ProductID"`
-	ShopID         string      `json:"shop_id"`
-	Shop           Shop        `json:"shop" gorm:"foreignKey:ShopID"`
-	Qty            float64     `json:"qty"`
-	Price          float64     `json:"price"`
-	SubTotal       float64     `json:"sub_total"`
-	Discount       float64     `json:"discount"`
-	DiscountAmount float64     `json:"discount_amount"`
-	Total          float64     `json:"total"`
-	EmployeeID     string      `json:"employee_id"`
-	Employee       Employee    `gorm:"foreignKey:EmployeeID"`
+	Date                time.Time   `json:"date"`
+	Code                string      `json:"code"`
+	SaleReceiptID       *string     `json:"sale_receipt_id"`
+	SaleReceipt         SaleReceipt `json:"sale_receipt" gorm:"foreignKey:SaleReceiptID"`
+	ProductID           string      `json:"product_id"`
+	Product             Product     `json:"product" gorm:"foreignKey:ProductID"`
+	ShopID              string      `json:"shop_id"`
+	Shop                Shop        `json:"shop" gorm:"foreignKey:ShopID"`
+	Qty                 float64     `json:"qty"`
+	Price               float64     `json:"price"`
+	SubTotal            float64     `json:"sub_total"`
+	Discount            float64     `json:"discount"`
+	DiscountAmount      float64     `json:"discount_amount"`
+	Total               float64     `json:"total"`
+	EmployeeID          string      `json:"employee_id"`
+	Employee            Employee    `gorm:"foreignKey:EmployeeID"`
+	IncentiveID         *string     `json:"incentive_id"`
+	Incentive           Incentive   `gorm:"foreignKey:IncentiveID"`
+	IsIncentiveExcluded bool        `json:"is_incentive_excluded"`
+	IsIncentiveIncluded bool        `json:"is_incentive_included"`
 }
 
 func (u *Sale) BeforeCreate(tx *gorm.DB) (err error) {
@@ -60,5 +64,6 @@ func (m Sale) MarshalJSON() ([]byte, error) {
 		EmployeeID:      m.EmployeeID,
 		EmployeeName:    m.Employee.FullName,
 		EmployeePicture: employeePicture,
+		IncentiveID:     m.IncentiveID,
 	})
 }

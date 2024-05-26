@@ -328,6 +328,26 @@ func SetupRouter() *gin.Engine {
 			saleReceipt.DELETE("/:id", handler.SaleReceiptDeleteHandler)
 		}
 
+		incentiveSetting := admin.Group("/incentiveSetting")
+		incentiveSetting.Use()
+		{
+			incentiveSetting.GET("", handler.IncentiveSettingGetAllHandler)
+			incentiveSetting.GET("/:id", handler.IncentiveSettingGetOneHandler)
+			incentiveSetting.POST("", handler.IncentiveSettingCreateHandler)
+			incentiveSetting.PUT("/:id", handler.IncentiveSettingUpdateHandler)
+			incentiveSetting.DELETE("/:id", handler.IncentiveSettingDeleteHandler)
+		}
+
+		incentiveShop := admin.Group("/incentiveShop")
+		incentiveShop.Use()
+		{
+			incentiveShop.GET("", handler.IncentiveShopGetAllHandler)
+			incentiveShop.GET("/:id", handler.IncentiveShopGetOneHandler)
+			incentiveShop.POST("", handler.IncentiveShopCreateHandler)
+			incentiveShop.PUT("/:id", handler.IncentiveShopUpdateHandler)
+			incentiveShop.DELETE("/:id", handler.IncentiveShopDeleteHandler)
+		}
+
 		// DONT REMOVE THIS LINE
 
 	}

@@ -3,7 +3,9 @@ package handler
 import (
 	"avolta/database"
 	"avolta/model"
+	"avolta/object/constants"
 	"avolta/util"
+	"bytes"
 	"fmt"
 	"net/http"
 	"time"
@@ -14,7 +16,7 @@ import (
 
 func SaleGetAllHandler(c *gin.Context) {
 	var data []model.Sale
-	preloads := []string{"Product", "Employee", "Shop"}
+	preloads := []string{"Product", "Product.ProductCategory", "Employee", "Shop"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
@@ -64,10 +66,66 @@ func SaleGetAllHandler(c *gin.Context) {
 		})
 
 	}
+	employeeId, ok := c.GetQuery("employee_id")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"sales.employee_id": employeeId,
+		})
+
+	}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	_, ok = c.GetQuery("download")
+	if ok {
+		sheet1Name := "Sheet1"
+		row := 1
+		xls := excelize.NewFile()
+		xlsStyle := constants.NewExcelStyle(xls)
+		xls.SetSheetName(xls.GetSheetName(0), sheet1Name)
+		// ac := accounting.Accounting{Symbol: "", Precision: 4}
+		// no	date	name	sku	barcode	qty	price	sub_total	discount	discount_amount	total	sales	nik	shop	shop_code
+		headers := []string{"No", "Tgl", "Nama Produk", "SKU", "Kategori", "Qty", "Sub Total", "Diskon", "Diskon Amount", "Total", "Salesman", "Nik", "Toko", "Kode Toko"}
+		headerStyle := []int{xlsStyle.Bold, xlsStyle.Bold, xlsStyle.Bold, xlsStyle.Bold, xlsStyle.Bold,
+			xlsStyle.TextRightBold, xlsStyle.TextRightBold, xlsStyle.TextRightBold, xlsStyle.TextRightBold, xlsStyle.TextRightBold,
+			xlsStyle.Bold, xlsStyle.Bold, xlsStyle.Bold, xlsStyle.Bold,
+		}
+		headerWidth := []float64{7, 25, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15}
+		for j, v := range headers {
+			xls.SetCellValue(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(j)+1), row), v)
+			xls.SetCellStyle(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(j)+1), row), fmt.Sprintf("%s%v", util.IntToLetters(int32(j)+1), row), headerStyle[j])
+			xls.SetColWidth(sheet1Name, util.IntToLetters(int32(j)+1), util.IntToLetters(int32(j)+1), headerWidth[j])
+		}
+		row++
+		for i, v := range data {
+			cols := []interface{}{i + 1, v.Date.Format("02-01-2006"), v.Product.Name, v.Product.SKU, v.Product.ProductCategory.Name,
+				v.Qty, v.SubTotal, v.Discount * 100, v.DiscountAmount, v.Total, v.Employee.FullName, v.Employee.EmployeeIdentityNumber, v.Shop.Name, v.Shop.Code,
+			}
+			colStyle := []int{xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal,
+				xlsStyle.TextRight, xlsStyle.TextRight, xlsStyle.TextRight, xlsStyle.TextRight, xlsStyle.TextRight,
+				xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal,
+			}
+			for k, v := range cols {
+				xls.SetCellValue(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), v)
+				xls.SetCellStyle(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), colStyle[k])
+			}
+			row++
+		}
+
+		var b *bytes.Buffer
+		b, err := xls.WriteToBuffer()
+		if err != nil {
+			util.ResponseFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		filename := fmt.Sprintf("Data-Produk-%s.xlsx", time.Now().UTC().Format("02-01-2006"))
+		c.Header("Content-Description", filename)
+		c.Header("Content-Disposition", "attachment; filename="+filename)
+		c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", b.Bytes())
 		return
 	}
 

@@ -18,4 +18,5 @@ type SaleResponse struct {
 	EmployeeID      string  `json:"employee_id"`
 	EmployeeName    string  `json:"employee_name"`
 	EmployeePicture string  `json:"employee_picture"`
+	IncentiveID     *string `json:"incentive_id"`
 }

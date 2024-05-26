@@ -10,10 +10,11 @@ import (
 
 type Shop struct {
 	Base
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Code        string `json:"code"`
-	Sales       []Sale `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Name           string          `json:"name"`
+	Description    string          `json:"description"`
+	Code           string          `json:"code"`
+	Sales          []Sale          `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	IncentiveShops []IncentiveShop `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
 }
 
 func (u *Shop) BeforeCreate(tx *gorm.DB) (err error) {
