@@ -211,9 +211,6 @@ func IncentiveImportHandler(c *gin.Context) {
 			MaximumSalesTarget:     util.ParseThousandSeparatedNumber(row[5]),
 			MinimumSalesCommission: minCommission,
 			MaximumSalesCommission: maxCommission,
-			SickLeaveThreshold:     util.ParseThousandSeparatedNumber(row[8]),
-			OtherLeaveThreshold:    util.ParseThousandSeparatedNumber(row[9]),
-			AbsentThreshold:        util.ParseThousandSeparatedNumber(row[10]),
 		}
 		err = database.DB.Create(&dataSetting).Error
 		if err != nil {

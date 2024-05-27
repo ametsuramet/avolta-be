@@ -41,6 +41,9 @@ type Setting struct {
 	IncentiveAutoFormat                string  `json:"incentive_auto_format" gorm:"default:'{static-character}-{auto-numeric}/{month-roman}/{year-yyyy}'"`
 	IncentiveStaticCharacter           string  `json:"incentive_static_character" gorm:"default:'INS'"`
 	IncentiveAutoNumberCharacterLength int     `json:"incentive_auto_number_character_length" gorm:"default:5"`
+	IncentiveSickLeaveThreshold        float64 `json:"incentive_sick_leave_threshold"`
+	IncentiveOtherLeaveThreshold       float64 `json:"incentive_other_leave_threshold"`
+	IncentiveAbsentThreshold           float64 `json:"incentive_absent_threshold"`
 }
 
 func (u *Setting) BeforeCreate(tx *gorm.DB) (err error) {
@@ -76,5 +79,8 @@ func (m Setting) MarshalJSON() ([]byte, error) {
 		IncentiveAutoFormat:                m.IncentiveAutoFormat,
 		IncentiveStaticCharacter:           m.IncentiveStaticCharacter,
 		IncentiveAutoNumberCharacterLength: m.IncentiveAutoNumberCharacterLength,
+		IncentiveSickLeaveThreshold:        m.IncentiveSickLeaveThreshold,
+		IncentiveOtherLeaveThreshold:       m.IncentiveOtherLeaveThreshold,
+		IncentiveAbsentThreshold:           m.IncentiveAbsentThreshold,
 	})
 }

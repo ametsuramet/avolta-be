@@ -68,7 +68,7 @@ func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 	}
 
 	limit, err := strconv.Atoi(p.Ctx.DefaultQuery("limit", "10"))
-	if err != nil || limit <= 0 {
+	if err != nil || limit < 0 {
 		return nil, errors.New("invalid limit value")
 	}
 
@@ -175,7 +175,9 @@ func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 		db = db.Select(p.Select)
 	}
 
-	db = db.Limit(limit).Offset(offset)
+	if limit != 0 {
+		db = db.Limit(limit).Offset(offset)
+	}
 	db = db.Find(model)
 	err = db.Error
 	if err != nil {
@@ -183,7 +185,10 @@ func (p *Paginator) Paginate(model interface{}) (*DataPaginator, error) {
 	}
 
 	<-done
-	totalPage := int64(math.Ceil(float64(count) / float64(limit)))
+	totalPage := int64(0)
+	if limit != 0 {
+		totalPage = int64(math.Ceil(float64(count) / float64(limit)))
+	}
 	prev := int64(1)
 	next := totalPage
 	if page-1 != 0 {

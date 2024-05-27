@@ -14,16 +14,23 @@ type ProductCategory struct {
 }
 
 type ProductCategorySales struct {
-	ID     string  `json:"id"`
-	ShopID string  `json:"shop_id"`
-	Name   string  `json:"name"`
-	Total  float64 `json:"total"`
+	ID               string  `json:"id"`
+	ShopID           string  `json:"shop_id"`
+	Name             string  `json:"name"`
+	ShopName         string  `json:"shop_name"`
+	Total            float64 `json:"total"`
+	ComissionPercent float64 `json:"commission_percent"`
+	TotalComission   float64 `json:"total_comission"`
 }
 
-func (m ProductCategorySales) GetIncentive() float64 {
+func (m *ProductCategorySales) GetIncentive() {
 
+	prodCat := ProductCategory{}
 	incentiveSetting := IncentiveSetting{}
+	shop := Shop{}
 	database.DB.Find(&incentiveSetting, "shop_id = ? and product_category_id = ?", m.ShopID, m.ID)
+	database.DB.Select("name").Find(&prodCat, "id = ?", m.ID)
+	database.DB.Select("name").Find(&shop, "id = ?", m.ShopID)
 
 	// if sick > incentiveSetting.SickLeaveThreshold {
 	// 	return 0
@@ -41,9 +48,10 @@ func (m ProductCategorySales) GetIncentive() float64 {
 	if m.Total > incentiveSetting.MaximumSalesTarget {
 		commissionPercent = incentiveSetting.MaximumSalesCommission
 	}
-	// fmt.Println(incentiveSetting.MinimumSalesTarget, incentiveSetting.MaximumSalesCommission, commissionPercent)
-	// ADD OTHER CRITERIA HERE
-	return m.Total * commissionPercent
+	m.ComissionPercent = commissionPercent
+	m.Name = prodCat.Name
+	m.ShopName = shop.Name
+	m.TotalComission = m.Total * commissionPercent
 }
 
 func (u *ProductCategory) BeforeCreate(tx *gorm.DB) (err error) {

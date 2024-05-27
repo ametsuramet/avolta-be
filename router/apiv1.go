@@ -357,6 +357,7 @@ func SetupRouter() *gin.Engine {
 			incentiveReport.GET("/:id", handler.IncentiveReportGetOneHandler)
 			incentiveReport.POST("", handler.IncentiveReportCreateHandler)
 			incentiveReport.PUT("/:id", handler.IncentiveReportUpdateHandler)
+			incentiveReport.PUT("/:id/EditIncentive/:incentiveId", handler.IncentiveReportEditIncentiveHandler)
 			incentiveReport.PUT("/:id/AddEmployee", handler.IncentiveReportAddEmployeeHandler)
 			incentiveReport.DELETE("/:id", handler.IncentiveReportDeleteHandler)
 		}

@@ -72,6 +72,13 @@ func SaleGetAllHandler(c *gin.Context) {
 		})
 
 	}
+	incentiveId, ok := c.GetQuery("incentive_id")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"sales.incentive_id": incentiveId,
+		})
+
+	}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
@@ -121,7 +128,7 @@ func SaleGetAllHandler(c *gin.Context) {
 			util.ResponseFail(c, http.StatusBadRequest, err.Error())
 			return
 		}
-		filename := fmt.Sprintf("Data-Produk-%s.xlsx", time.Now().UTC().Format("02-01-2006"))
+		filename := fmt.Sprintf("Data-Penjualan-%s.xlsx", time.Now().UTC().Format("02-01-2006"))
 		c.Header("Content-Description", filename)
 		c.Header("Content-Disposition", "attachment; filename="+filename)
 		c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", b.Bytes())

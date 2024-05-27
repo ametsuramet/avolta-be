@@ -11,7 +11,7 @@ import (
 
 func IncentiveGetAllHandler(c *gin.Context) {
 	var data []model.Incentive
-	preloads := []string{}
+	preloads := []string{"Employee", "Sales", "IncentiveShops", "IncentiveShops.Shop"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
 
@@ -21,6 +21,14 @@ func IncentiveGetAllHandler(c *gin.Context) {
 	// 		"full_name": search,
 	// 	})
 	// }
+
+	incentiveReportId, ok := c.GetQuery("incentive_report_id")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"incentive_report_id": incentiveReportId,
+		})
+
+	}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
@@ -90,7 +98,7 @@ func IncentiveDeleteHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Model(&data).Delete(&input, "id = ?", id).Error; err != nil {
+	if err := database.DB.Model(&data).Unscoped().Delete(&input, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

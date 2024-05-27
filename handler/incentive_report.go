@@ -104,7 +104,7 @@ func IncentiveReportGetOneHandler(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Preload("User").Preload("Incentives").Preload("Shops").Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("User").Preload("Shops").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -159,6 +159,21 @@ func IncentiveReportUpdateHandler(c *gin.Context) {
 		return
 	}
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	util.ResponseSuccess(c, "Data IncentiveReport Updated", nil, nil)
+}
+
+func IncentiveReportEditIncentiveHandler(c *gin.Context) {
+	var data model.IncentiveReport
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Preload("Shops").Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := data.UpdateIncentive(c); err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

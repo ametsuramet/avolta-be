@@ -25,4 +25,7 @@ type SettingResponse struct {
 	IncentiveAutoFormat                string  `json:"incentive_auto_format"`
 	IncentiveStaticCharacter           string  `json:"incentive_static_character"`
 	IncentiveAutoNumberCharacterLength int     `json:"incentive_auto_number_character_length"`
+	IncentiveSickLeaveThreshold        float64 `json:"incentive_sick_leave_threshold"`
+	IncentiveOtherLeaveThreshold       float64 `json:"incentive_other_leave_threshold"`
+	IncentiveAbsentThreshold           float64 `json:"incentive_absent_threshold"`
 }
