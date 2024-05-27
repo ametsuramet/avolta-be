@@ -52,6 +52,13 @@ func EmployeeImportHandler(c *gin.Context) {
 		positionalAllowance, _ := strconv.Atoi(row[9])
 		transportAllowance, _ := strconv.Atoi(row[10])
 		mealAllowance, _ := strconv.Atoi(row[11])
+		gender := row[14]
+		if gender == "Laki-laki" {
+			gender = "m"
+		}
+		if gender == "Perempuan" {
+			gender = "f"
+		}
 		if err := database.DB.Create(&model.Employee{
 			FullName:                  row[1],
 			Email:                     row[2],
@@ -66,7 +73,7 @@ func EmployeeImportHandler(c *gin.Context) {
 			MealAllowance:             float64(mealAllowance),
 			NonTaxableIncomeLevelCode: row[12],
 			TaxPayerNumber:            row[13],
-			Gender:                    row[14],
+			Gender:                    gender,
 			StartedWork:               model.NullTimeConv(startedWork),
 		}).Error; err != nil {
 			errString := fmt.Sprintf("Error at Line %s : %s", row[0], err.Error())
