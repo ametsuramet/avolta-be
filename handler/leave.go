@@ -12,10 +12,14 @@ import (
 
 func LeaveGetAllHandler(c *gin.Context) {
 	var data []model.Leave
-	preloads := []string{"LeaveCategory", "Employee"}
+	preloads := []string{"LeaveCategory"}
 	paginator := util.NewPaginator(c)
-	paginator.Preloads = preloads
 
+	_, ok := c.GetQuery("show_employee")
+	if ok {
+		preloads = append(preloads, "Employee")
+	}
+	paginator.Preloads = preloads
 	paginator.Joins = append(paginator.Joins, map[string]interface{}{
 		"JOIN leave_categories ON leave_categories.id = leaves.leave_category_id": nil,
 	})
@@ -68,6 +72,10 @@ func LeaveGetAllHandler(c *gin.Context) {
 			"leave_categories.absent": false,
 		})
 	}
+	orderBy, ok := c.GetQuery("order_by")
+	if ok {
+		paginator.OrderBy = []string{orderBy}
+	}
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
@@ -102,6 +110,13 @@ func LeaveCreateHandler(c *gin.Context) {
 	// user := getUser.(model.User)
 
 	// data.AuthorID = user.ID
+
+	leaveCat := model.LeaveCategory{}
+	database.DB.Find(&leaveCat, "id = ?", data.LeaveCategoryID)
+	if leaveCat.Absent {
+		data.Status = "APPROVED"
+		data.RequestType = "FULL_DAY"
+	}
 
 	if err := database.DB.Create(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

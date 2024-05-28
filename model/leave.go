@@ -66,6 +66,11 @@ func (m Leave) MarshalJSON() ([]byte, error) {
 	if m.Employee.Picture.Valid {
 		employeePicture = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, m.Employee.Picture.String)
 	}
+	diffDays := int64(0)
+	if m.RequestType == "FULL_DAY" {
+		diff := m.EndDate.Sub(*m.StartDate)
+		diffDays = int64(diff.Hours()/24) + 1
+	}
 
 	return json.Marshal(resp.LeaveResponse{
 		ID:              m.ID,
@@ -84,5 +89,8 @@ func (m Leave) MarshalJSON() ([]byte, error) {
 		Status:          m.Status,
 		Remarks:         m.Remarks,
 		AttachmentURL:   attachmentURL,
+		Absent:          m.LeaveCategory.Absent,
+		Sick:            m.LeaveCategory.Sick,
+		Diff:            diffDays,
 	})
 }

@@ -109,6 +109,23 @@ func PayRollProcessHandler(c *gin.Context) {
 	util.ResponseSuccess(c, "Data PayRoll Processed", nil, nil)
 
 }
+func FinishProcessHandler(c *gin.Context) {
+	var data model.PayRoll
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := database.DB.Model(&data).Update("status", "FINISHED").Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.ResponseSuccess(c, "Data PayRoll Processed", nil, nil)
+
+}
 func PayRollUpdateHandler(c *gin.Context) {
 	var input, data model.PayRoll
 	id := c.Params.ByName("id")

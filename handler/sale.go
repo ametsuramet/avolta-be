@@ -239,11 +239,15 @@ func SaleImportHandler(c *gin.Context) {
 			continue
 		}
 		shop := model.Shop{}
-		if err := database.DB.Find(&shop, "code = ?", row[14]); err != nil {
+		count := int64(0)
+		if err := database.DB.Find(&shop, "code = ?", row[14]).Count(&count); err == nil {
 
-			shop.Name = row[13]
-			shop.Code = row[14]
-			database.DB.Create(&shop)
+			if count == 0 {
+				shop.Name = row[13]
+				shop.Code = row[14]
+				database.DB.Create(&shop)
+			}
+
 			// continue
 		}
 		date, err := time.Parse("02-01-2006", row[1])

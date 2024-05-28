@@ -86,6 +86,7 @@ func SetupRouter() *gin.Engine {
 			payRoll.POST("", middleware.PermissionMiddleware("create_pay_roll"), handler.PayRollCreateHandler)
 			payRoll.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollUpdateHandler)
 			payRoll.PUT("/:id/Process", middleware.PermissionMiddleware("update_pay_roll"), handler.PayRollProcessHandler)
+			payRoll.PUT("/:id/Finish", middleware.PermissionMiddleware("update_pay_roll"), handler.FinishProcessHandler)
 			payRoll.PUT("/:id/Payment", middleware.PermissionMiddleware("payment_pay_roll"), handler.PayRollPaymentHandler)
 			payRoll.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll"), handler.PayRollDeleteHandler)
 		}
@@ -117,6 +118,7 @@ func SetupRouter() *gin.Engine {
 		attendance.Use(middleware.AdminMiddleware())
 		{
 			attendance.GET("", middleware.PermissionMiddleware("read_attendance"), handler.AttendanceGetAllHandler)
+			attendance.GET("/summary/:employeeId", middleware.PermissionMiddleware("read_attendance"), handler.SummaryGetAllHandler)
 			attendance.POST("/import", middleware.PermissionMiddleware("import_attendance"), handler.AttendanceImportHandler)
 			attendance.GET("/import/:id", middleware.PermissionMiddleware("import_attendance"), handler.AttendanceImportDetailHandler)
 			attendance.PUT("/import/:id/Reject", middleware.PermissionMiddleware("import_attendance_approval"), handler.AttendanceImportRejectHandler)
@@ -360,6 +362,16 @@ func SetupRouter() *gin.Engine {
 			incentiveReport.PUT("/:id/EditIncentive/:incentiveId", handler.IncentiveReportEditIncentiveHandler)
 			incentiveReport.PUT("/:id/AddEmployee", handler.IncentiveReportAddEmployeeHandler)
 			incentiveReport.DELETE("/:id", handler.IncentiveReportDeleteHandler)
+		}
+
+		bank := admin.Group("/bank")
+		bank.Use()
+		{
+			bank.GET("", handler.BankGetAllHandler)
+			bank.GET("/:id", handler.BankGetOneHandler)
+			bank.POST("", handler.BankCreateHandler)
+			bank.PUT("/:id", handler.BankUpdateHandler)
+			bank.DELETE("/:id", handler.BankDeleteHandler)
 		}
 
 		// DONT REMOVE THIS LINE

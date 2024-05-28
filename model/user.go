@@ -54,6 +54,7 @@ func (u *User) CreateSuperAdmin(email string, password string) error {
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		user := &User{
 			Email:    email,
+			FullName: "SUPER ADMIN",
 			Password: password,
 			IsAdmin:  true,
 		}

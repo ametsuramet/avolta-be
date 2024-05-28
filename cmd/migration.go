@@ -52,6 +52,7 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.IncentiveShop{})
 	database.DB.AutoMigrate(&model.IncentiveSetting{})
 	database.DB.AutoMigrate(&model.IncentiveReport{})
+	database.DB.AutoMigrate(&model.Bank{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }
@@ -426,10 +427,20 @@ func GenPermissions() {
 	}
 	// GenSuperAdmin()
 }
+func GenBanks() {
+	banks := constants.BankList
+	for _, v := range banks {
+		if err := database.DB.Create(&model.Bank{
+			Name: v["name"],
+			Code: v["code"],
+		}).Error; err != nil {
+			fmt.Println("ERROR CREATE BANK ", v["name"], err)
+		}
+	}
+	// GenSuperAdmin()
+}
 func GenLeaveCategories() {
 	cats := []string{
-		"Izin Sakit",
-		"Sakit dengan Surat Dokter",
 		"Dinas Luar Kota",
 		"Cuti Menikah",
 		"Cuti Menikahkan Anak",
@@ -445,6 +456,17 @@ func GenLeaveCategories() {
 	for _, v := range cats {
 		database.DB.Create(&model.LeaveCategory{
 			Name: v,
+		})
+	}
+
+	sicks := []string{
+		"Izin Sakit",
+		"Sakit dengan Surat Dokter",
+	}
+	for _, v := range sicks {
+		database.DB.Create(&model.LeaveCategory{
+			Name: v,
+			Sick: true,
 		})
 	}
 

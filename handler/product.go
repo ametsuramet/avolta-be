@@ -178,9 +178,12 @@ func ProductImportHandler(c *gin.Context) {
 			continue
 		}
 		cat := model.ProductCategory{}
-		if err := database.DB.Find(&cat, "name = ?", row[4]).Error; err == nil {
-			cat.Name = row[4]
-			database.DB.Create(&cat)
+		count := int64(0)
+		if err := database.DB.Find(&cat, "name = ?", row[4]).Count(&count).Error; err == nil {
+			if count == 0 {
+				cat.Name = row[4]
+				database.DB.Create(&cat)
+			}
 		}
 		price, err := strconv.Atoi(row[5])
 		if err != nil {

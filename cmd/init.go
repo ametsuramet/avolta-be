@@ -11,6 +11,8 @@ func Init(args []string) {
 		GenAccounts()
 	case "gen-permission":
 		GenPermissions()
+	case "gen-bank":
+		GenBanks()
 	case "gen-leave-category":
 		GenLeaveCategories()
 	case "gen-product-category":

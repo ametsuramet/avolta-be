@@ -261,6 +261,67 @@ func AttendanceImportHandler(c *gin.Context) {
 	util.ResponseSuccess(c, "Import Succeed", data.ID, nil)
 }
 
+func SummaryGetAllHandler(c *gin.Context) {
+	var data model.Employee
+
+	employeeId := c.Params.ByName("employeeId")
+
+	if err := database.DB.Find(&data, "id = ?", employeeId).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	startDate, ok := c.GetQuery("start_date")
+	if !ok {
+		util.ResponseFail(c, http.StatusBadRequest, "Rentang tanggal belum di set")
+		return
+	}
+	endDate, ok := c.GetQuery("end_date")
+	if !ok {
+		util.ResponseFail(c, http.StatusBadRequest, "Rentang tanggal belum di set")
+		return
+	}
+
+	summaries := []struct {
+		ID       string  `sql:"id"`
+		ClockIn  string  `sql:"clock_in"`
+		ClockOut string  `sql:"clock_out"`
+		Diff     float64 `sql:"diff"`
+		FullTime float64 `sql:"full_time"`
+	}{}
+
+	if err := database.DB.Raw(`select id, clock_in , clock_out , SUM(TIMESTAMPDIFF(MINUTE ,clock_in, clock_out))  as diff,  
+	CASE WHEN SUM(TIMESTAMPDIFF(MINUTE ,clock_in, clock_out)) / 60 >= ? THEN 1 ELSE 0 END full_time
+	from attendances a 
+	WHERE DATE(clock_in) BETWEEN DATE(?) AND DATE(?)
+	AND clock_in is not null
+	and employee_id = ?
+	group by id, DATE(clock_in), DATE(clock_out) `, data.DailyWorkingHours, startDate, endDate, employeeId).Scan(&summaries).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	totalDays := 0
+	totalFullDays := 0
+	totalMinutes := 0
+	for _, v := range summaries {
+		totalDays++
+		if v.FullTime == 1 {
+			totalFullDays++
+		}
+		totalMinutes += int(v.Diff)
+	}
+
+	util.ResponsePaginatorSuccess(c, "Data Summary Attandance Retrived", gin.H{
+		"employee_name":       data.FullName,
+		"total_working_days":  data.TotalWorkingDays,
+		"total_working_hours": data.TotalWorkingHours,
+		"daily_working_hours": data.DailyWorkingHours,
+		"total_hours":         totalMinutes,
+		"total_days":          totalDays,
+		"total_full_days":     totalFullDays,
+	}, nil)
+
+}
 func AttendanceGetAllHandler(c *gin.Context) {
 	_, ok := c.GetQuery("download")
 	if ok {

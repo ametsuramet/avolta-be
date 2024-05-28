@@ -41,9 +41,12 @@ func EmployeeImportHandler(c *gin.Context) {
 			continue
 		}
 		jobTitle := model.JobTitle{}
-		if err := database.DB.Find(&jobTitle, "name = ?", row[4]); err != nil {
-			jobTitle.Name = row[4]
-			database.DB.Create(&jobTitle)
+		count := int64(0)
+		if err := database.DB.Find(&jobTitle, "name = ?", row[4]).Count(&count).Error; err == nil {
+			if count == 0 {
+				jobTitle.Name = row[4]
+				database.DB.Create(&jobTitle)
+			}
 		}
 
 		var dob, startedWork time.Time
@@ -244,7 +247,7 @@ func EmployeeGetOneHandler(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-	if err := database.DB.Preload("Schedules").Preload("JobTitle").Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Schedules").Preload("JobTitle").Preload("Bank").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}

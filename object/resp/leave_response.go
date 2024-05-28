@@ -17,4 +17,7 @@ type LeaveResponse struct {
 	Remarks         string `json:"remarks"`
 	AttachmentURL   string `json:"attachment_url"`
 	EmployeePicture string `json:"employee_picture"`
+	Absent          bool   `json:"absent"`
+	Sick            bool   `json:"sick"`
+	Diff            int64  `json:"diff"`
 }

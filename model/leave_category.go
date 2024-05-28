@@ -13,6 +13,7 @@ type LeaveCategory struct {
 	Name        string
 	Description string
 	Absent      bool `gorm:"default:false; NOT NULL"`
+	Sick        bool `gorm:"default:false; NOT NULL"`
 }
 
 func (u *LeaveCategory) BeforeCreate(tx *gorm.DB) (err error) {
@@ -27,5 +28,7 @@ func (m LeaveCategory) MarshalJSON() ([]byte, error) {
 		ID:          m.ID,
 		Name:        m.Name,
 		Description: m.Description,
+		Absent:      m.Absent,
+		Sick:        m.Sick,
 	})
 }

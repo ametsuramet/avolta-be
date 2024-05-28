@@ -29,6 +29,7 @@ func Login(c *gin.Context) {
 			return
 		}
 		cmd.GenPermissions()
+		cmd.GenBanks()
 		cmd.GenAccounts()
 		cmd.GenLeaveCategories()
 		cmd.GenProductCategories()

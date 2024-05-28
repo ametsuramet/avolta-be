@@ -42,4 +42,7 @@ type EmployeeResponse struct {
 	TotalWorkingDays          int32              `json:"total_working_days"`
 	TotalWorkingHours         float64            `json:"total_working_hours"`
 	DailyWorkingHours         float64            `json:"daily_working_hours"`
+	BankAccountNumber         string             `json:"bank_account_number"`
+	BankID                    *string            `json:"bank_id"`
+	BankName                  string             `json:"bank_name"`
 }

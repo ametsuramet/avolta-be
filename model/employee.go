@@ -55,6 +55,9 @@ type Employee struct {
 	DailyWorkingHours         float64         `json:"daily_working_hours"`
 	WorkSafetyRisks           string          `gorm:"type:ENUM('very_low','low','middle', 'high','very_high') DEFAULT 'very_low'" json:"work_safety_risks"`
 	Sales                     []Sale          `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	BankAccountNumber         string          `json:"bank_account_number"`
+	BankID                    *string         `json:"bank_id"`
+	Bank                      Bank            `gorm:"foreignKey:BankID"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -162,6 +165,11 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		userID = *m.UserID
 	}
 
+	bankName := ""
+	if m.BankID != nil {
+		bankName = m.Bank.Name
+	}
+
 	return json.Marshal(resp.EmployeeResponse{
 		ID:                        m.ID,
 		Email:                     m.Email,
@@ -195,6 +203,9 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		TotalWorkingDays:          m.TotalWorkingDays,
 		TotalWorkingHours:         m.TotalWorkingHours,
 		DailyWorkingHours:         m.DailyWorkingHours,
+		BankAccountNumber:         m.BankAccountNumber,
+		BankID:                    m.BankID,
+		BankName:                  bankName,
 	})
 }
 

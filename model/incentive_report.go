@@ -149,6 +149,21 @@ func (m *IncentiveReport) UpdateIncentive(c *gin.Context) error {
 				fmt.Println("SETTING", incentive.SickLeave, "=>", setting.IncentiveSickLeaveThreshold)
 				fmt.Println("TOTAL COMMISION", totalComission)
 				productCats = append(productCats, productCat)
+				if incentive.SickLeave == 0 {
+					if err := tx.Model(&incentive).Update("sick_leave", 0).Error; err != nil {
+						return err
+					}
+				}
+				if incentive.OtherLeave == 0 {
+					if err := tx.Model(&incentive).Update("other_leave", 0).Error; err != nil {
+						return err
+					}
+				}
+				if incentive.Absent == 0 {
+					if err := tx.Model(&incentive).Update("absent", 0).Error; err != nil {
+						return err
+					}
+				}
 			}
 
 			incentiveShop := IncentiveShop{}
