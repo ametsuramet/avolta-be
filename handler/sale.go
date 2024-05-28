@@ -223,6 +223,9 @@ func SaleImportHandler(c *gin.Context) {
 		return
 	}
 	for i, row := range rows {
+		if i < 1 {
+			continue
+		}
 		product := model.Product{}
 		if err := database.DB.Find(&product, "sku = ?", row[3]).Error; err != nil {
 			errString := fmt.Sprintf("Error at Line %s : %s", row[3], err.Error())
@@ -236,10 +239,12 @@ func SaleImportHandler(c *gin.Context) {
 			continue
 		}
 		shop := model.Shop{}
-		if err := database.DB.Find(&shop, "code = ?", row[14]).Error; err != nil {
-			errString := fmt.Sprintf("Error at Line %s : %s", row[14], err.Error())
-			errorRows = append(errorRows, errString)
-			continue
+		if err := database.DB.Find(&shop, "code = ?", row[14]); err != nil {
+
+			shop.Name = row[13]
+			shop.Code = row[14]
+			database.DB.Create(&shop)
+			// continue
 		}
 		date, err := time.Parse("02-01-2006", row[1])
 		if err != nil {

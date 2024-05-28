@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,12 +41,16 @@ func EmployeeImportHandler(c *gin.Context) {
 			continue
 		}
 		jobTitle := model.JobTitle{}
-		database.DB.Find(&jobTitle, "name = ?", row[4])
+		if err := database.DB.Find(&jobTitle, "name = ?", row[4]); err != nil {
+			jobTitle.Name = row[4]
+			database.DB.Create(&jobTitle)
+		}
+
 		var dob, startedWork time.Time
-		if dob, err = time.Parse("2006-01-02", row[6]); err != nil {
+		if dob, err = time.Parse("2006-01-02", strings.TrimSpace(row[6])); err != nil {
 			dob = time.Time{}
 		}
-		if startedWork, err = time.Parse("2006-01-02", row[15]); err != nil {
+		if startedWork, err = time.Parse("2006-01-02", strings.TrimSpace(row[15])); err != nil {
 			startedWork = time.Time{}
 		}
 		basicSalary, _ := strconv.Atoi(row[8])
@@ -59,6 +64,21 @@ func EmployeeImportHandler(c *gin.Context) {
 		if gender == "Perempuan" {
 			gender = "f"
 		}
+		workingType := "FULL_TIME"
+		if len(row) > 17 {
+			workingType = row[17]
+		}
+		var totalWorkingDays, totalWorkingHours, dailyWorkingHours int
+		if len(row) > 18 {
+			totalWorkingDays, _ = strconv.Atoi(row[18])
+		}
+		if len(row) > 19 {
+			totalWorkingHours, _ = strconv.Atoi(row[19])
+		}
+		if len(row) > 20 {
+			dailyWorkingHours, _ = strconv.Atoi(row[20])
+		}
+
 		if err := database.DB.Create(&model.Employee{
 			FullName:                  row[1],
 			Email:                     row[2],
@@ -75,6 +95,12 @@ func EmployeeImportHandler(c *gin.Context) {
 			TaxPayerNumber:            row[13],
 			Gender:                    gender,
 			StartedWork:               model.NullTimeConv(startedWork),
+			EmployeeCode:              row[16],
+			WorkingType:               workingType,
+			TotalWorkingDays:          int32(totalWorkingDays),
+			TotalWorkingHours:         float64(totalWorkingHours),
+			DailyWorkingHours:         float64(dailyWorkingHours),
+			WorkSafetyRisks:           "very_low",
 		}).Error; err != nil {
 			errString := fmt.Sprintf("Error at Line %s : %s", row[0], err.Error())
 			errorRows = append(errorRows, errString)
@@ -141,6 +167,10 @@ func EmployeeGetAllHandler(c *gin.Context) {
 			"started_work": startedWorkEnd,
 		})
 
+	}
+	employeeId, ok := c.GetQuery("employee_id")
+	if ok {
+		paginator.OrderBy = append(paginator.OrderBy, "IF(id = \""+employeeId+"\", 0, 1) ASC")
 	}
 	_, ok = c.GetQuery("download")
 	if ok {
@@ -255,7 +285,7 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if input.UserID != "" && input.UserID != data.UserID {
+	if input.UserID != nil && input.UserID != data.UserID {
 		count := int64(0)
 		database.DB.Model(&model.Employee{}).Where("user_id = ?", input.UserID).Count(&count)
 		if count > 0 {
@@ -268,7 +298,7 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if input.UserID == "" {
+	if input.UserID == nil {
 		if err := database.DB.Model(&data).Update("user_id", nil).Error; err != nil {
 			util.ResponseFail(c, http.StatusBadRequest, err.Error())
 			return

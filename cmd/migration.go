@@ -424,7 +424,7 @@ func GenPermissions() {
 			fmt.Println("ERROR CREATE PERMISSION ", v.Name, err)
 		}
 	}
-	GenSuperAdmin()
+	// GenSuperAdmin()
 }
 func GenLeaveCategories() {
 	cats := []string{
@@ -447,6 +447,11 @@ func GenLeaveCategories() {
 			Name: v,
 		})
 	}
+
+	database.DB.Create(&model.LeaveCategory{
+		Name:   "Absen",
+		Absent: true,
+	})
 }
 
 func GenProductCategories() {

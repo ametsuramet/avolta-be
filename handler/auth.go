@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"avolta/cmd"
 	"avolta/model"
 	"avolta/object/auth"
 	"avolta/util"
@@ -20,6 +21,19 @@ func Login(c *gin.Context) {
 	}
 
 	var user model.User
+
+	if exists := user.CountSuperAdmin(); !exists {
+
+		if err := user.CreateSuperAdmin(input.Email, input.Password); err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error(), "message": "Error Generate Super Admin"})
+			return
+		}
+		cmd.GenPermissions()
+		cmd.GenAccounts()
+		cmd.GenLeaveCategories()
+		cmd.GenProductCategories()
+
+	}
 
 	if exists := user.CheckAdminByEmail(input.Email); !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User Not Exists", "message": "User Not Exists or not admin"})

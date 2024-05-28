@@ -25,7 +25,7 @@ type Employee struct {
 	JobTitleID                sql.NullString  `json:"job_title_id"`
 	JobTitle                  JobTitle        `gorm:"foreignKey:JobTitleID"`
 	Grade                     string          `json:"grade"`
-	UserID                    string          `json:"user_id"`
+	UserID                    *string         `json:"user_id"`
 	Address                   string          `json:"address"`
 	Picture                   sql.NullString  `json:"picture"`
 	Cover                     string          `json:"cover"`
@@ -154,10 +154,12 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		}
 	}
 	username := ""
-	if m.UserID != "" {
+	userID := ""
+	if m.UserID != nil {
 		user := User{}
 		database.DB.Select("full_name").Find(&user, "id = ?", m.UserID)
 		username = user.FullName
+		userID = *m.UserID
 	}
 
 	return json.Marshal(resp.EmployeeResponse{
@@ -189,7 +191,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		PictureUrl:                pictureUrl,
 		Schedules:                 schedules,
 		EmployeeCode:              m.EmployeeCode,
-		UserID:                    m.UserID,
+		UserID:                    userID,
 		TotalWorkingDays:          m.TotalWorkingDays,
 		TotalWorkingHours:         m.TotalWorkingHours,
 		DailyWorkingHours:         m.DailyWorkingHours,

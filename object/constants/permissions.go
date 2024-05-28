@@ -33,7 +33,6 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "incentive_shop", "is_default": true, "is_active": true},
 		{"name": "incentive_setting", "is_default": true, "is_active": true},
 		{"name": "incentive_report", "is_default": true, "is_active": true},
-		{"name": "incentive", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},

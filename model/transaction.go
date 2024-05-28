@@ -24,23 +24,23 @@ type Transaction struct {
 	IsAccountPayable       bool          `json:"is_account_payable"`
 	AccountSourceID        *string       `json:"account_source_id"`
 	AccountSourceName      string        `json:"account_source_name" gorm:"-"`
-	AccountSource          Account       `gorm:"foreignKey:AccountSourceID" json:"-"`
+	AccountSource          Account       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountSourceID" json:"-"`
 	AccountDestinationID   *string       `json:"account_destination_id"`
 	AccountDestinationName string        `json:"account_destination_name" gorm:"-"`
-	AccountDestination     Account       `gorm:"foreignKey:AccountDestinationID" json:"-"`
+	AccountDestination     Account       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountDestinationID" json:"-"`
 	EmployeeID             string        `json:"employee_id"`
-	Employee               Employee      `gorm:"foreignKey:EmployeeID" json:"-"`
+	Employee               Employee      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:EmployeeID" json:"-"`
 	Images                 []Image       `json:"images" gorm:"-"`
 	PayRollID              *string       `json:"pay_roll_id"`
-	PayRoll                PayRoll       `gorm:"foreignKey:PayRollID" json:"-"`
+	PayRoll                PayRoll       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PayRollID" json:"-"`
 	ReimbursementID        *string       `json:"reimbursement_id"`
-	Reimbursement          Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
+	Reimbursement          Reimbursement `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:ReimbursementID" json:"-"`
 	TaxPaymentID           string        `json:"tax_payment_id"`
 	PayRollPayableID       string        `json:"pay_roll_payable_id"`
 	IsPayRollPayment       bool          `json:"is_pay_roll_payment"`
 	IsReimbursementPayment bool          `json:"is_reimbursement_payment"`
 	TransactionRefID       *string       `json:"transaction_ref_id"`
-	TransactionRefs        []Transaction `json:"transaction_refs" gorm:"foreignKey:TransactionRefID"`
+	TransactionRefs        []Transaction `json:"transaction_refs" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:TransactionRefID"`
 }
 
 func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {

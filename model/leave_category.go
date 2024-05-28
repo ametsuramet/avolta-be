@@ -12,6 +12,7 @@ type LeaveCategory struct {
 	Base
 	Name        string
 	Description string
+	Absent      bool `gorm:"default:false; NOT NULL"`
 }
 
 func (u *LeaveCategory) BeforeCreate(tx *gorm.DB) (err error) {

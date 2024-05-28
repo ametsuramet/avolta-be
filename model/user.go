@@ -43,6 +43,49 @@ func (u *User) CheckAdminByEmail(email string) bool {
 	database.DB.Find(&u, "email = ? and is_admin = 1", email).Count(&count)
 	return count > 0
 }
+
+func (u *User) CountSuperAdmin() bool {
+	count := int64(0)
+	database.DB.Find(&u, "is_admin = 1").Count(&count)
+	return count > 0
+}
+func (u *User) CreateSuperAdmin(email string, password string) error {
+
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		user := &User{
+			Email:    email,
+			Password: password,
+			IsAdmin:  true,
+		}
+		// CREATE FIRST SUPER ADMIN
+		if err := tx.Create(&user).Error; err != nil {
+			return err
+		}
+		// GENERATE STATIC DATA
+		role := Role{
+			Name:         "SUPERADMIN",
+			Description:  "Yes i'am superman",
+			IsSuperAdmin: true,
+		}
+
+		// CREATE SUPER ADMIN
+		if err := tx.Create(&role).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&user).Update("role_id", role.ID).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *User) CheckUserByEmail(email string) bool {
 	count := int64(0)
 	database.DB.Find(&u, "email = ?", email).Count(&count)

@@ -14,9 +14,9 @@ import (
 type Reimbursement struct {
 	Base
 	AccountPayableID *string             `gorm:"size:30" json:"account_payable_id"`
-	AccountPayable   Account             `gorm:"foreignKey:AccountPayableID" json:"-"`
+	AccountPayable   Account             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountPayableID" json:"-"`
 	AccountExpenseID *string             `gorm:"size:30" json:"account_expense_id"`
-	AccountExpense   Account             `gorm:"foreignKey:AccountExpenseID" json:"-"`
+	AccountExpense   Account             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountExpenseID" json:"-"`
 	Date             time.Time           `json:"date" binding:"required"`
 	Name             string              `json:"name"`
 	Notes            string              `json:"notes"`

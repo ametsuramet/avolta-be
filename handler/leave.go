@@ -12,9 +12,13 @@ import (
 
 func LeaveGetAllHandler(c *gin.Context) {
 	var data []model.Leave
-	preloads := []string{}
+	preloads := []string{"LeaveCategory", "Employee"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
+
+	paginator.Joins = append(paginator.Joins, map[string]interface{}{
+		"JOIN leave_categories ON leave_categories.id = leaves.leave_category_id": nil,
+	})
 
 	// search, ok := c.GetQuery("search")
 	// if ok {
@@ -26,14 +30,14 @@ func LeaveGetAllHandler(c *gin.Context) {
 	startDate, ok := c.GetQuery("start_date")
 	if ok {
 		paginator.WhereMoreEqual = append(paginator.WhereMoreEqual, map[string]interface{}{
-			"start_date": startDate,
+			"leaves.start_date": startDate,
 		})
 
 	}
 	endDate, ok := c.GetQuery("end_date")
 	if ok {
 		paginator.WhereLessEqual = append(paginator.WhereLessEqual, map[string]interface{}{
-			"start_date": endDate,
+			"leaves.start_date": endDate,
 		})
 
 	}
@@ -41,17 +45,30 @@ func LeaveGetAllHandler(c *gin.Context) {
 	employeeId, ok := c.GetQuery("employee_id")
 	if ok {
 		paginator.Where = append(paginator.Where, map[string]interface{}{
-			"employee_id": employeeId,
+			"leaves.employee_id": employeeId,
 		})
 
 	}
 	status, ok := c.GetQuery("status")
 	if ok {
 		paginator.Where = append(paginator.Where, map[string]interface{}{
-			"status": status,
+			"leaves.status": status,
 		})
 
 	}
+
+	absent, ok := c.GetQuery("absent")
+	if ok {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"leave_categories.absent": absent,
+		})
+
+	} else {
+		paginator.Where = append(paginator.Where, map[string]interface{}{
+			"leave_categories.absent": false,
+		})
+	}
+
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

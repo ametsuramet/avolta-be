@@ -36,6 +36,11 @@ func ProductGetAllHandler(c *gin.Context) {
 		})
 
 	}
+
+	productId, ok := c.GetQuery("product_id")
+	if ok {
+		paginator.OrderBy = append(paginator.OrderBy, "IF(id = \""+productId+"\", 0, 1) ASC")
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

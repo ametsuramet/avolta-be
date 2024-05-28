@@ -21,6 +21,12 @@ var DB = &gorm.DB{}
 // InitDB initializes the database connection
 func InitDB(ctx context.Context) (*gorm.DB, error) {
 	config.LoadConfig()
+
+	if err := createDatabase(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		config.App.Database.DBUser, config.App.Database.DBPassword, config.App.Database.DBHost, config.App.Database.DBPort, config.App.Database.DBName)
 	var cfg gorm.Config
@@ -30,6 +36,7 @@ func InitDB(ctx context.Context) (*gorm.DB, error) {
 			Logger: logger.Default.LogMode(logger.Info),
 		}
 	}
+
 	// Open a connection to the database
 	db, err := gorm.Open(mysql.Open(dsn), &cfg)
 	if err != nil {
@@ -41,6 +48,19 @@ func InitDB(ctx context.Context) (*gorm.DB, error) {
 	schema.RegisterSerializer("json", JSONSerializer{})
 
 	return db, nil
+}
+
+func createDatabase() error {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local",
+		config.App.Database.DBUser, config.App.Database.DBPassword, config.App.Database.DBHost, config.App.Database.DBPort)
+	DB, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	createDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci", config.App.Database.DBName)
+	err := DB.Exec(createDB).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type JSONSerializer struct {
