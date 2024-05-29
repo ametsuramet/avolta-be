@@ -7,6 +7,7 @@ import (
 	"avolta/util"
 	"bytes"
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
@@ -98,8 +99,8 @@ func PayRollReporDownloadPayRollBankHandler(c *gin.Context) {
 	xls := excelize.NewFile()
 	xlsStyle := constants.NewExcelStyle(xls)
 	xls.SetSheetName(xls.GetSheetName(0), sheet1Name)
-	headers := []string{"No", "Nama Karyawan", "Telp", "Email", "Bank", "Kode Bank", "No. Rekening"}
-	headerStyle := []int{xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter}
+	headers := []string{"No", "Nama Karyawan", "Telp", "Email", "Bank", "Kode Bank", "No. Rekening", "Take Home Pay"}
+	headerStyle := []int{xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter, xlsStyle.BoldCenter}
 	headerWidth := []float64{7, 25, 15, 15, 15, 20, 30, 15, 15}
 	for j, v := range headers {
 		xls.SetCellValue(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(j)+1), row), v)
@@ -110,8 +111,8 @@ func PayRollReporDownloadPayRollBankHandler(c *gin.Context) {
 	orderNumber := 1
 
 	for _, v := range data.Items {
-		cols := []interface{}{orderNumber, v.EmployeeName, v.EmployeePhone, v.EmployeeEmail, v.BankName, v.BankCode, v.BankAccountNumber}
-		colStyle := []int{xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal}
+		cols := []interface{}{orderNumber, v.EmployeeName, v.EmployeePhone, v.EmployeeEmail, v.BankName, v.BankCode, v.BankAccountNumber, math.Round(v.TotalReimbursement + v.TotalTakeHomePay)}
+		colStyle := []int{xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal, xlsStyle.Normal}
 		for k, v := range cols {
 			xls.SetCellValue(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), v)
 			xls.SetCellStyle(sheet1Name, fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), fmt.Sprintf("%s%v", util.IntToLetters(int32(k)+1), row), colStyle[k])
