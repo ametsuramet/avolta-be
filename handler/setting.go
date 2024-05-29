@@ -49,6 +49,26 @@ func SettingIncentiveAutoNumberHandler(c *gin.Context) {
 
 	util.ResponseSuccess(c, "Data Setting Retrived", nextNumber, nil)
 }
+func SettingPayrollReportAutoNumberHandler(c *gin.Context) {
+	var data model.Setting
+	var payrollReport model.PayRollReport
+
+	if err := database.DB.First(&data).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	nextNumber := ""
+	if data.PayRollReportAutoNumber {
+		if err := database.DB.Order("created_at desc").First(&payrollReport).Error; err != nil {
+			nextNumber = model.GenerateInvoiceBillNumber(model.AutoNumber{AutoNumber: data.PayRollReportAutoNumber, AutoFormat: data.PayRollReportAutoFormat, StaticCharacter: data.PayRollReportStaticCharacter, AutoNumberCharacterLength: data.PayRollReportAutoNumberCharacterLength}, "00")
+		} else {
+			nextNumber = model.ExtractNumber(model.AutoNumber{AutoNumber: data.PayRollReportAutoNumber, AutoFormat: data.PayRollReportAutoFormat, StaticCharacter: data.PayRollReportStaticCharacter, AutoNumberCharacterLength: data.PayRollReportAutoNumberCharacterLength}, payrollReport.ReportNumber)
+		}
+	}
+
+	util.ResponseSuccess(c, "Data Setting Retrived", nextNumber, nil)
+}
 func SettingGetOneHandler(c *gin.Context) {
 	var data model.Setting
 	count := int64(0)

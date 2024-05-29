@@ -172,31 +172,31 @@ func SetupRouter() *gin.Engine {
 		role := admin.Group("/role")
 		role.Use(middleware.AdminMiddleware())
 		{
-			role.GET("", handler.RoleGetAllHandler)
-			role.GET("/:id", handler.RoleGetOneHandler)
-			role.POST("", handler.RoleCreateHandler)
-			role.PUT("/:id", handler.RoleUpdateHandler)
-			role.DELETE("/:id", handler.RoleDeleteHandler)
+			role.GET("", middleware.PermissionMiddleware("read_role"), handler.RoleGetAllHandler)
+			role.GET("/:id", middleware.PermissionMiddleware("read_role"), handler.RoleGetOneHandler)
+			role.POST("", middleware.PermissionMiddleware("create_role"), handler.RoleCreateHandler)
+			role.PUT("/:id", middleware.PermissionMiddleware("update_role"), handler.RoleUpdateHandler)
+			role.DELETE("/:id", middleware.PermissionMiddleware("delete_role"), handler.RoleDeleteHandler)
 		}
 
 		organization := admin.Group("/organization")
 		organization.Use(middleware.AdminMiddleware())
 		{
-			organization.GET("", handler.OrganizationGetAllHandler)
-			organization.GET("/:id", handler.OrganizationGetOneHandler)
-			organization.POST("", handler.OrganizationCreateHandler)
-			organization.PUT("/:id", handler.OrganizationUpdateHandler)
-			organization.DELETE("/:id", handler.OrganizationDeleteHandler)
+			organization.GET("", middleware.PermissionMiddleware("read_organization"), handler.OrganizationGetAllHandler)
+			organization.GET("/:id", middleware.PermissionMiddleware("read_organization"), handler.OrganizationGetOneHandler)
+			organization.POST("", middleware.PermissionMiddleware("create_organization"), handler.OrganizationCreateHandler)
+			organization.PUT("/:id", middleware.PermissionMiddleware("update_organization"), handler.OrganizationUpdateHandler)
+			organization.DELETE("/:id", middleware.PermissionMiddleware("delete_organization"), handler.OrganizationDeleteHandler)
 		}
 
 		jobTitle := admin.Group("/jobTitle")
 		jobTitle.Use(middleware.AdminMiddleware())
 		{
-			jobTitle.GET("", handler.JobTitleGetAllHandler)
-			jobTitle.GET("/:id", handler.JobTitleGetOneHandler)
-			jobTitle.POST("", handler.JobTitleCreateHandler)
-			jobTitle.PUT("/:id", handler.JobTitleUpdateHandler)
-			jobTitle.DELETE("/:id", handler.JobTitleDeleteHandler)
+			jobTitle.GET("", middleware.PermissionMiddleware("read_job_title"), handler.JobTitleGetAllHandler)
+			jobTitle.GET("/:id", middleware.PermissionMiddleware("read_job_title"), handler.JobTitleGetOneHandler)
+			jobTitle.POST("", middleware.PermissionMiddleware("create_job_title"), handler.JobTitleCreateHandler)
+			jobTitle.PUT("/:id", middleware.PermissionMiddleware("update_job_title"), handler.JobTitleUpdateHandler)
+			jobTitle.DELETE("/:id", middleware.PermissionMiddleware("delete_job_title"), handler.JobTitleDeleteHandler)
 		}
 
 		schedule := admin.Group("/schedule")
@@ -243,6 +243,7 @@ func SetupRouter() *gin.Engine {
 		{
 			setting.GET("/autonumber", handler.SettingAutoNumberHandler)
 			setting.GET("/incentive/autonumber", handler.SettingIncentiveAutoNumberHandler)
+			setting.GET("/pay_roll_report/autonumber", handler.SettingPayrollReportAutoNumberHandler)
 			setting.GET("", handler.SettingGetOneHandler)
 			setting.PUT("", middleware.PermissionMiddleware("menu_setting"), handler.SettingUpdateHandler)
 		}
@@ -282,42 +283,42 @@ func SetupRouter() *gin.Engine {
 		product := admin.Group("/product")
 		product.Use(middleware.AdminMiddleware())
 		{
-			product.GET("", handler.ProductGetAllHandler)
-			product.GET("/:id", handler.ProductGetOneHandler)
-			product.POST("", handler.ProductCreateHandler)
-			product.PUT("/:id", handler.ProductUpdateHandler)
-			product.DELETE("/:id", handler.ProductDeleteHandler)
+			product.GET("", middleware.PermissionMiddleware("read_product"), handler.ProductGetAllHandler)
+			product.GET("/:id", middleware.PermissionMiddleware("read_product"), handler.ProductGetOneHandler)
+			product.POST("", middleware.PermissionMiddleware("create_product"), handler.ProductCreateHandler)
+			product.PUT("/:id", middleware.PermissionMiddleware("update_product"), handler.ProductUpdateHandler)
+			product.DELETE("/:id", middleware.PermissionMiddleware("delete_product"), handler.ProductDeleteHandler)
 			product.POST("/import", middleware.PermissionMiddleware("import_product"), handler.ProductImportHandler)
 		}
 
 		productCategory := admin.Group("/productCategory")
 		productCategory.Use(middleware.AdminMiddleware())
 		{
-			productCategory.GET("", handler.ProductCategoryGetAllHandler)
-			productCategory.GET("/:id", handler.ProductCategoryGetOneHandler)
-			productCategory.POST("", handler.ProductCategoryCreateHandler)
-			productCategory.PUT("/:id", handler.ProductCategoryUpdateHandler)
-			productCategory.DELETE("/:id", handler.ProductCategoryDeleteHandler)
+			productCategory.GET("", middleware.PermissionMiddleware("read_product_category"), handler.ProductCategoryGetAllHandler)
+			productCategory.GET("/:id", middleware.PermissionMiddleware("read_product_category"), handler.ProductCategoryGetOneHandler)
+			productCategory.POST("", middleware.PermissionMiddleware("create_product_category"), handler.ProductCategoryCreateHandler)
+			productCategory.PUT("/:id", middleware.PermissionMiddleware("update_product_category"), handler.ProductCategoryUpdateHandler)
+			productCategory.DELETE("/:id", middleware.PermissionMiddleware("delete_product_category"), handler.ProductCategoryDeleteHandler)
 		}
 
 		shop := admin.Group("/shop")
 		shop.Use(middleware.AdminMiddleware())
 		{
-			shop.GET("", handler.ShopGetAllHandler)
-			shop.GET("/:id", handler.ShopGetOneHandler)
-			shop.POST("", handler.ShopCreateHandler)
-			shop.PUT("/:id", handler.ShopUpdateHandler)
-			shop.DELETE("/:id", handler.ShopDeleteHandler)
+			shop.GET("", middleware.PermissionMiddleware("read_shop"), handler.ShopGetAllHandler)
+			shop.GET("/:id", middleware.PermissionMiddleware("read_shop"), handler.ShopGetOneHandler)
+			shop.POST("", middleware.PermissionMiddleware("create_shop"), handler.ShopCreateHandler)
+			shop.PUT("/:id", middleware.PermissionMiddleware("update_shop"), handler.ShopUpdateHandler)
+			shop.DELETE("/:id", middleware.PermissionMiddleware("delete_shop"), handler.ShopDeleteHandler)
 		}
 
 		sale := admin.Group("/sale")
 		sale.Use(middleware.AdminMiddleware())
 		{
-			sale.GET("", handler.SaleGetAllHandler)
-			sale.GET("/:id", handler.SaleGetOneHandler)
-			sale.POST("", handler.SaleCreateHandler)
-			sale.PUT("/:id", handler.SaleUpdateHandler)
-			sale.DELETE("/:id", handler.SaleDeleteHandler)
+			sale.GET("", middleware.PermissionMiddleware("read_sale"), handler.SaleGetAllHandler)
+			sale.GET("/:id", middleware.PermissionMiddleware("read_sale"), handler.SaleGetOneHandler)
+			sale.POST("", middleware.PermissionMiddleware("create_sale"), handler.SaleCreateHandler)
+			sale.PUT("/:id", middleware.PermissionMiddleware("update_sale"), handler.SaleUpdateHandler)
+			sale.DELETE("/:id", middleware.PermissionMiddleware("delete_sale"), handler.SaleDeleteHandler)
 			sale.POST("/import", middleware.PermissionMiddleware("import_sale"), handler.SaleImportHandler)
 		}
 
@@ -334,45 +335,78 @@ func SetupRouter() *gin.Engine {
 		incentiveSetting := admin.Group("/incentiveSetting")
 		incentiveSetting.Use(middleware.AdminMiddleware())
 		{
-			incentiveSetting.GET("", handler.IncentiveSettingGetAllHandler)
-			incentiveSetting.GET("/:id", handler.IncentiveSettingGetOneHandler)
-			incentiveSetting.POST("", handler.IncentiveSettingCreateHandler)
-			incentiveSetting.PUT("/:id", handler.IncentiveSettingUpdateHandler)
-			incentiveSetting.DELETE("/:id", handler.IncentiveSettingDeleteHandler)
+			incentiveSetting.GET("", middleware.PermissionMiddleware("read_incentive_setting"), handler.IncentiveSettingGetAllHandler)
+			incentiveSetting.GET("/:id", middleware.PermissionMiddleware("read_incentive_setting"), handler.IncentiveSettingGetOneHandler)
+			incentiveSetting.POST("", middleware.PermissionMiddleware("create_incentive_setting"), handler.IncentiveSettingCreateHandler)
+			incentiveSetting.PUT("/:id", middleware.PermissionMiddleware("update_incentive_setting"), handler.IncentiveSettingUpdateHandler)
+			incentiveSetting.DELETE("/:id", middleware.PermissionMiddleware("delete_incentive_setting"), handler.IncentiveSettingDeleteHandler)
 			incentiveSetting.POST("/import", middleware.PermissionMiddleware("import_incentive"), handler.IncentiveImportHandler)
 		}
 
 		incentiveShop := admin.Group("/incentiveShop")
 		incentiveShop.Use(middleware.AdminMiddleware())
 		{
-			incentiveShop.GET("", handler.IncentiveShopGetAllHandler)
-			incentiveShop.GET("/:id", handler.IncentiveShopGetOneHandler)
-			// incentiveShop.POST("", handler.IncentiveShopCreateHandler)
-			// incentiveShop.PUT("/:id", handler.IncentiveShopUpdateHandler)
-			incentiveShop.DELETE("/:id", handler.IncentiveShopDeleteHandler)
+			incentiveShop.GET("", middleware.PermissionMiddleware("read_incentive_shop"), handler.IncentiveShopGetAllHandler)
+			incentiveShop.GET("/:id", middleware.PermissionMiddleware("read_incentive_shop"), handler.IncentiveShopGetOneHandler)
+			// incentiveShop.POST("", middleware.PermissionMiddleware("create_incentive_shop"),  handler.IncentiveShopCreateHandler)
+			// incentiveShop.PUT("/:id", middleware.PermissionMiddleware("update_incentive_shop"),  handler.IncentiveShopUpdateHandler)
+			incentiveShop.DELETE("/:id", middleware.PermissionMiddleware("delete_incentive_shop"), handler.IncentiveShopDeleteHandler)
 		}
 
 		incentiveReport := admin.Group("/incentiveReport")
 		incentiveReport.Use(middleware.AdminMiddleware())
 		{
-			incentiveReport.GET("", handler.IncentiveReportGetAllHandler)
-			incentiveReport.GET("/:id", handler.IncentiveReportGetOneHandler)
-			incentiveReport.POST("", handler.IncentiveReportCreateHandler)
-			incentiveReport.PUT("/:id", handler.IncentiveReportUpdateHandler)
+			incentiveReport.GET("", middleware.PermissionMiddleware("read_incentive_report"), handler.IncentiveReportGetAllHandler)
+			incentiveReport.GET("/:id", middleware.PermissionMiddleware("read_incentive_report"), handler.IncentiveReportGetOneHandler)
+			incentiveReport.POST("", middleware.PermissionMiddleware("create_incentive_report"), handler.IncentiveReportCreateHandler)
+			incentiveReport.PUT("/:id", middleware.PermissionMiddleware("update_incentive_report"), handler.IncentiveReportUpdateHandler)
+			incentiveReport.DELETE("/:id", middleware.PermissionMiddleware("delete_incentive_report"), handler.IncentiveReportDeleteHandler)
 			incentiveReport.PUT("/:id/EditIncentive/:incentiveId", handler.IncentiveReportEditIncentiveHandler)
 			incentiveReport.PUT("/:id/AddEmployee", handler.IncentiveReportAddEmployeeHandler)
-			incentiveReport.DELETE("/:id", handler.IncentiveReportDeleteHandler)
 		}
 
 		bank := admin.Group("/bank")
-		bank.Use()
+		bank.Use(middleware.AdminMiddleware())
 		{
-			bank.GET("", handler.BankGetAllHandler)
-			bank.GET("/:id", handler.BankGetOneHandler)
-			bank.POST("", handler.BankCreateHandler)
-			bank.PUT("/:id", handler.BankUpdateHandler)
-			bank.DELETE("/:id", handler.BankDeleteHandler)
+			bank.GET("", middleware.PermissionMiddleware("read_bank"), handler.BankGetAllHandler)
+			bank.GET("/:id", middleware.PermissionMiddleware("read_bank"), handler.BankGetOneHandler)
+			bank.POST("", middleware.PermissionMiddleware("create_bank"), handler.BankCreateHandler)
+			bank.PUT("/:id", middleware.PermissionMiddleware("update_bank"), handler.BankUpdateHandler)
+			bank.DELETE("/:id", middleware.PermissionMiddleware("delete_bank"), handler.BankDeleteHandler)
 		}
+
+		announcement := admin.Group("/announcement")
+		announcement.Use(middleware.AdminMiddleware())
+		{
+			announcement.GET("", middleware.PermissionMiddleware("read_announcement"), handler.AnnouncementGetAllHandler)
+			announcement.GET("/:id", middleware.PermissionMiddleware("read_announcement"), handler.AnnouncementGetOneHandler)
+			announcement.POST("", middleware.PermissionMiddleware("create_announcement"), handler.AnnouncementCreateHandler)
+			announcement.PUT("/:id", middleware.PermissionMiddleware("update_announcement"), handler.AnnouncementUpdateHandler)
+			announcement.DELETE("/:id", middleware.PermissionMiddleware("delete_announcement"), handler.AnnouncementDeleteHandler)
+		}
+
+		payRollReport := admin.Group("/payRollReport")
+		payRollReport.Use(middleware.AdminMiddleware())
+		{
+			payRollReport.GET("", middleware.PermissionMiddleware("read_pay_roll_report"), handler.PayRollReportGetAllHandler)
+			payRollReport.GET("/:id", middleware.PermissionMiddleware("read_pay_roll_report"), handler.PayRollReportGetOneHandler)
+			payRollReport.POST("", middleware.PermissionMiddleware("create_pay_roll_report"), handler.PayRollReportCreateHandler)
+			payRollReport.PUT("/:id", middleware.PermissionMiddleware("update_pay_roll_report"), handler.PayRollReportUpdateHandler)
+			payRollReport.DELETE("/:id", middleware.PermissionMiddleware("delete_pay_roll_report"), handler.PayRollReportDeleteHandler)
+			payRollReport.PUT("/:id/AddItem/:payrollID", middleware.PermissionMiddleware("update_pay_roll_report"), handler.PayRollReportAddItemHandler)
+			payRollReport.GET("/:id/PayRolllBankDownLoad", middleware.PermissionMiddleware("update_pay_roll_report"), handler.PayRollReporDownloadPayRollBankHandler)
+			payRollReport.DELETE("/:id/DeleteItem/:payrollID", middleware.PermissionMiddleware("update_pay_roll_report"), handler.PayRollReportDeleteItemHandler)
+		}
+
+		// payRollReportItem := admin.Group("/payRollReportItem")
+		// payRollReportItem.Use()
+		// {
+		// 	payRollReportItem.GET("", handler.PayRollReportItemGetAllHandler)
+		// 	payRollReportItem.GET("/:id", handler.PayRollReportItemGetOneHandler)
+		// 	payRollReportItem.POST("", handler.PayRollReportItemCreateHandler)
+		// 	payRollReportItem.PUT("/:id", handler.PayRollReportItemUpdateHandler)
+		// 	payRollReportItem.DELETE("/:id", handler.PayRollReportItemDeleteHandler)
+		// }
 
 		// DONT REMOVE THIS LINE
 

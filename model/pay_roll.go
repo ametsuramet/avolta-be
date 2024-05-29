@@ -54,6 +54,7 @@ type PayRoll struct {
 	Employee                        Employee        `gorm:"foreignKey:EmployeeID" `
 	TaxSummary                      CountTaxSummary `gorm:"-" json:"tax_summary"`
 	BpjsSetting                     *service.Bpjs   `gorm:"-" `
+	PayRollReportItemID             *string         `json:"pay_roll_report_item_id"`
 }
 
 type PayRollPayment struct {
@@ -72,6 +73,33 @@ func (u *PayRoll) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+func (m PayRoll) MapWithOutDetail() resp.PayRollResponse {
+	return resp.PayRollResponse{
+		ID:                              m.ID,
+		PayRollNumber:                   m.PayRollNumber,
+		Notes:                           m.Notes,
+		StartDate:                       m.StartDate.Format("2006-01-02"),
+		EndDate:                         m.EndDate.Format("2006-01-02"),
+		EmployeeID:                      m.EmployeeID,
+		TaxAllowance:                    m.TaxAllowance,
+		EmployeeName:                    m.Employee.FullName,
+		TaxSummary:                      resp.CountTaxSummary(m.TaxSummary),
+		IsGrossUp:                       m.IsGrossUp,
+		IsEffectiveRateAverage:          m.IsEffectiveRateAverage,
+		TotalIncome:                     m.TotalIncome,
+		TotalReimbursement:              m.TotalReimbursement,
+		TotalDeduction:                  m.TotalDeduction,
+		TotalTax:                        m.TotalTax,
+		TaxCost:                         m.TaxCost,
+		NetIncome:                       m.NetIncome,
+		NetIncomeBeforeTaxCost:          m.NetIncomeBeforeTaxCost,
+		TakeHomePay:                     m.TakeHomePay,
+		TotalPayable:                    m.TotalPayable,
+		TakeHomePayCounted:              m.TakeHomePayCounted,
+		TakeHomePayReimbursementCounted: m.TakeHomePayReimbursementCounted,
+		Status:                          m.Status,
+	}
+}
 func (m PayRoll) MarshalJSON() ([]byte, error) {
 
 	m.GetItems()
@@ -187,36 +215,12 @@ func (m PayRoll) MarshalJSON() ([]byte, error) {
 
 	m.TakeHomePayCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay)))))
 	m.TakeHomePayReimbursementCounted = strings.ToTitle(strings.ToLower(terbilang.ToTerbilang(int(math.Round(m.TakeHomePay + m.TotalReimbursement)))))
-
-	return json.Marshal(resp.PayRollResponse{
-		ID:                              m.ID,
-		PayRollNumber:                   m.PayRollNumber,
-		Notes:                           m.Notes,
-		StartDate:                       m.StartDate.Format("2006-01-02"),
-		EndDate:                         m.EndDate.Format("2006-01-02"),
-		EmployeeID:                      m.EmployeeID,
-		TaxAllowance:                    m.TaxAllowance,
-		EmployeeName:                    m.Employee.FullName,
-		Items:                           items,
-		TaxSummary:                      resp.CountTaxSummary(m.TaxSummary),
-		IsGrossUp:                       m.IsGrossUp,
-		IsEffectiveRateAverage:          m.IsEffectiveRateAverage,
-		TotalIncome:                     m.TotalIncome,
-		TotalReimbursement:              m.TotalReimbursement,
-		TotalDeduction:                  m.TotalDeduction,
-		TotalTax:                        m.TotalTax,
-		TaxCost:                         m.TaxCost,
-		NetIncome:                       m.NetIncome,
-		NetIncomeBeforeTaxCost:          m.NetIncomeBeforeTaxCost,
-		TakeHomePay:                     m.TakeHomePay,
-		TotalPayable:                    m.TotalPayable,
-		TakeHomePayCounted:              m.TakeHomePayCounted,
-		TakeHomePayReimbursementCounted: m.TakeHomePayReimbursementCounted,
-		Status:                          m.Status,
-		Transactions:                    transactions,
-		PayableTransactions:             payableTransactions,
-		Costs:                           costs,
-	})
+	response := m.MapWithOutDetail()
+	response.Items = items
+	response.Transactions = transactions
+	response.PayableTransactions = payableTransactions
+	response.Costs = costs
+	return json.Marshal(response)
 }
 
 func (m *PayRoll) GetEmployee() {
@@ -235,6 +239,8 @@ func (m *PayRoll) Payment(c *gin.Context) error {
 	if err := database.DB.First(&setting).Error; err != nil {
 		return err
 	}
+	refTrans := Transaction{}
+	database.DB.Find(&refTrans, "id = ?", data.TransactionRefID)
 	if err := database.DB.Create(&Transaction{
 		Description:          data.Description + " (" + m.PayRollNumber + ")",
 		Debit:                data.Amount,
@@ -244,6 +250,7 @@ func (m *PayRoll) Payment(c *gin.Context) error {
 		EmployeeID:           m.EmployeeID,
 		IsPayRollPayment:     true,
 		TransactionRefID:     &data.TransactionRefID,
+		IsTakeHomePay:        refTrans.IsTakeHomePay,
 	}).Error; err != nil {
 		return err
 	}
@@ -278,6 +285,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 			Date:                 now,
 			PayRollID:            &m.ID,
 			EmployeeID:           m.EmployeeID,
+			IsTakeHomePay:        true,
 		}).Error; err != nil {
 			return err
 		}
@@ -290,6 +298,7 @@ func (m *PayRoll) RunPayRoll(c *gin.Context) error {
 			Date:                 now,
 			PayRollID:            &m.ID,
 			EmployeeID:           m.EmployeeID,
+			IsTakeHomePay:        true,
 		}).Error; err != nil {
 			return err
 		}

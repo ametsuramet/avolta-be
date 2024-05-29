@@ -53,6 +53,8 @@ func Migrate() {
 	database.DB.AutoMigrate(&model.IncentiveSetting{})
 	database.DB.AutoMigrate(&model.IncentiveReport{})
 	database.DB.AutoMigrate(&model.Bank{})
+	database.DB.AutoMigrate(&model.PayRollReportItem{})
+	database.DB.AutoMigrate(&model.PayRollReport{})
 
 	fmt.Println("FINISHED  MIGRATE")
 }

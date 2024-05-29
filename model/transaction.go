@@ -41,6 +41,7 @@ type Transaction struct {
 	IsReimbursementPayment bool          `json:"is_reimbursement_payment"`
 	TransactionRefID       *string       `json:"transaction_ref_id"`
 	TransactionRefs        []Transaction `json:"transaction_refs" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:TransactionRefID"`
+	IsTakeHomePay          bool          `json:"is_take_home_pay"`
 }
 
 func (u *Transaction) BeforeCreate(tx *gorm.DB) (err error) {

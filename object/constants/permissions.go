@@ -22,6 +22,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "leave_category", "is_default": true, "is_active": true},
 		{"name": "overtime", "is_default": true, "is_active": true},
 		{"name": "pay_roll", "is_default": true, "is_active": true},
+		{"name": "pay_roll_report", "is_default": true, "is_active": true},
 		{"name": "role", "is_default": true, "is_active": true},
 		{"name": "user", "is_default": true, "is_active": true},
 		{"name": "organization", "is_default": true, "is_active": true},
@@ -33,6 +34,8 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "incentive_shop", "is_default": true, "is_active": true},
 		{"name": "incentive_setting", "is_default": true, "is_active": true},
 		{"name": "incentive_report", "is_default": true, "is_active": true},
+		{"name": "incentive_report", "is_default": true, "is_active": true},
+		{"name": "announcement", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},

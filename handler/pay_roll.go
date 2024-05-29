@@ -23,6 +23,28 @@ func PayRollGetAllHandler(c *gin.Context) {
 	// 		"full_name": search,
 	// 	})
 	// }
+
+	startDate, ok := c.GetQuery("start_date")
+	if ok {
+		paginator.WhereMoreEqual = append(paginator.WhereMoreEqual, map[string]interface{}{
+			"pay_rolls.start_date": startDate,
+		})
+
+	}
+	endDate, ok := c.GetQuery("end_date")
+	if ok {
+		paginator.WhereLessEqual = append(paginator.WhereLessEqual, map[string]interface{}{
+			"pay_rolls.end_date": endDate,
+		})
+
+	}
+
+	_, ok = c.GetQuery("unreported")
+	if ok {
+		paginator.WhereNull = append(paginator.WhereNull, "pay_roll_report_item_id")
+
+	}
+
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
