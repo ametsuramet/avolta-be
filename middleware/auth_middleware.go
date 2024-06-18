@@ -56,13 +56,18 @@ func AuthMiddleware() gin.HandlerFunc {
 		if claims, ok := token.Claims.(*auth.Claims); ok && token.Valid {
 			fmt.Println("Authorized user:", claims.Id)
 			var user = model.User{Base: model.Base{ID: claims.Id}}
-			user.GetUserByID()
+			companyID := c.GetHeader("ID-Company")
+			company := model.Company{}
+			database.DB.Find(&company, "id = ?", companyID)
+			user.GetUserByID(companyID)
 			// fmt.Println("user", user)
 			timezone := c.GetHeader("timezone")
 			if timezone == "" {
 				timezone = "Asia/Jakarta"
 			}
 			c.Set("user", user)
+			c.Set("roles", user.Roles)
+			c.Set("company", company)
 			c.Set("timezone", timezone)
 			c.Next()
 		} else {
@@ -77,12 +82,24 @@ func AdminMiddleware() gin.HandlerFunc {
 
 		getUser, _ := c.Get("user")
 		user := getUser.(model.User)
+		getRoles, _ := c.Get("roles")
+		roles := getRoles.([]model.Role)
 		if !user.IsAdmin {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": "user is not admin"})
 			c.Abort()
 		}
-		user.GetPermissions(c.GetHeader("ID-Company"))
-		// fmt.Println("PERMISSIONS", user.Permissions)
+		// user.GetPermissions(c.GetHeader("ID-Company"))
+		// fmt.Println("roles", roles)
+		if len(roles) > 0 {
+			for _, v := range roles {
+				if v.IsSuperAdmin {
+					v.GetPermissions()
+					for _, v := range v.Permissions {
+						user.Permissions = append(user.Permissions, v.Key)
+					}
+				}
+			}
+		}
 		c.Set("permissions", user.Permissions)
 		c.Next()
 	}

@@ -29,7 +29,7 @@ type Schedule struct {
 	Friday       bool       `json:"friday"`
 	Saturday     bool       `json:"saturday"`
 	EmployeeIDs  []string   `json:"employee_ids" gorm:"-"`
-	CompanyID    string     `json:"company_id"`
+	CompanyID    string     `json:"company_id" gorm:"not null"`
 	Company      Company    `gorm:"foreignKey:CompanyID"`
 }
 

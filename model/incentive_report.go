@@ -24,7 +24,7 @@ type IncentiveReport struct {
 	Shops        []Shop      `gorm:"many2many:incentive_report_shops;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Status       string      `json:"status" gorm:"type:enum('DRAFT',  'PROCESSING', 'FINISHED', 'CANCELED');default:'DRAFT'"`
 	Incentives   []Incentive `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
-	CompanyID    string      `json:"company_id"`
+	CompanyID    string      `json:"company_id" gorm:"not null"`
 	Company      Company     `gorm:"foreignKey:CompanyID"`
 }
 

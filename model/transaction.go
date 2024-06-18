@@ -42,7 +42,7 @@ type Transaction struct {
 	TransactionRefID       *string       `json:"transaction_ref_id"`
 	TransactionRefs        []Transaction `json:"transaction_refs" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:TransactionRefID"`
 	IsTakeHomePay          bool          `json:"is_take_home_pay"`
-	CompanyID              string        `json:"company_id"`
+	CompanyID              string        `json:"company_id" gorm:"not null"`
 	Company                Company       `gorm:"foreignKey:CompanyID"`
 }
 

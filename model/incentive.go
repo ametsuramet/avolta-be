@@ -26,7 +26,7 @@ type Incentive struct {
 	IncentiveShops      []IncentiveShop        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Status              string                 `json:"status" gorm:"type:enum('REQUEST','APPROVED', 'REJECTED', 'PAID', 'FINISHED');default:'REQUEST'"`
 	Summaries           []ProductCategorySales `json:"summaries" gorm:"serializer:json;type:JSON"`
-	CompanyID           string                 `json:"company_id"`
+	CompanyID           string                 `json:"company_id" gorm:"not null"`
 	Company             Company                `gorm:"foreignKey:CompanyID"`
 }
 

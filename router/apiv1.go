@@ -15,7 +15,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"http://localhost:3033", "http://localhost:3034", "https://avolta.web.app", "https://avoltafe.web.app"},
 		AllowMethods:  []string{"PUT", "PATCH", "GET", "POST", "DELETE", "HEAD"},
-		AllowHeaders:  []string{"Origin", "Authorization", "Content-Length", "Content-Type", "Access-Control-Allow-Origin", "API-KEY", "Currency-Code", "Cache-Control", "X-Requested-With", "Content-Disposition", "Content-Description"},
+		AllowHeaders:  []string{"Origin", "Authorization", "Content-Length", "Content-Type", "Access-Control-Allow-Origin", "API-KEY", "Currency-Code", "Cache-Control", "X-Requested-With", "Content-Disposition", "Content-Description", "ID-Company"},
 		ExposeHeaders: []string{"Content-Length", "Content-Disposition", "Content-Description"},
 	}))
 

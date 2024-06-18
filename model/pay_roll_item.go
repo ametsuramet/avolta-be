@@ -28,7 +28,7 @@ type PayRollItem struct {
 	Bpjs             bool          `json:"bpjs"`
 	BpjsCounted      bool          `json:"bpjs_counted"`
 	Tariff           float64       `json:"tariff"`
-	CompanyID        string        `json:"company_id"`
+	CompanyID        string        `json:"company_id" gorm:"not null"`
 	Company          Company       `gorm:"foreignKey:CompanyID"`
 }
 

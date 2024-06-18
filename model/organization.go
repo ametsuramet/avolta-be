@@ -20,7 +20,7 @@ type Organization struct {
 	Description      string         `gorm:"size:100" json:"description"`
 	Employee         []Employee     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	SubOrganizations []Organization `json:"sub_organizations" gorm:"foreignKey:parent_id"`
-	CompanyID        string         `json:"company_id"`
+	CompanyID        string         `json:"company_id" gorm:"not null"`
 	Company          Company        `gorm:"foreignKey:CompanyID"`
 }
 

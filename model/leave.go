@@ -29,7 +29,7 @@ type Leave struct {
 	Attachment      *string       `json:"attachment" gorm:"type:TEXT"`
 	ApproverID      *string       `json:"approver_id"`
 	Approver        User          `json:"approver" gorm:"foreignKey:ApproverID"`
-	CompanyID       string        `json:"company_id"`
+	CompanyID       string        `json:"company_id" gorm:"not null"`
 	Company         Company       `gorm:"foreignKey:CompanyID"`
 }
 

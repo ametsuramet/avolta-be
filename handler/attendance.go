@@ -112,6 +112,8 @@ func AttendanceImportApproveHandler(c *gin.Context) {
 					}
 				}
 
+				getCompany, _ := c.Get("company")
+				company := getCompany.(model.Company)
 				if err := database.DB.Create(&model.Attendance{
 					ClockIn:                clockIn,
 					ClockOut:               clockOut,
@@ -121,6 +123,7 @@ func AttendanceImportApproveHandler(c *gin.Context) {
 					AttendanceBulkImportID: &id,
 					AttendanceImportItemID: &item.ID,
 					LateIn:                 lateIn,
+					CompanyID:              company.ID,
 				}).Error; err != nil {
 					return err
 				}
@@ -411,6 +414,12 @@ func AttendanceGetAllHandler(c *gin.Context) {
 		paginator.OrderBy = []string{orderBy}
 
 	}
+
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	paginator.Where = append(paginator.Where, map[string]interface{}{
+		"attendances.company_id": company.ID,
+	})
 
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {

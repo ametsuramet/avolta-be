@@ -64,6 +64,10 @@ func IncentiveCreateHandler(c *gin.Context) {
 
 	// data.AuthorID = user.ID
 
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	data.CompanyID = company.ID
+
 	if err := database.DB.Create(&data).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return

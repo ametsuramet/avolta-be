@@ -29,7 +29,7 @@ type Account struct {
 	TypeLabel             string        `gorm:"-" json:"type_label"`
 	CashflowGroupLabel    string        `gorm:"-" json:"cashflow_group_label"`
 	CashflowSubGroupLabel string        `gorm:"-" json:"cashflow_subgroup_label" `
-	CompanyID             string        `json:"company_id"`
+	CompanyID             string        `json:"company_id" gorm:"not null"`
 	Company               Company       `gorm:"foreignKey:CompanyID"`
 }
 

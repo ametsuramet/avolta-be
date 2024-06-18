@@ -48,7 +48,7 @@ type Setting struct {
 	PayRollReportAutoFormat                string  `json:"pay_roll_report_auto_format" gorm:"default:'{static-character}-{auto-numeric}/{month-roman}/{year-yyyy}'"`
 	PayRollReportStaticCharacter           string  `json:"pay_roll_report_static_character" gorm:"default:'PAYROLL'"`
 	PayRollReportAutoNumberCharacterLength int     `json:"pay_roll_report_auto_number_character_length" gorm:"default:5"`
-	CompanyID                              string  `json:"company_id"`
+	CompanyID                              string  `json:"company_id" gorm:"not null"`
 	Company                                Company `gorm:"foreignKey:CompanyID"`
 }
 

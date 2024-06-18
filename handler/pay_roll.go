@@ -95,6 +95,10 @@ func PayRollCreateHandler(c *gin.Context) {
 	data.BpjsSetting.BpjsTkJpEnabled = setting.BpjsTkJp
 	data.BpjsSetting.BpjsTkJkkEnabled = setting.BpjsTkJkk
 
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	data.CompanyID = company.ID
+
 	if err := database.DB.Transaction(func(tx *gorm.DB) error {
 		if err := database.DB.Create(&data).Error; err != nil {
 			return err

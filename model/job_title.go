@@ -13,7 +13,7 @@ type JobTitle struct {
 	Name        string
 	Description string
 	Employees   []Employee `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	CompanyID   string     `json:"company_id"`
+	CompanyID   string     `json:"company_id" gorm:"not null"`
 	Company     Company    `gorm:"foreignKey:CompanyID"`
 }
 

@@ -15,7 +15,7 @@ type Shop struct {
 	Code           string          `json:"code"`
 	Sales          []Sale          `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	IncentiveShops []IncentiveShop `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
-	CompanyID      string          `json:"company_id"`
+	CompanyID      string          `json:"company_id" gorm:"not null"`
 	Company        Company         `gorm:"foreignKey:CompanyID"`
 }
 

@@ -16,7 +16,7 @@ type ReimbursementItem struct {
 	Reimbursement   Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
 	Files           string        `json:"files" gorm:"default:'[]'"`
 	Attachments     []string      `json:"attachments" gorm:"-"`
-	CompanyID       string        `json:"company_id"`
+	CompanyID       string        `json:"company_id" gorm:"not null"`
 	Company         Company       `gorm:"foreignKey:CompanyID"`
 }
 type ReimbursementItemReq struct {

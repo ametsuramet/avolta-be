@@ -22,7 +22,7 @@ type PayRollReport struct {
 	Status                string              `json:"status" gorm:"type:enum('DRAFT',  'PROCESSING', 'FINISHED', 'CANCELED');default:'DRAFT'"`
 	Items                 []PayRollReportItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	GrandTotalTakeHomePay float64             `json:"grand_total_take_home_pay"`
-	CompanyID             string              `json:"company_id"`
+	CompanyID             string              `json:"company_id" gorm:"not null"`
 	Company               Company             `gorm:"foreignKey:CompanyID"`
 }
 

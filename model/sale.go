@@ -34,7 +34,7 @@ type Sale struct {
 	Incentive           Incentive   `gorm:"foreignKey:IncentiveID"`
 	IsIncentiveExcluded bool        `json:"is_incentive_excluded"`
 	IsIncentiveIncluded bool        `json:"is_incentive_included"`
-	CompanyID           string      `json:"company_id"`
+	CompanyID           string      `json:"company_id" gorm:"not null"`
 	Company             Company     `gorm:"foreignKey:CompanyID"`
 }
 

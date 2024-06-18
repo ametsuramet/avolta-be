@@ -21,7 +21,7 @@ type IncentiveSetting struct {
 	SickLeaveThreshold     float64         `json:"sick_leave_threshold"`
 	OtherLeaveThreshold    float64         `json:"other_leave_threshold"`
 	AbsentThreshold        float64         `json:"absent_threshold"`
-	CompanyID              string          `json:"company_id"`
+	CompanyID              string          `json:"company_id" gorm:"not null"`
 	Company                Company         `gorm:"foreignKey:CompanyID"`
 }
 

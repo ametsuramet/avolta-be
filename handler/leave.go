@@ -111,6 +111,10 @@ func LeaveCreateHandler(c *gin.Context) {
 
 	// data.AuthorID = user.ID
 
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	data.CompanyID = company.ID
+
 	leaveCat := model.LeaveCategory{}
 	database.DB.Find(&leaveCat, "id = ?", data.LeaveCategoryID)
 	if leaveCat.Absent {

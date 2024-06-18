@@ -9,8 +9,10 @@ import (
 
 type ProductCategory struct {
 	Base
-	Name     string    `json:"name"`
-	Products []Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
+	Name      string    `json:"name"`
+	Products  []Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
+	CompanyID string    `json:"company_id" gorm:"not null"`
+	Company   Company   `gorm:"foreignKey:CompanyID"`
 }
 
 type ProductCategorySales struct {
@@ -21,7 +23,7 @@ type ProductCategorySales struct {
 	Total            float64 `json:"total"`
 	ComissionPercent float64 `json:"commission_percent"`
 	TotalComission   float64 `json:"total_comission"`
-	CompanyID        string  `json:"company_id"`
+	CompanyID        string  `json:"company_id" gorm:"not null"`
 	Company          Company `gorm:"foreignKey:CompanyID"`
 }
 

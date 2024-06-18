@@ -48,7 +48,7 @@ type Employee struct {
 	Attendance                []Attendance    `json:"attendance" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Organization              Organization    `gorm:"foreignKey:OrganizationID"`
 	OrganizationID            sql.NullString  `json:"organization_id"`
-	WorkingType               string          `gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
+	WorkingType               string          `json:"working_type" gorm:"type:ENUM('FULL_TIME','PART_TIME','FREELANCE', 'FLEXIBLE','SHIFT','SEASONAL') DEFAULT 'FULL_TIME'"`
 	Schedules                 []*Schedule     `json:"-" gorm:"many2many:schedule_employees;"`
 	TotalWorkingDays          int32           `json:"total_working_days"`
 	TotalWorkingHours         float64         `json:"total_working_hours"`
@@ -58,11 +58,13 @@ type Employee struct {
 	BankAccountNumber         string          `json:"bank_account_number"`
 	BankID                    *string         `json:"bank_id"`
 	Bank                      Bank            `gorm:"foreignKey:BankID"`
-	CompanyID                 string          `json:"company_id"`
+	CompanyID                 string          `json:"company_id" gorm:"not null"`
 	Company                   Company         `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
+	ctx := tx.Statement.Context
+	fmt.Println("CONTEXT", ctx)
 	if u.ID == "" {
 		tx.Statement.SetColumn("id", uuid.New().String())
 	}

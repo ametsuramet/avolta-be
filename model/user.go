@@ -112,9 +112,9 @@ func (u *User) CheckUserByEmail(email string) bool {
 	database.DB.Find(&u, "email = ?", email).Count(&count)
 	return count > 0
 }
-func (u *User) GetUserByID() {
+func (u *User) GetUserByID(companyID string) {
 	count := int64(0)
-	database.DB.Find(&u, "id = ?", u.ID).Count(&count)
+	database.DB.Preload("Roles", "company_id = ?", companyID).Find(&u, "id = ?", u.ID).Count(&count)
 }
 func GetUserFromCtx(c *gin.Context) *User {
 	user, ok := c.Get("user")

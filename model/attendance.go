@@ -37,7 +37,7 @@ type Attendance struct {
 	AttendanceBulkImport   AttendanceBulkImport `gorm:"foreignKey:AttendanceBulkImportID"`
 	AttendanceImportItemID *string              `json:"attendance_import_item_id"`
 	AttendanceImportItem   AttendanceImportItem `gorm:"foreignKey:AttendanceImportItemID"`
-	CompanyID              string               `json:"company_id"`
+	CompanyID              string               `json:"company_id" gorm:"not null"`
 	Company                Company              `gorm:"foreignKey:CompanyID"`
 }
 

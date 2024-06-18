@@ -55,7 +55,7 @@ type PayRoll struct {
 	TaxSummary                      CountTaxSummary `gorm:"-" json:"tax_summary"`
 	BpjsSetting                     *service.Bpjs   `gorm:"-" `
 	PayRollReportItemID             *string         `json:"pay_roll_report_item_id"`
-	CompanyID                       string          `json:"company_id"`
+	CompanyID                       string          `json:"company_id" gorm:"not null"`
 	Company                         Company         `gorm:"foreignKey:CompanyID"`
 }
 

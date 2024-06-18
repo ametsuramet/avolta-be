@@ -15,7 +15,7 @@ type Role struct {
 	Description  string
 	IsSuperAdmin bool
 	Permissions  []Permission `gorm:"many2many:role_permissions;"`
-	CompanyID    string       `json:"company_id"`
+	CompanyID    string       `json:"company_id" gorm:"not null"`
 	Company      Company      `gorm:"foreignKey:CompanyID"`
 	// User         []User       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

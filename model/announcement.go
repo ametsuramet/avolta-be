@@ -17,7 +17,7 @@ type Announcement struct {
 	EndDate        *time.Time
 	OrganizationID *string      `json:"organization_id"`
 	Organization   Organization `gorm:"foreignKey:OrganizationID"`
-	CompanyID      string       `json:"company_id"`
+	CompanyID      string       `json:"company_id" gorm:"not null"`
 	Company        Company      `gorm:"foreignKey:CompanyID"`
 }
 

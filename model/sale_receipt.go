@@ -13,7 +13,7 @@ type SaleReceipt struct {
 	Name      string
 	Sales     []Sale  `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Total     float64 `json:"total"`
-	CompanyID string  `json:"company_id"`
+	CompanyID string  `json:"company_id" gorm:"not null"`
 	Company   Company `gorm:"foreignKey:CompanyID"`
 }
 

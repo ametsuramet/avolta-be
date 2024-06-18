@@ -56,6 +56,9 @@ func PayRollItemCreateHandler(c *gin.Context) {
 	// user := getUser.(model.User)
 
 	// data.AuthorID = user.ID
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	data.CompanyID = company.ID
 
 	if err := database.DB.Find(&payRoll, "id = ?", input.PayRollID).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())

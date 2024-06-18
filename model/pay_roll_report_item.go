@@ -28,7 +28,7 @@ type PayRollReportItem struct {
 	PayRollReport          PayRollReport `gorm:"foreignKey:PayRollReportID" json:"-"`
 	Status                 string        `json:"status" gorm:"type:enum('PROCESSING', 'FINISHED', 'PAID');default:'PROCESSING'"`
 	PayRoll                PayRoll       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyID              string        `json:"company_id"`
+	CompanyID              string        `json:"company_id" gorm:"not null"`
 	Company                Company       `gorm:"foreignKey:CompanyID"`
 }
 

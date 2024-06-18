@@ -20,7 +20,7 @@ type IncentiveShop struct {
 	TotalIncentive      float64                `json:"total_incentive"`
 	TotalIncentiveBruto float64                `json:"total_incentive_bruto"`
 	Summaries           []ProductCategorySales `json:"summaries" gorm:"serializer:json;type:JSON"`
-	CompanyID           string                 `json:"company_id"`
+	CompanyID           string                 `json:"company_id" gorm:"not null"`
 	Company             Company                `gorm:"foreignKey:CompanyID"`
 }
 

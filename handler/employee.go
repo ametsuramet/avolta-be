@@ -262,8 +262,9 @@ func EmployeeCreateHandler(c *gin.Context) {
 		return
 	}
 
-	// getUser, _ := c.Get("user")
-	// user := getUser.(model.User)
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	data.CompanyID = company.ID
 
 	// data.AuthorID = user.ID
 

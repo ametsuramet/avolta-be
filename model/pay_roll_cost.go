@@ -20,7 +20,7 @@ type PayRollCost struct {
 	BpjsTkJht     bool        `json:"bpjs_tk_jht"`
 	BpjsTkJp      bool        `json:"bpjs_tk_jp"`
 	DebtDeposit   bool        `json:"debt_deposit"`
-	CompanyID     string      `json:"company_id"`
+	CompanyID     string      `json:"company_id" gorm:"not null"`
 	Company       Company     `gorm:"foreignKey:CompanyID"`
 }
 

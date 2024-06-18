@@ -18,7 +18,7 @@ type Product struct {
 	ProductCategoryID *string         `json:"product_category_id"`
 	ProductCategory   ProductCategory `json:"product_category" gorm:"foreignKey:ProductCategoryID"`
 	Sale              []Sale          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyID         string          `json:"company_id"`
+	CompanyID         string          `json:"company_id" gorm:"not null"`
 	Company           Company         `gorm:"foreignKey:CompanyID"`
 }
 
