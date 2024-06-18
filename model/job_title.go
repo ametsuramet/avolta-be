@@ -13,6 +13,8 @@ type JobTitle struct {
 	Name        string
 	Description string
 	Employees   []Employee `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CompanyID   string     `json:"company_id"`
+	Company     Company    `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *JobTitle) BeforeCreate(tx *gorm.DB) (err error) {

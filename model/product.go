@@ -18,6 +18,8 @@ type Product struct {
 	ProductCategoryID *string         `json:"product_category_id"`
 	ProductCategory   ProductCategory `json:"product_category" gorm:"foreignKey:ProductCategoryID"`
 	Sale              []Sale          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyID         string          `json:"company_id"`
+	Company           Company         `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Product) BeforeCreate(tx *gorm.DB) (err error) {

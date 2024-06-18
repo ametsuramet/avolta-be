@@ -20,6 +20,8 @@ type IncentiveShop struct {
 	TotalIncentive      float64                `json:"total_incentive"`
 	TotalIncentiveBruto float64                `json:"total_incentive_bruto"`
 	Summaries           []ProductCategorySales `json:"summaries" gorm:"serializer:json;type:JSON"`
+	CompanyID           string                 `json:"company_id"`
+	Company             Company                `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *IncentiveShop) BeforeCreate(tx *gorm.DB) (err error) {

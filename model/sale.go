@@ -34,6 +34,8 @@ type Sale struct {
 	Incentive           Incentive   `gorm:"foreignKey:IncentiveID"`
 	IsIncentiveExcluded bool        `json:"is_incentive_excluded"`
 	IsIncentiveIncluded bool        `json:"is_incentive_included"`
+	CompanyID           string      `json:"company_id"`
+	Company             Company     `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Sale) BeforeCreate(tx *gorm.DB) (err error) {

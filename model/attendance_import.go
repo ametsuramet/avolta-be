@@ -16,6 +16,8 @@ type AttendanceBulkImport struct {
 	Data           []AttendanceImport `json:"data" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Status         string             `json:"status" gorm:"type:enum('DRAFT','APPROVED','REJECTED') DEFAULT 'DRAFT'"`
 	Notes          string
+	CompanyID      string  `json:"company_id"`
+	Company        Company `gorm:"foreignKey:CompanyID"`
 }
 type AttendanceImport struct {
 	Base

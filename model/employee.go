@@ -58,6 +58,8 @@ type Employee struct {
 	BankAccountNumber         string          `json:"bank_account_number"`
 	BankID                    *string         `json:"bank_id"`
 	Bank                      Bank            `gorm:"foreignKey:BankID"`
+	CompanyID                 string          `json:"company_id"`
+	Company                   Company         `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {

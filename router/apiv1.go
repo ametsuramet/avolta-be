@@ -28,14 +28,16 @@ func SetupRouter() *gin.Engine {
 	UserRouter(v1)
 	admin := v1.Group("/admin")
 
-	admin.Use()
+	admin.Use(middleware.GeneralMiddleware())
 	{
 		admin.POST("/login", handler.Login)
+		admin.POST("/register", handler.Register)
+		admin.POST("/verification/:token", handler.Verification)
 	}
 
 	admin.Use(middleware.AuthMiddleware())
 	{
-
+		admin.POST("/create/company", handler.CreateCompany)
 		category := admin.Group("/category")
 		category.Use()
 		{

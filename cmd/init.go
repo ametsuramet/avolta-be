@@ -7,8 +7,8 @@ func Init(args []string) {
 		Migrate()
 	case "user":
 		TestCreateUser(args)
-	case "gen-account":
-		GenAccounts()
+	// case "gen-account":
+	// 	GenAccounts(args)
 	case "gen-permission":
 		GenPermissions()
 	case "gen-bank":

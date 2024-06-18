@@ -5,6 +5,7 @@ import (
 	"avolta/database"
 	"avolta/model"
 	"avolta/object/auth"
+	svc "avolta/service"
 	"avolta/util"
 	"fmt"
 	"net/http"
@@ -14,6 +15,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GeneralMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		svc.InitMail(c)
+		c.Next()
+	}
+}
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
@@ -30,11 +37,11 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		token1, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.App.Server.SecretKey), nil
-		})
+		// token1, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// 	return []byte(config.App.Server.SecretKey), nil
+		// })
 
-		fmt.Println(token1.Claims)
+		// fmt.Println(token1.Claims)
 
 		token, err := jwt.ParseWithClaims(reqToken, &auth.Claims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(config.App.Server.SecretKey), nil
@@ -67,13 +74,14 @@ func AuthMiddleware() gin.HandlerFunc {
 
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		getUser, _ := c.Get("user")
 		user := getUser.(model.User)
 		if !user.IsAdmin {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": "user is not admin"})
 			c.Abort()
 		}
-		user.GetPermissions()
+		user.GetPermissions(c.GetHeader("ID-Company"))
 		// fmt.Println("PERMISSIONS", user.Permissions)
 		c.Set("permissions", user.Permissions)
 		c.Next()
@@ -101,11 +109,11 @@ func PermissionMiddleware(userPermission string) gin.HandlerFunc {
 		permissions := getPermissions.([]string)
 		getUser, _ := c.Get("user")
 		user := getUser.(model.User)
-		user.GetPermissions()
-		if user.Role.IsSuperAdmin {
-			c.Next()
-			return
-		}
+		user.GetPermissions(c.GetHeader("ID-Company"))
+		// if user.Role.IsSuperAdmin {
+		// 	c.Next()
+		// 	return
+		// }
 
 		if util.Contains(permissions, userPermission) {
 			c.Next()

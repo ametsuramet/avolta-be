@@ -21,6 +21,8 @@ type ProductCategorySales struct {
 	Total            float64 `json:"total"`
 	ComissionPercent float64 `json:"commission_percent"`
 	TotalComission   float64 `json:"total_comission"`
+	CompanyID        string  `json:"company_id"`
+	Company          Company `gorm:"foreignKey:CompanyID"`
 }
 
 func (m *ProductCategorySales) GetIncentive() {

@@ -29,6 +29,8 @@ type Leave struct {
 	Attachment      *string       `json:"attachment" gorm:"type:TEXT"`
 	ApproverID      *string       `json:"approver_id"`
 	Approver        User          `json:"approver" gorm:"foreignKey:ApproverID"`
+	CompanyID       string        `json:"company_id"`
+	Company         Company       `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Leave) BeforeCreate(tx *gorm.DB) (err error) {

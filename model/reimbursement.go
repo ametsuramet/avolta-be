@@ -29,6 +29,8 @@ type Reimbursement struct {
 	Employee         Employee            `gorm:"foreignKey:EmployeeID" json:"-"`
 	Transactions     []Transaction       `json:"transactions" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Attachment       string              `json:"attachment"`
+	CompanyID        string              `json:"company_id"`
+	Company          Company             `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Reimbursement) BeforeCreate(tx *gorm.DB) (err error) {

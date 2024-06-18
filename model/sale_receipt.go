@@ -10,9 +10,11 @@ import (
 
 type SaleReceipt struct {
 	Base
-	Name  string
-	Sales []Sale  `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Total float64 `json:"total"`
+	Name      string
+	Sales     []Sale  `json:"sales" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Total     float64 `json:"total"`
+	CompanyID string  `json:"company_id"`
+	Company   Company `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *SaleReceipt) BeforeCreate(tx *gorm.DB) (err error) {

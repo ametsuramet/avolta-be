@@ -29,6 +29,8 @@ type Schedule struct {
 	Friday       bool       `json:"friday"`
 	Saturday     bool       `json:"saturday"`
 	EmployeeIDs  []string   `json:"employee_ids" gorm:"-"`
+	CompanyID    string     `json:"company_id"`
+	Company      Company    `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Schedule) BeforeCreate(tx *gorm.DB) (err error) {

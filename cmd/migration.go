@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-faker/faker/v4"
+	"gorm.io/gorm"
 )
 
 func Migrate() {
@@ -175,247 +176,276 @@ func AssignSuperadmin(args []string) {
 	}
 }
 
-func GenAccounts() {
+func GenAccounts(tx *gorm.DB, args []string) {
 
 	// CURRENT ASSET
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.CASH_BANK,
 		CashflowGroup:    config.CASHFLOW_GROUP_CURRENT_ASSET,
 		Category:         config.CATEGORY_CURRENT_ASSET,
 		Name:             "Kas Kecil",
 		Type:             config.TYPE_ASSET,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.CASH_BANK,
 		CashflowGroup:    config.CASHFLOW_GROUP_CURRENT_ASSET,
 		Category:         config.CATEGORY_CURRENT_ASSET,
 		Name:             "BANK",
 		Type:             config.TYPE_ASSET,
+		CompanyID:        args[1],
 	})
 
 	// EQUITY
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.EQUITY_CAPITAL,
 		CashflowGroup:    config.CASHFLOW_GROUP_FINANCING,
 		Category:         config.CATEGORY_EQUITY,
 		Name:             "Modal Awal",
 		Type:             config.TYPE_EQUITY,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.EQUITY_CAPITAL,
 		CashflowGroup:    config.CASHFLOW_GROUP_FINANCING,
 		Category:         config.CATEGORY_EQUITY,
 		Name:             "Ekuitas Saldo Awal",
 		Type:             config.TYPE_EQUITY,
+		CompanyID:        args[1],
 		IsDeletable:      true,
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.EQUITY_CAPITAL,
 		CashflowGroup:    config.CASHFLOW_GROUP_FINANCING,
 		Category:         config.CATEGORY_EQUITY,
 		Name:             "Saldo Awal Aset Tetap",
 		Type:             config.TYPE_EQUITY,
+		CompanyID:        args[1],
 		IsDeletable:      true,
 	})
 	// INCOME
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.ACCEPTANCE_FROM_CUSTOMERS,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_SALES,
 		Name:             "Penjualan",
 		Type:             config.TYPE_INCOME,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Retur Penjualan",
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
 
 	// EXPENSE
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Pengeluaran Gaji",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Peralatan Kantor",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Pembayaran Listrik",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Rekening Telepon & Pulsa",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
 
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Internet",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
 
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_OPERATING,
 		Name:             "Bonus Pegawai",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_EXPENSE,
 		Name:             "Beban Lainnya",
 		IsDeletable:      true,
 		Type:             config.TYPE_EXPENSE,
+		CompanyID:        args[1],
 	})
 
-	// database.DB.Create(&model.Account{
+	// tx.Create(&model.Account{
 	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
 	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
 	// 	Category:         config.CATEGORY_EXPENSE,
 	// 	Name:             "Penyusutan Tanah - Bangunan",
 	// 	Type:             config.TYPE_EXPENSE,
+	// CompanyID: args[1],
 	// })
-	// database.DB.Create(&model.Account{
+	// tx.Create(&model.Account{
 	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
 	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
 	// 	Category:         config.CATEGORY_EXPENSE,
 	// 	Name:             "Penyusutan Kendaraan",
 	// 	Type:             config.TYPE_EXPENSE,
+	// CompanyID: args[1],
 	// })
-	// database.DB.Create(&model.Account{
+	// tx.Create(&model.Account{
 	// 	CashflowSubGroup: config.ACQUISITION_SALE_OF_ASSETS,
 	// 	CashflowGroup:    config.CASHFLOW_GROUP_INVESTING,
 	// 	Category:         config.CATEGORY_EXPENSE,
 	// 	Name:             "Penyusutan Lainnya",
 	// 	Type:             config.TYPE_EXPENSE,
+	// CompanyID: args[1],
 	// })
 
 	// RECEIVABLE
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.ACCEPTANCE_FROM_CUSTOMERS,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_RECEIVABLE,
 		Name:             "Piutang Usaha",
 		Type:             config.TYPE_RECEIVABLE,
+		CompanyID:        args[1],
 	})
 
 	// LIABILITY
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.PAYMENT_TO_VENDORS,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Usaha",
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Gaji / Reimbursement",
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang BPJS",
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 	// COST
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_COST_OF_REVENUE,
 		Name:             "Beban Pokok Pendapatan",
 		Type:             config.TYPE_COST,
+		CompanyID:        args[1],
 	})
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_PURCHASE_RETURNS,
 		Name:             "Retur Pembelian",
 		Type:             config.TYPE_COST,
+		CompanyID:        args[1],
 	})
 
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.OPERATIONAL_EXPENSES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_PRODUCTION_COST,
 		Name:             "Biaya Produksi",
 		Type:             config.TYPE_COST,
+		CompanyID:        args[1],
 	})
 
 	// Hutang Pajak - PPh 21
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Pajak - PPh 21",
 		IsTax:            true,
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 
 	// Hutang Pajak - PPh 22
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Pajak - PPh 22",
 		IsTax:            true,
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 	// Hutang Pajak - PPh 23
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Pajak - PPh 23",
 		IsTax:            true,
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 	// Hutang Pajak - PPh 29
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Pajak - PPh 29",
 		IsTax:            true,
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 
 	// Hutang Pajak Lainnya
-	database.DB.Create(&model.Account{
+	tx.Create(&model.Account{
 		CashflowSubGroup: config.RETURNS_PAYMENT_OF_TAXES,
 		CashflowGroup:    config.CASHFLOW_GROUP_OPERATING,
 		Category:         config.CATEGORY_DEBT,
 		Name:             "Hutang Pajak Lainnya",
 		IsTax:            true,
 		Type:             config.TYPE_LIABILITY,
+		CompanyID:        args[1],
 	})
 
 }

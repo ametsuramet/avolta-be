@@ -23,6 +23,7 @@ type Company struct {
 	ContactPerson         string `json:"contact_person"`
 	ContactPersonPosition string `json:"contact_person_position"`
 	TaxPayerNumber        string `json:"tax_payer_number"`
+	UserID                string `json:"user_id"`
 }
 
 func (u *Company) BeforeCreate(tx *gorm.DB) (err error) {

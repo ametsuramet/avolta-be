@@ -20,6 +20,8 @@ type PayRollCost struct {
 	BpjsTkJht     bool        `json:"bpjs_tk_jht"`
 	BpjsTkJp      bool        `json:"bpjs_tk_jp"`
 	DebtDeposit   bool        `json:"debt_deposit"`
+	CompanyID     string      `json:"company_id"`
+	Company       Company     `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *PayRollCost) BeforeCreate(tx *gorm.DB) (err error) {

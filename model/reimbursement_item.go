@@ -16,6 +16,8 @@ type ReimbursementItem struct {
 	Reimbursement   Reimbursement `gorm:"foreignKey:ReimbursementID" json:"-"`
 	Files           string        `json:"files" gorm:"default:'[]'"`
 	Attachments     []string      `json:"attachments" gorm:"-"`
+	CompanyID       string        `json:"company_id"`
+	Company         Company       `gorm:"foreignKey:CompanyID"`
 }
 type ReimbursementItemReq struct {
 	Amount          float64 `json:"amount" form:"amount"`

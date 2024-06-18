@@ -3,6 +3,7 @@ package model
 import (
 	"avolta/object/resp"
 	"encoding/json"
+	"fmt"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -28,12 +29,20 @@ type Account struct {
 	TypeLabel             string        `gorm:"-" json:"type_label"`
 	CashflowGroupLabel    string        `gorm:"-" json:"cashflow_group_label"`
 	CashflowSubGroupLabel string        `gorm:"-" json:"cashflow_subgroup_label" `
+	CompanyID             string        `json:"company_id"`
+	Company               Company       `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Account) BeforeCreate(tx *gorm.DB) (err error) {
+	ctx := tx.Statement.Context
+	fmt.Println(ctx)
 	if u.ID == "" {
 		tx.Statement.SetColumn("id", uuid.New().String())
 	}
+
+	// if u.CompanyID == "" {
+	// 	tx.Statement.SetColumn("company_id", ctx.Value("ID-Company"))
+	// }
 	return
 }
 

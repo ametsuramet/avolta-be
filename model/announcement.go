@@ -3,6 +3,7 @@ package model
 import (
 	"avolta/object/resp"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -10,7 +11,14 @@ import (
 
 type Announcement struct {
 	Base
-	Name string
+	Name           string
+	Description    string
+	StartDate      time.Time
+	EndDate        *time.Time
+	OrganizationID *string      `json:"organization_id"`
+	Organization   Organization `gorm:"foreignKey:OrganizationID"`
+	CompanyID      string       `json:"company_id"`
+	Company        Company      `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Announcement) BeforeCreate(tx *gorm.DB) (err error) {

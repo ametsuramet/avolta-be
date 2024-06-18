@@ -20,6 +20,8 @@ type Organization struct {
 	Description      string         `gorm:"size:100" json:"description"`
 	Employee         []Employee     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	SubOrganizations []Organization `json:"sub_organizations" gorm:"foreignKey:parent_id"`
+	CompanyID        string         `json:"company_id"`
+	Company          Company        `gorm:"foreignKey:CompanyID"`
 }
 
 func (u *Organization) BeforeCreate(tx *gorm.DB) (err error) {

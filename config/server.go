@@ -6,5 +6,7 @@ type ServerConfiguration struct {
 	Addr         string
 	Environment  string
 	BaseURL      string
+	FrontendURL  string
+	CmsURL       string
 	ExpiredToken int
 }

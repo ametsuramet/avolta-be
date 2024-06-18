@@ -10,6 +10,7 @@ var App *Configuration
 type Configuration struct {
 	Server   ServerConfiguration
 	Database DatabaseConfiguration
+	Mail     MailConfig
 }
 
 // LoadConfig loads configuration from file
