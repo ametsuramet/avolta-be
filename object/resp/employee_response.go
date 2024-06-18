@@ -45,4 +45,5 @@ type EmployeeResponse struct {
 	BankAccountNumber         string             `json:"bank_account_number"`
 	BankID                    *string            `json:"bank_id"`
 	BankName                  string             `json:"bank_name"`
+	WorkingType               string             `json:"working_type"`
 }

@@ -36,6 +36,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "incentive_report", "is_default": true, "is_active": true},
 		{"name": "incentive_report", "is_default": true, "is_active": true},
 		{"name": "announcement", "is_default": true, "is_active": true},
+		{"name": "bank", "is_default": true, "is_active": true},
 	}
 	var reports = []map[string]interface{}{
 		{"name": "attendance", "is_default": true, "is_active": true},
@@ -53,6 +54,7 @@ func DefaultPermission(search string) []model.Permission {
 		{"name": "company", "is_default": true, "is_active": true},
 		{"name": "report", "is_default": true, "is_active": true},
 		{"name": "system", "is_default": true, "is_active": true},
+		{"name": "setting", "is_default": true, "is_active": true},
 	}
 	var imports = []map[string]interface{}{
 		{"name": "dashboard", "is_default": true, "is_active": true},

@@ -10,23 +10,15 @@ import (
 )
 
 func CompanyGetOneHandler(c *gin.Context) {
-	var data model.Company
-	count := int64(0)
-	database.DB.Model(&data).Count(&count)
 
-	if count == 0 {
-		data = model.Company{
-			Name:    "Nama Perusahaan",
-			Address: "Alamat Perusahaan",
-		}
-		database.DB.Create(&data)
-	}
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
 
-	if err := database.DB.First(&data).Error; err != nil {
+	if err := database.DB.First(&company).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	util.ResponseSuccess(c, "Data Company Retrived", data, nil)
+	util.ResponseSuccess(c, "Data Company Retrived", company, nil)
 }
 
 func CompanyUpdateHandler(c *gin.Context) {

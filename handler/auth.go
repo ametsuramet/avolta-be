@@ -47,6 +47,10 @@ func CreateCompany(c *gin.Context) {
 		tx.Model(&user).Association("Companies").Append(&data)
 		tx.Model(&user).Association("Roles").Append(&role)
 		cmd.GenAccounts(tx, []string{"", data.ID})
+		setting := model.Setting{
+			CompanyID: data.ID,
+		}
+		tx.Create(&setting)
 		return nil
 	})
 

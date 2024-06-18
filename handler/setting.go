@@ -73,9 +73,13 @@ func SettingGetOneHandler(c *gin.Context) {
 	var data model.Setting
 	count := int64(0)
 	database.DB.Model(&data).Count(&count)
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
 
 	if count == 0 {
-		data = model.Setting{}
+		data = model.Setting{
+			CompanyID: company.ID,
+		}
 		database.DB.Create(&data)
 	}
 

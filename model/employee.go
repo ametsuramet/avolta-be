@@ -210,6 +210,7 @@ func (m Employee) MarshalJSON() ([]byte, error) {
 		BankAccountNumber:         m.BankAccountNumber,
 		BankID:                    m.BankID,
 		BankName:                  bankName,
+		WorkingType:               m.WorkingType,
 	})
 }
 
