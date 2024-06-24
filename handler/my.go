@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"avolta/config"
 	"avolta/model"
 	"avolta/util"
 	"fmt"
@@ -16,10 +15,11 @@ func MyController(c *gin.Context) {
 	getRoles, _ := c.Get("roles")
 	roles := getRoles.([]model.Role)
 	if ok {
-		user.Employee = getEmployee.(model.Employee)
-		if user.Employee.Picture.Valid {
-			user.Avatar = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, user.Employee.Picture.String)
-		}
+		fmt.Println(getEmployee)
+		// user.Employee = getEmployee.(model.Employee)
+		// if user.Employee.Picture.Valid {
+		// 	user.Avatar = fmt.Sprintf("%s/%s", config.App.Server.BaseURL, user.Employee.Picture.String)
+		// }
 	}
 	if len(roles) > 0 {
 		for _, v := range roles {

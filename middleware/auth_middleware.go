@@ -113,7 +113,7 @@ func UserMiddleware() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized", "message": "user not liked yet with employee data"})
 			c.Abort()
 		}
-		user.Employee = employee
+		// user.Employee = employee
 
 		c.Set("employee", employee)
 

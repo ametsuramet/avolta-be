@@ -10,21 +10,39 @@ import (
 )
 
 func UserGetAllHandler(c *gin.Context) {
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
 	var data []model.User
-	preloads := []string{"Employee"}
+	preloads := []string{"Employee", "Roles"}
 	paginator := util.NewPaginator(c)
 	paginator.Preloads = preloads
+	paginator.Joins = append(paginator.Joins, map[string]interface{}{
+		"JOIN user_companies ON user_companies.user_id = users.id": nil,
+	})
+	paginator.Joins = append(paginator.Joins, map[string]interface{}{
+		"JOIN companies ON companies.id = user_companies.company_id": nil,
+	})
 
-	// search, ok := c.GetQuery("search")
-	// if ok {
-	// 	paginator.Search = append(paginator.Search, map[string]interface{}{
-	// 		"full_name": search,
-	// 	})
-	// }
+	paginator.Where = append(paginator.Where, map[string]interface{}{
+		"companies.id": company.ID,
+	})
+
+	search, ok := c.GetQuery("search")
+	if ok {
+		paginator.Search = append(paginator.Search, map[string]interface{}{
+			"full_name": search,
+		})
+	}
 	dataRecords, err := paginator.Paginate(&data)
 	if err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	// fmt.Println("company", company)
+	for i := range data {
+		data[i].CompanyID = company.ID
+
 	}
 
 	util.ResponsePaginatorSuccess(c, "Data List User Retrived", dataRecords.Records, dataRecords)
@@ -70,7 +88,7 @@ func UserUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Employee").Find(&data, "id = ?", id).Error; err != nil {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -82,7 +100,7 @@ func UserUpdateHandler(c *gin.Context) {
 	if input.EmployeeID != "" && data.EmployeeID != input.EmployeeID {
 		employee := model.Employee{}
 		database.DB.Find(&employee, "id = ?", input.EmployeeID)
-		database.DB.Model(&data).Association("Employee").Append(&employee)
+		database.DB.Model(&data).Association("Employee").Replace(&employee)
 	}
 	util.ResponseSuccess(c, "Data User Updated", nil, nil)
 }

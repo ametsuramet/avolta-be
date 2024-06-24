@@ -17,6 +17,11 @@
                                             <h3>Halo, {{.Name}}</h3>
                                             <p>Aktfikan akun anda dengan klik link dibawah ini: </p>
                                             <p><strong><a href="{{.Link}}">{{.Link}}</strong></a></p>
+                                            {{ if ne .Password "" }}
+                                            <p>Gunakan Password Sementara untuk login: </p>
+                                            <p><strong>{{.Password}}</strong></p>
+                                            <p>Silakan ganti setelah berhasil login </p>
+                                            {{ end }}
 
                                             <p style="font-size:11px;color:#888888">© Araya 2024<br>takes your account
                                                 security very seriously. We will never email you and ask you to disclose

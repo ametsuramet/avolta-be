@@ -253,6 +253,23 @@ func EmployeeGetOneHandler(c *gin.Context) {
 	}
 	util.ResponseSuccess(c, "Data Employee Retrived", data, nil)
 }
+func EmployeeCreateUserHandler(c *gin.Context) {
+	var data model.Employee
+
+	id := c.Params.ByName("id")
+
+	if err := database.DB.Find(&data, "id = ?", id).Error; err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := data.CreateNewUser(c); err != nil {
+		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.ResponseSuccess(c, "Data Employee Retrived", data, nil)
+}
 
 func EmployeeCreateHandler(c *gin.Context) {
 	var data model.Employee
@@ -289,9 +306,12 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if input.UserID != nil && input.UserID != data.UserID {
+	getCompany, _ := c.Get("company")
+	company := getCompany.(model.Company)
+	// fmt.Println(*input.UserID, *data.UserID)
+	if input.UserID != nil && *input.UserID != *data.UserID {
 		count := int64(0)
-		database.DB.Model(&model.Employee{}).Where("user_id = ?", input.UserID).Count(&count)
+		database.DB.Model(&model.Employee{}).Where("user_id = ? && company_id = ?", input.UserID, company.ID).Count(&count)
 		if count > 0 {
 			err := errors.New("user sudah di tautkan ke karyawan lain")
 			util.ResponseFail(c, http.StatusBadRequest, err.Error())
@@ -302,6 +322,12 @@ func EmployeeUpdateHandler(c *gin.Context) {
 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	// if input.UserID == nil {
+	// 	if err := database.DB.Model(&data).Update("user_id", nil).Error; err != nil {
+	// 		util.ResponseFail(c, http.StatusBadRequest, err.Error())
+	// 		return
+	// 	}
+	// }
 	if input.UserID == nil {
 		if err := database.DB.Model(&data).Update("user_id", nil).Error; err != nil {
 			util.ResponseFail(c, http.StatusBadRequest, err.Error())

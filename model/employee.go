@@ -4,12 +4,15 @@ import (
 	"avolta/config"
 	"avolta/database"
 	"avolta/object/resp"
+	svc "avolta/service"
+	"avolta/util"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -25,7 +28,6 @@ type Employee struct {
 	JobTitleID                sql.NullString  `json:"job_title_id"`
 	JobTitle                  JobTitle        `gorm:"foreignKey:JobTitleID"`
 	Grade                     string          `json:"grade"`
-	UserID                    *string         `json:"user_id"`
 	Address                   string          `json:"address"`
 	Picture                   sql.NullString  `json:"picture"`
 	Cover                     string          `json:"cover"`
@@ -60,6 +62,7 @@ type Employee struct {
 	Bank                      Bank            `gorm:"foreignKey:BankID"`
 	CompanyID                 string          `json:"company_id" gorm:"not null"`
 	Company                   Company         `gorm:"foreignKey:CompanyID"`
+	UserID                    *string         `json:"user_id" `
 }
 
 func (u *Employee) BeforeCreate(tx *gorm.DB) (err error) {
@@ -101,6 +104,60 @@ func (u *Employee) BeforeUpdate(tx *gorm.DB) (err error) {
 		}
 	}
 	return
+}
+
+func (u *Employee) CreateNewUser(c *gin.Context) (err error) {
+	// CHECK USER EXISTING
+	count := int64(0)
+	user := User{}
+	database.DB.Find(&user, "email = ?", u.Email).Count(&count)
+	errs := database.DB.Transaction(func(tx *gorm.DB) error {
+		if count > 0 {
+
+		} else {
+			token := util.RandomString(20)
+			password := util.RandomString(20)
+
+			user = User{
+				FullName: u.FullName,
+				Email:    u.Email,
+				Token:    &token,
+				Password: password,
+			}
+			if err := tx.Create(&user).Error; err != nil {
+				return err
+			}
+
+			link := fmt.Sprintf("%s/verification/%s", config.App.Server.CmsURL, token)
+
+			svc.MAIL.SetAddress(u.FullName, u.Email)
+			svc.MAIL.SetTemplate("template/layout.html", "template/new_user.html")
+			err := svc.MAIL.SendEmail("Pendaftaran User", gin.H{
+				"Name":     u.FullName,
+				"Link":     link,
+				"Password": password,
+			}, []string{})
+			if err != nil {
+				return err
+			}
+		}
+		getCompany, _ := c.Get("company")
+		company := getCompany.(Company)
+
+		if err := tx.Model(&user).Association("Companies").Append(&company); err != nil {
+			return err
+		}
+		u.UserID = &user.ID
+		if err := tx.Updates(&u).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if errs != nil {
+		return errs
+	}
+
+	return nil
 }
 
 func (m Employee) MarshalJSON() ([]byte, error) {

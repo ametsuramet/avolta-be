@@ -24,12 +24,16 @@ type User struct {
 	IsAdmin     bool      `json:"is_admin"`
 	Token       *string   `json:"token"`
 	Permissions []string  `gorm:"-"`
-	EmployeeID  string    `json:"employee_id" gorm:"-"`
 	Employee    Employee  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Companies   []Company `gorm:"many2many:user_companies;"`
 	Roles       []Role    `gorm:"many2many:user_roles;"`
-	VerifiedAt  *time.Time
-	// RoleID      *string   `json:"role_id"`
+	// Employees        []Employee
+	VerifiedAt       *time.Time
+	CompanyID        string `json:"company_id" gorm:"-"`
+	RoleID           string `json:"role_id" gorm:"-"`
+	RoleName         string `json:"role_name" gorm:"-"`
+	EmployeeID       string `json:"employee_id" gorm:"-"`
+	EmployeeFullName string `json:"employee_full_name" gorm:"-"`
 }
 
 func (u *User) GetPermissions(companyID string) {
@@ -91,8 +95,9 @@ func (u *User) CreateSuperAdmin(email string, password string, fullName string) 
 		svc.MAIL.SetAddress(fullName, email)
 		svc.MAIL.SetTemplate("template/layout.html", "template/new_user.html")
 		err := svc.MAIL.SendEmail("Pendaftaran User", gin.H{
-			"Name": fullName,
-			"Link": link,
+			"Name":     fullName,
+			"Link":     link,
+			"Password": "",
 		}, []string{})
 		if err != nil {
 			return err
@@ -109,7 +114,7 @@ func (u *User) CreateSuperAdmin(email string, password string, fullName string) 
 
 func (u *User) CheckUserByEmail(email string) bool {
 	count := int64(0)
-	database.DB.Find(&u, "email = ?", email).Count(&count)
+	database.DB.Preload("Companies").Find(&u, "email = ? and verified_at is not null", email).Count(&count)
 	return count > 0
 }
 func (u *User) GetUserByID(companyID string) {
@@ -137,6 +142,18 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (m User) MarshalJSON() ([]byte, error) {
 	// m.GetPermissions()
+	if len(m.Roles) > 0 {
+		if m.Roles[0].CompanyID == m.CompanyID {
+			m.RoleID = m.Roles[0].ID
+			m.RoleName = m.Roles[0].Name
+		}
+	}
+	// if len(m.Employees) > 0 {
+	// 	if m.Employees[0].CompanyID == m.CompanyID {
+	// 		m.EmployeeID = m.Employees[0].ID
+	// 		m.EmployeeFullName = m.Employees[0].FullName
+	// 	}
+	// }
 	return json.Marshal(resp.UserResponse{
 		ID:          m.ID,
 		FullName:    m.FullName,
@@ -144,7 +161,8 @@ func (m User) MarshalJSON() ([]byte, error) {
 		Email:       m.Email,
 		Picture:     m.Avatar,
 		// RoleName:     m.Role.Name,
-		// RoleID:       m.Role.ID,
+		RoleID:       m.RoleID,
+		RoleName:     m.RoleName,
 		IsAdmin:      m.IsAdmin,
 		EmployeeID:   m.Employee.ID,
 		EmployeeName: m.Employee.FullName,

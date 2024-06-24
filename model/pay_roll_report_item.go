@@ -16,8 +16,8 @@ type PayRollReportItem struct {
 	EmployeeName           string        `json:"employee_name"`
 	EmployeePhone          string        `json:"employee_phone"`
 	EmployeeEmail          string        `json:"employee_email"`
-	EmployeeID             string        `json:"employee_id"`
-	Employee               Employee      `gorm:"foreignKey:EmployeeID" json:"-"`
+	EmployeeID             string        `json:"employee_id" gorm:"size:191"`
+	Employee               Employee      `gorm:"foreignKey:EmployeeID;" json:"-"`
 	EmployeeIdentityNumber string        `json:"employee_identity_number"`
 	BankAccountNumber      string        `json:"bank_account_number"`
 	BankName               string        `json:"bank_name"`
