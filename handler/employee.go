@@ -308,14 +308,18 @@ func EmployeeUpdateHandler(c *gin.Context) {
 	}
 	getCompany, _ := c.Get("company")
 	company := getCompany.(model.Company)
-	// fmt.Println(*input.UserID, *data.UserID)
-	if input.UserID != nil && *input.UserID != *data.UserID {
-		count := int64(0)
-		database.DB.Model(&model.Employee{}).Where("user_id = ? && company_id = ?", input.UserID, company.ID).Count(&count)
-		if count > 0 {
-			err := errors.New("user sudah di tautkan ke karyawan lain")
-			util.ResponseFail(c, http.StatusBadRequest, err.Error())
-			return
+	// fmt.Println(*input.UserID)
+	// fmt.Println(*data.UserID)
+	if input.UserID != nil && data.UserID != nil {
+		if *input.UserID != *data.UserID {
+
+			count := int64(0)
+			database.DB.Model(&model.Employee{}).Where("user_id = ? && company_id = ?", input.UserID, company.ID).Count(&count)
+			if count > 0 {
+				err := errors.New("user sudah di tautkan ke karyawan lain")
+				util.ResponseFail(c, http.StatusBadRequest, err.Error())
+				return
+			}
 		}
 	}
 	if err := database.DB.Model(&data).Updates(&input).Error; err != nil {
